@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>RS IconGen– iOS Icon Studio</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      background: #f2f2f6;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .app-container {
+      max-width: 1300px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 48px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 6px 12px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .header {
+      padding: 24px 32px 12px 32px;
+      border-bottom: 1px solid #e9e9ef;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      font-size: 32px;
+      font-weight: 600;
+      background: #007aff;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #1c1c1e, #3a3a3e);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .badge-selector {
+      background: #f2f2f6;
+      border-radius: 30px;
+      padding: 4px;
+      display: inline-flex;
+      gap: 6px;
+    }
+
+    .badge-option {
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 500;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #3a3a3e;
+    }
+
+    .badge-option.active {
+      background: #ffffff;
+      color: #007aff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .two-columns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      padding: 28px 32px 32px 32px;
+    }
+
+    .preview-panel {
+      flex: 1.2;
+      min-width: 280px;
+      background: #fefefe;
+      border-radius: 36px;
+      padding: 24px 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02), inset 0 1px 0 #fff;
+      border: 1px solid #efeff4;
+    }
+
+    .canvas-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 32px;
+      position: relative;
+    }
+
+    .icon-preview {
+      width: 220px;
+      height: 220px;
+      background: #f0f0f5;
+      border-radius: 48px;
+      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.05);
+      transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-inner {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .icon-symbol {
+      font-size: 88px;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+      transition: transform 0.2s ease;
+    }
+
+    .shape-selector {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin: 28px 0 20px;
+      background: #f2f2f6;
+      border-radius: 100px;
+      padding: 6px 10px;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .shape-btn {
+      background: transparent;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #5a5a5e;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+
+    .shape-btn.active {
+      background: #fff;
+      color: #007aff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .badge-note {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 13px;
+      color: #8e8e93;
+      background: #f8f8fc;
+      padding: 8px;
+      border-radius: 28px;
+    }
+
+    .controls-panel {
+      flex: 1;
+      min-width: 280px;
+      background: #ffffff;
+      border-radius: 36px;
+      padding: 12px 8px 20px 8px;
+    }
+
+    .control-group {
+      margin-bottom: 28px;
+      border-bottom: 1px solid #e9e9ef;
+      padding-bottom: 20px;
+    }
+
+    .group-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1c1c1e;
+      margin-bottom: 16px;
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .color-preview {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: #007aff;
+      border: 1px solid #e9e9ef;
+    }
+
+    .grid-colors {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 12px 0 6px;
+    }
+
+    .swatch {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: 0.1s;
+      border: 2px solid transparent;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .swatch.selected {
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 2px #007aff;
+      transform: scale(1.02);
+    }
+
+    .texture-grid {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .texture-item {
+      background: #f2f2f6;
+      border-radius: 28px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.1s;
+      color: #2c2c2e;
+    }
+
+    .texture-item.active {
+      background: #007aff;
+      color: white;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-top: 12px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      height: 4px;
+      -webkit-appearance: none;
+      background: #d9d9df;
+      border-radius: 10px;
+    }
+
+    input[type="range"]:focus {
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #007aff;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .effect-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .effect-chip {
+      background: #f2f2f6;
+      border-radius: 32px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+
+    .effect-chip.active {
+      background: #1c1c1e;
+      color: white;
+    }
+
+    .download-area {
+      margin-top: 32px;
+      text-align: center;
+    }
+
+    .download-btn {
+      background: #007aff;
+      border: none;
+      border-radius: 44px;
+      padding: 12px 24px;
+      font-weight: 600;
+      font-size: 17px;
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 2px 8px rgba(0,122,255,0.3);
+      width: 100%;
+      justify-content: center;
+    }
+
+    .download-btn:active {
+      transform: scale(0.97);
+    }
+
+    .filename-hint {
+      font-size: 12px;
+      color: #8e8e93;
+      margin-top: 12px;
+    }
+
+    hr {
+      margin: 6px 0;
+      border-color: #efeff4;
+    }
+
+    @media (max-width: 780px) {
+      .two-columns {
+        flex-direction: column;
+      }
+      .icon-preview {
+        width: 180px;
+        height: 180px;
+      }
+    }
+  </style>
+
+    <!-- PREMIUM_DARK_MODE_INJECTED -->
+    <style>
+        /* === Apple System Dark Mode Color Mapping === */
+        body {
+            background: #000000 !important; /* System Background */
+        }
+
+        .app-container {
+            background: #1c1c1e !important; /* Secondary System Background */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 6px 12px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        .header {
+            border-bottom-color: #38383a !important; /* Opaque Separator */
+        }
+
+        .logo-text {
+            background: linear-gradient(135deg, #ffffff, #d1d1d6) !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+        }
+
+        .badge-selector, .shape-selector {
+            background: #2c2c2e !important; /* Tertiary System Background */
+        }
+
+        .badge-option, .shape-btn {
+            color: #ebebf5 !important; /* Secondary Label */
+        }
+
+        .badge-option.active, .shape-btn.active {
+            background: #3a3a3c !important; 
+            color: #0a84ff !important; /* Dark Mode Apple Blue */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4) !important;
+        }
+
+        .preview-panel {
+            background: #2c2c2e !important;
+            border-color: #38383a !important;
+            box-shadow: none !important;
+        }
+
+        .icon-preview {
+            background: #1c1c1e !important;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.8), 0 1px 3px rgba(0,0,0,0.4) !important;
+        }
+
+        .badge-note {
+            color: #98989d !important;
+            background: #2c2c2e !important;
+        }
+
+        .controls-panel {
+            background: #1c1c1e !important;
+        }
+
+        .control-group {
+            border-bottom-color: #38383a !important;
+        }
+
+        .group-title {
+            color: #ffffff !important; /* Label */
+        }
+
+        .color-preview, .swatch {
+            border-color: #38383a !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
+        }
+
+        .swatch.selected {
+            border-color: #1c1c1e !important;
+            box-shadow: 0 0 0 2px #0a84ff !important;
+        }
+
+        .texture-item, .effect-chip, #loadPngBtn {
+            background: #2c2c2e !important;
+            color: #ffffff !important;
+        }
+
+        .texture-item.active {
+            background: #0a84ff !important;
+            color: white !important;
+        }
+
+        .effect-chip.active {
+            background: #e0e0e0 !important; /* Standout active chip */
+            color: #000000 !important;
+        }
+
+        input[type="range"] {
+            background: #39393d !important; /* Dark Mode Track */
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            background: #0a84ff !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5) !important;
+        }
+
+        .download-btn {
+            background: #0a84ff !important; /* Dark Mode Apple Blue */
+            box-shadow: 0 2px 8px rgba(10,132,255,0.4) !important;
+        }
+
+        .filename-hint {
+            color: #98989d !important;
+        }
+    </style>
+    </head>
+<body>
+
+<div class="app-container">
+  <div class="header">
+    <div class="logo-area">
+      <div class="logo-icon">🎨</div>
+      <div class="logo-text">RS iconGen</div>
+    </div>
+    <div class="badge-selector">
+      <button class="badge-option active" data-badge="none">No Badge</button>
+      <button class="badge-option" data-badge="beta">BETA</button>
+      <button class="badge-option" data-badge="new">NEW</button>
+      <button class="badge-option" data-badge="numeric">123</button>
+    </div>
+  </div>
+
+  <div class="two-columns">
+    <div class="preview-panel">
+      <div class="canvas-container">
+        <div class="icon-preview" id="iconPreview">
+          <div class="icon-inner" id="iconInner">
+            <div class="icon-symbol" id="iconSymbol">📱</div>
+          </div>
+        </div>
+      </div>
+      <div class="shape-selector">
+        <button class="shape-btn active" data-shape="squircle">🍎 Squircle</button>
+        <button class="shape-btn" data-shape="circle">⚪ Circle</button>
+        <button class="shape-btn" data-shape="square">⬛ Square</button>
+      </div>
+      <div class="badge-note" id="badgeStatus">
+        ✨ No badge — clean iOS style
+      </div>
+    </div>
+
+    <div class="controls-panel">
+      <div class="control-group">
+        <div class="group-title"><span>🎨 Background</span> <span class="color-preview" id="bgColorPreview"></span></div>
+        <div class="grid-colors" id="colorGrid">
+          <div class="swatch" style="background: #007aff;" data-color="#007aff"></div>
+          <div class="swatch" style="background: #34c759;" data-color="#34c759"></div>
+          <div class="swatch" style="background: #ff3b30;" data-color="#ff3b30"></div>
+          <div class="swatch" style="background: #ff9500;" data-color="#ff9500"></div>
+          <div class="swatch" style="background: #af52de;" data-color="#af52de"></div>
+          <div class="swatch" style="background: #000000;" data-color="#000000"></div>
+          <div class="swatch" style="background: #ffffff; border:1px solid #ddd;" data-color="#ffffff"></div>
+          <div class="swatch" style="background: linear-gradient(135deg, #4158D0, #C850C0);" data-color="gradient1"></div>
+        </div>
+        <div class="slider-container">
+          <span style="font-size:12px;">🎨 Custom</span>
+          <input type="color" id="customColorPicker" value="#007aff">
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="group-title">✨ Texture / Pattern</div>
+        <div class="texture-grid" id="textureGrid">
+          <div class="texture-item" data-texture="none">None</div>
+          <div class="texture-item" data-texture="dots">Dots</div>
+          <div class="texture-item" data-texture="stripes">Stripes</div>
+          <div class="texture-item" data-texture="waves">Waves</div>
+          <div class="texture-item" data-texture="halftone">Halftone</div>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="group-title">💎 Effect</div>
+        <div class="effect-buttons" id="effectGroup">
+          <div class="effect-chip" data-effect="none">None</div>
+          <div class="effect-chip active" data-effect="shadow">Drop Shadow</div>
+          <div class="effect-chip" data-effect="glow">Soft Glow</div>
+          <div class="effect-chip" data-effect="inner">Inner Light</div>
+        </div>
+        <div class="slider-container" style="margin-top: 12px;">
+          <span style="font-size:12px;">🔘 Icon Symbol</span>
+          <input type="range" id="iconScaleSlider" min="0.5" max="1.4" step="0.01" value="1">
+          <span id="scaleValue" style="min-width: 40px;">1.0</span>
+        </div>
+        <div class="slider-container">
+          <span style="font-size:12px;">🖌️ Padding / Size</span>
+          <input type="range" id="paddingSlider" min="10" max="35" step="1" value="20">
+          <span id="paddingValue">20%</span>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="group-title">🌟 Icon Emoji / Symbol</div>
+        <div class="grid-colors" style="gap: 10px; flex-wrap: wrap;">
+          <span style="font-size: 26px; cursor: pointer;" data-emoji="📱">📱</span>
+          <span style="font-size: 26px; cursor: pointer;" data-emoji="🎵">🎵</span>
+          <span style="font-size: 26px; cursor: pointer;" data-emoji="⚙️">⚙️</span>
+          <span style="font-size: 26px; cursor: pointer;" data-emoji="❤️">❤️</span>
+          <span style="font-size: 26px; cursor: pointer;" data-emoji="🔥">🔥</span>
+          <span style="font-size: 26px; cursor: pointer;" data-emoji="🌟">🌟</span>
+          <span style="font-size: 26px; cursor: pointer;" data-emoji="🎮">🎮</span>
+          <span style="font-size: 26px; cursor: pointer;" data-emoji="☕">☕</span>
+          <span style="font-size: 26px; cursor: pointer;" data-emoji="✈️">✈️</span>
+        </div>
+        <div style="margin-top: 14px; display: flex; align-items: center; gap: 10px;">
+          <input type="file" id="customPngInput" accept="image/png" style="display:none;">
+          <button id="loadPngBtn" style="background:#f2f2f6; border:none; border-radius:28px; padding:8px 14px; font-size:13px; cursor:pointer;">📁 Load PNG</button>
+          <span id="customImageLabel" style="font-size:12px; color:#8e8e93;"></span>
+        </div>
+      </div>
+
+      <div class="download-area">
+        <button class="download-btn" id="downloadBtn">⬇️ Download iOS Icon</button>
+        <div class="filename-hint">Export as PNG – optimized for App Store</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // DOM elements
+    const iconPreviewDiv = document.getElementById('iconPreview');
+    const iconInner = document.getElementById('iconInner');
+    const iconSymbolSpan = document.getElementById('iconSymbol');
+    const bgColorPreviewSpan = document.getElementById('bgColorPreview');
+    const colorSwatches = document.querySelectorAll('.swatch');
+    const customColorPicker = document.getElementById('customColorPicker');
+    const textureItems = document.querySelectorAll('.texture-item');
+    const effectChips = document.querySelectorAll('.effect-chip');
+    const shapeBtns = document.querySelectorAll('.shape-btn');
+    const badgeOptions = document.querySelectorAll('.badge-option');
+    const badgeStatusDiv = document.getElementById('badgeStatus');
+    const iconScaleSlider = document.getElementById('iconScaleSlider');
+    const scaleValueSpan = document.getElementById('scaleValue');
+    const paddingSlider = document.getElementById('paddingSlider');
+    const paddingValueSpan = document.getElementById('paddingValue');
+    const emojiSelectors = document.querySelectorAll('[data-emoji]');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const loadPngBtn = document.getElementById('loadPngBtn');
+    const customPngInput = document.getElementById('customPngInput');
+    const customImageLabel = document.getElementById('customImageLabel');
+
+    // State
+    let currentBackground = '#007aff';
+    let currentTexture = 'none';
+    let currentEffect = 'shadow';
+    let currentShape = 'squircle';
+    let currentBadge = 'none';
+    let currentIconEmoji = '📱';
+    let iconScale = 1;
+    let iconPaddingPercent = 20;
+
+    // Custom image state
+    let useCustomImage = false;
+    let customImageSrc = null;
+
+    function updateIconPreview() {
+      // Background texture
+      let bgStyle = '';
+      if (currentTexture === 'none') {
+        bgStyle = currentBackground;
+      } else if (currentTexture === 'dots') {
+        bgStyle = `repeating-radial-gradient(circle at 20% 30%, rgba(0,0,0,0.1) 2px, transparent 4px), ${currentBackground}`;
+      } else if (currentTexture === 'stripes') {
+        bgStyle = `repeating-linear-gradient(45deg, rgba(255,255,255,0.2) 0px, rgba(255,255,255,0.2) 8px, transparent 8px, transparent 16px), ${currentBackground}`;
+      } else if (currentTexture === 'waves') {
+        bgStyle = `repeating-linear-gradient(100deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 3px, transparent 3px, transparent 12px), ${currentBackground}`;
+      } else if (currentTexture === 'halftone') {
+        bgStyle = `${currentBackground}, repeating-radial-gradient(circle at 30% 40%, rgba(0,0,0,0.08) 3px, transparent 8px)`;
+        iconInner.style.backgroundBlendMode = 'overlay';
+      } else {
+        bgStyle = currentBackground;
+      }
+
+      iconInner.style.background = bgStyle;
+      if (currentTexture !== 'halftone') {
+        iconInner.style.backgroundBlendMode = 'normal';
+      }
+
+      // Effect
+      iconSymbolSpan.style.transition = 'all 0.2s';
+      if (currentEffect === 'shadow') {
+        iconSymbolSpan.style.filter = 'drop-shadow(0 8px 12px rgba(0,0,0,0.25))';
+        iconSymbolSpan.style.textShadow = 'none';
+      } else if (currentEffect === 'glow') {
+        iconSymbolSpan.style.filter = 'drop-shadow(0 0 5px rgba(255,255,200,0.7))';
+        iconSymbolSpan.style.textShadow = '0 0 8px rgba(255,215,0,0.5)';
+      } else if (currentEffect === 'inner') {
+        iconSymbolSpan.style.filter = 'none';
+        iconSymbolSpan.style.textShadow = 'inset 0 1px 2px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.6)';
+      } else {
+        iconSymbolSpan.style.filter = 'none';
+        iconSymbolSpan.style.textShadow = 'none';
+      }
+
+      // Shape
+      let borderRadius = '';
+      if (currentShape === 'squircle') borderRadius = '48px';
+      else if (currentShape === 'circle') borderRadius = '50%';
+      else borderRadius = '18px';
+      iconPreviewDiv.style.borderRadius = borderRadius;
+
+      // Padding
+      const innerPaddingValue = Math.max(12, Math.min(45, iconPaddingPercent));
+      iconInner.style.padding = `${innerPaddingValue}%`;
+      iconInner.style.display = 'flex';
+      iconInner.style.alignItems = 'center';
+      iconInner.style.justifyContent = 'center';
+      iconInner.style.boxSizing = 'border-box';
+
+      // Symbol content (emoji or custom PNG)
+      if (useCustomImage && customImageSrc) {
+        iconSymbolSpan.innerHTML = `<img src="${customImageSrc}" style="width: 100%; height: 100%; object-fit: contain; pointer-events: none;" />`;
+        iconSymbolSpan.style.display = 'block';
+        iconSymbolSpan.style.fontSize = '0';
+        iconSymbolSpan.style.transform = `scale(${iconScale})`;
+        iconSymbolSpan.style.transformOrigin = 'center center';
+      } else {
+        iconSymbolSpan.innerHTML = currentIconEmoji;
+        iconSymbolSpan.style.display = '';
+        iconSymbolSpan.style.fontSize = `${88 * iconScale}px`;
+        iconSymbolSpan.style.transform = `scale(${iconScale > 1 ? 1 : 1})`;
+        iconSymbolSpan.style.transformOrigin = 'initial';
+      }
+
+      // Badge
+      const oldBadge = iconPreviewDiv.querySelector('.dynamic-badge');
+      if (oldBadge) oldBadge.remove();
+
+      if (currentBadge !== 'none') {
+        const badgeDiv = document.createElement('div');
+        badgeDiv.className = 'dynamic-badge';
+        let text = '';
+        let bgColor = '#ff3b30';
+        if (currentBadge === 'beta') { text = 'BETA'; bgColor = '#007aff'; }
+        else if (currentBadge === 'new') { text = 'NEW'; bgColor = '#34c759'; }
+        else if (currentBadge === 'numeric') { text = '123'; bgColor = '#ff9500'; }
+        badgeDiv.innerText = text;
+        badgeDiv.style.position = 'absolute';
+        badgeDiv.style.top = '14px';
+        badgeDiv.style.right = '14px';
+        badgeDiv.style.background = bgColor;
+        badgeDiv.style.color = 'white';
+        badgeDiv.style.fontSize = '13px';
+        badgeDiv.style.fontWeight = 'bold';
+        badgeDiv.style.padding = '4px 12px';
+        badgeDiv.style.borderRadius = '40px';
+        badgeDiv.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+        badgeDiv.style.zIndex = '20';
+        badgeDiv.style.fontFamily = 'inherit';
+        iconPreviewDiv.style.position = 'relative';
+        iconPreviewDiv.appendChild(badgeDiv);
+      }
+
+      bgColorPreviewSpan.style.background = (currentBackground.startsWith('#')) ? currentBackground : 'linear-gradient(45deg,#4158D0,#C850C0)';
+
+      if (currentBadge === 'none') badgeStatusDiv.innerHTML = '✨ No badge — clean iOS style';
+      else if (currentBadge === 'beta') badgeStatusDiv.innerHTML = '🔵 BETA badge · perfect for testing';
+      else if (currentBadge === 'new') badgeStatusDiv.innerHTML = '🟢 NEW badge · highlight freshness';
+      else badgeStatusDiv.innerHTML = '🟠 Numeric badge 123 · attention grabber';
+    }
+
+    function setBackground(colorOrGradient, isGradient = false) {
+      if (isGradient) {
+        currentBackground = 'linear-gradient(135deg, #4158D0, #C850C0)';
+      } else {
+        currentBackground = colorOrGradient;
+      }
+      updateIconPreview();
+    }
+
+    // Texture
+    textureItems.forEach(item => {
+      item.addEventListener('click', () => {
+        textureItems.forEach(t => t.classList.remove('active'));
+        item.classList.add('active');
+        currentTexture = item.getAttribute('data-texture');
+        updateIconPreview();
+      });
+    });
+
+    // Effect
+    effectChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        effectChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        currentEffect = chip.getAttribute('data-effect');
+        updateIconPreview();
+      });
+    });
+
+    // Shape
+    shapeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        shapeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentShape = btn.getAttribute('data-shape');
+        updateIconPreview();
+      });
+    });
+
+    // Badge
+    badgeOptions.forEach(badge => {
+      badge.addEventListener('click', () => {
+        badgeOptions.forEach(b => b.classList.remove('active'));
+        badge.classList.add('active');
+        currentBadge = badge.getAttribute('data-badge');
+        updateIconPreview();
+      });
+    });
+
+    // Color swatches
+    colorSwatches.forEach(swatch => {
+      swatch.addEventListener('click', () => {
+        const colorVal = swatch.getAttribute('data-color');
+        if (colorVal === 'gradient1') {
+          setBackground('', true);
+        } else {
+          setBackground(colorVal, false);
+          customColorPicker.value = colorVal;
+        }
+      });
+    });
+
+    customColorPicker.addEventListener('input', (e) => {
+      setBackground(e.target.value, false);
+    });
+
+    // Icon scale
+    iconScaleSlider.addEventListener('input', (e) => {
+      iconScale = parseFloat(e.target.value);
+      scaleValueSpan.innerText = iconScale.toFixed(2);
+      updateIconPreview();
+    });
+
+    // Padding
+    paddingSlider.addEventListener('input', (e) => {
+      iconPaddingPercent = parseInt(e.target.value, 10);
+      paddingValueSpan.innerText = iconPaddingPercent + '%';
+      updateIconPreview();
+    });
+
+    // Emoji picker
+    emojiSelectors.forEach(em => {
+      em.addEventListener('click', () => {
+        useCustomImage = false;
+        customImageSrc = null;
+        customImageLabel.textContent = '';
+        currentIconEmoji = em.getAttribute('data-emoji');
+        updateIconPreview();
+      });
+    });
+
+    // Custom PNG upload
+    loadPngBtn.addEventListener('click', () => {
+      customPngInput.click();
+    });
+
+    customPngInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const dataUrl = ev.target.result;
+        const img = new Image();
+        img.onload = () => {
+          customImageSrc = dataUrl;
+          useCustomImage = true;
+          updateIconPreview();
+          customImageLabel.textContent = 'Custom image loaded';
+        };
+        img.src = dataUrl;
+      };
+      reader.readAsDataURL(file);
+      // Reset input so the same file can be selected again
+      customPngInput.value = '';
+    });
+
+    // Download
+    downloadBtn.addEventListener('click', async () => {
+      const previewElement = document.getElementById('iconPreview');
+      if (!previewElement) return;
+
+      if (typeof html2canvas === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        script.onload = () => capturePreview(previewElement);
+        document.head.appendChild(script);
+      } else {
+        capturePreview(previewElement);
+      }
+
+      function capturePreview(el) {
+        html2canvas(el, {
+          scale: 3,
+          backgroundColor: null,
+          useCORS: false,
+          logging: false
+        }).then(canvasResult => {
+          const link = document.createElement('a');
+          link.download = 'ios-icon.png';
+          link.href = canvasResult.toDataURL('image/png');
+          link.click();
+        }).catch(err => alert('Could not render icon to PNG, but you can screenshot.'));
+      }
+    });
+
+    // Initial render
+    updateIconPreview();
+  })();
+</script>
+</body>
+</html>
