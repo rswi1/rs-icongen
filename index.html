@@ -5,23 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <!-- ===== ZERO-FAIL FAVICON STACK ===== -->
 
-<!-- 1. ICO: Legacy IE & browsers that only sniff .ico -->
-<link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/RSWI1/RSView@main/favicon.ico">
-
-<!-- 2. PNG 16×16: Old tabs, Windows jump lists -->
-<link rel="icon" type="image/png" sizes="16x16" href="https://cdn.jsdelivr.net/gh/RSWI1/RSView@main/favicon-16x16.png?v=2">
-
-<!-- 3. PNG 32×32: Standard desktop tabs (Retina) -->
-<link rel="icon" type="image/png" sizes="32x32" href="https://cdn.jsdelivr.net/gh/RSWI1/RSView@main/favicon-32x32.png?v=2">
-
-<!-- 4. SVG: Modern browsers (Chrome 80+, Firefox 41+, Safari 9+) — infinite scale, tiny file -->
-<link rel="icon" type="image/svg+xml" href="https://cdn.jsdelivr.net/gh/RSWI1/RSView@main/favicon.svg?v=2">
-
-<!-- 5. Apple Touch: iOS Home Screen + Safari bookmarks (MUST be opaque, no transparency) -->
-<link rel="apple-touch-icon" sizes="180x180" href="https://cdn.jsdelivr.net/gh/RSWI1/RSView@main/apple-touch-icon.png?v=2">
-
-<!-- 6. Safari Pinned Tab (monochrome SVG, single-color paths only) -->
-<link rel="mask-icon" href="https://cdn.jsdelivr.net/gh/RSWI1/RSView@main/safari-pinned-tab.svg?v=2" color="#00fbff">
+<!-- ===== SELF-CONTAINED FAVICON (no external deps) ===== -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23007aff'/><text y='48' x='8' font-size='48'>🎨</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%23007aff'/><text y='140' x='20' font-size='130'>🎨</text></svg>">
 
   <title>RS IconGen– iOS Icon Studio</title>
   <style>
