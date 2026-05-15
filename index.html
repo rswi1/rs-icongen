@@ -3,6 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <!-- ===== ZERO-FAIL FAVICON STACK ===== -->
+
+<!-- 1. ICO: Legacy IE & browsers that only sniff .ico -->
+<link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/RSWI1/RSView@main/favicon.ico">
+
+<!-- 2. PNG 16×16: Old tabs, Windows jump lists -->
+<link rel="icon" type="image/png" sizes="16x16" href="https://cdn.jsdelivr.net/gh/RSWI1/RSView@main/favicon-16x16.png?v=2">
+
+<!-- 3. PNG 32×32: Standard desktop tabs (Retina) -->
+<link rel="icon" type="image/png" sizes="32x32" href="https://cdn.jsdelivr.net/gh/RSWI1/RSView@main/favicon-32x32.png?v=2">
+
+<!-- 4. SVG: Modern browsers (Chrome 80+, Firefox 41+, Safari 9+) — infinite scale, tiny file -->
+<link rel="icon" type="image/svg+xml" href="https://cdn.jsdelivr.net/gh/RSWI1/RSView@main/favicon.svg?v=2">
+
+<!-- 5. Apple Touch: iOS Home Screen + Safari bookmarks (MUST be opaque, no transparency) -->
+<link rel="apple-touch-icon" sizes="180x180" href="https://cdn.jsdelivr.net/gh/RSWI1/RSView@main/apple-touch-icon.png?v=2">
+
+<!-- 6. Safari Pinned Tab (monochrome SVG, single-color paths only) -->
+<link rel="mask-icon" href="https://cdn.jsdelivr.net/gh/RSWI1/RSView@main/safari-pinned-tab.svg?v=2" color="#00fbff">
+
   <title>RS IconGen– iOS Icon Studio</title>
   <style>
     * {
@@ -360,6 +380,115 @@
       border-color: #efeff4;
     }
 
+    /* ===== NEW FEATURES ===== */
+
+    /* Gradient presets row */
+    .gradient-presets {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 10px 0 6px;
+    }
+    .grad-swatch {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      transition: 0.12s;
+    }
+    .grad-swatch.selected {
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 2px #007aff;
+      transform: scale(1.04);
+    }
+    .angle-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .angle-row span { font-size: 12px; }
+
+    /* Border/Frame */
+    .border-color-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 8px 0 6px;
+    }
+    .border-swatch {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      transition: 0.12s;
+    }
+    .border-swatch.selected {
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 2px #007aff;
+    }
+
+    /* Text label */
+    .label-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .label-input {
+      flex: 1;
+      border: 1px solid #d9d9df;
+      border-radius: 16px;
+      padding: 7px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #f2f2f6;
+      color: #1c1c1e;
+      outline: none;
+      min-width: 100px;
+    }
+
+    /* Randomize button */
+    .randomize-btn {
+      background: linear-gradient(135deg, #ff9500, #ff3b30);
+      border: none;
+      border-radius: 44px;
+      padding: 10px 22px;
+      font-weight: 600;
+      font-size: 15px;
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 2px 8px rgba(255,80,0,0.3);
+      width: 100%;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .randomize-btn:active { transform: scale(0.97); }
+
+    /* Icon text overlay */
+    #iconTextOverlay {
+      position: absolute;
+      bottom: 18px;
+      left: 0; right: 0;
+      text-align: center;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      pointer-events: none;
+      z-index: 10;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+
     @media (max-width: 780px) {
       .two-columns {
         flex-direction: column;
@@ -477,6 +606,20 @@
         .filename-hint {
             color: #98989d !important;
         }
+
+        /* Dark mode new features */
+        .label-input {
+          background: #2c2c2e !important;
+          border-color: #38383a !important;
+          color: #ffffff !important;
+        }
+        .randomize-btn {
+          background: linear-gradient(135deg, #ff9f0a, #ff453a) !important;
+          box-shadow: 0 2px 8px rgba(255,80,0,0.4) !important;
+        }
+        .border-swatch, .grad-swatch {
+          box-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
+        }
     </style>
     </head>
 <body>
@@ -502,6 +645,7 @@
           <div class="icon-inner" id="iconInner">
             <div class="icon-symbol" id="iconSymbol">📱</div>
           </div>
+          <div id="iconTextOverlay"></div>
         </div>
       </div>
       <div class="shape-selector">
@@ -584,6 +728,80 @@
         </div>
       </div>
 
+      <!-- FEATURE 1: Icon Rotation -->
+      <div class="control-group">
+        <div class="group-title">🔄 Icon Rotation</div>
+        <div class="slider-container">
+          <span style="font-size:12px;">0°</span>
+          <input type="range" id="rotationSlider" min="0" max="360" step="1" value="0">
+          <span id="rotationValue" style="min-width:40px;">0°</span>
+        </div>
+      </div>
+
+      <!-- FEATURE 2: Gradient Presets + Angle -->
+      <div class="control-group">
+        <div class="group-title">🌈 Gradient Presets</div>
+        <div class="gradient-presets" id="gradientPresets">
+          <div class="grad-swatch" style="background:linear-gradient(135deg,#f953c6,#b91d73)" data-grad="linear-gradient(135deg,#f953c6,#b91d73)" title="Pink Blaze"></div>
+          <div class="grad-swatch" style="background:linear-gradient(135deg,#0f0c29,#302b63,#24243e)" data-grad="linear-gradient(135deg,#0f0c29,#302b63,#24243e)" title="Deep Space"></div>
+          <div class="grad-swatch" style="background:linear-gradient(135deg,#11998e,#38ef7d)" data-grad="linear-gradient(135deg,#11998e,#38ef7d)" title="Emerald"></div>
+          <div class="grad-swatch" style="background:linear-gradient(135deg,#f7971e,#ffd200)" data-grad="linear-gradient(135deg,#f7971e,#ffd200)" title="Citrus"></div>
+          <div class="grad-swatch" style="background:linear-gradient(135deg,#fc466b,#3f5efb)" data-grad="linear-gradient(135deg,#fc466b,#3f5efb)" title="Candy"></div>
+          <div class="grad-swatch" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)" data-grad="linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)" title="Midnight"></div>
+          <div class="grad-swatch" style="background:linear-gradient(135deg,#a8edea,#fed6e3)" data-grad="linear-gradient(135deg,#a8edea,#fed6e3)" title="Cotton Candy"></div>
+          <div class="grad-swatch" style="background:linear-gradient(135deg,#ff6a00,#ee0979)" data-grad="linear-gradient(135deg,#ff6a00,#ee0979)" title="Volcano"></div>
+        </div>
+        <div class="angle-row">
+          <span>📐 Angle</span>
+          <input type="range" id="gradAngleSlider" min="0" max="360" step="5" value="135" style="flex:1;">
+          <span id="gradAngleValue" style="min-width:36px;">135°</span>
+        </div>
+      </div>
+
+      <!-- FEATURE 3: Border / Frame -->
+      <div class="control-group">
+        <div class="group-title">🖼️ Border Frame</div>
+        <div class="border-color-row" id="borderColorRow">
+          <div class="border-swatch selected" style="background:transparent;border:2px dashed #aaa;" data-border-color="none" title="No border"></div>
+          <div class="border-swatch" style="background:#ffffff;" data-border-color="#ffffff" title="White"></div>
+          <div class="border-swatch" style="background:#000000;" data-border-color="#000000" title="Black"></div>
+          <div class="border-swatch" style="background:#007aff;" data-border-color="#007aff" title="Blue"></div>
+          <div class="border-swatch" style="background:#ff9500;" data-border-color="#ff9500" title="Orange"></div>
+          <div class="border-swatch" style="background:#ff3b30;" data-border-color="#ff3b30" title="Red"></div>
+          <div class="border-swatch" style="background:linear-gradient(135deg,#f953c6,#b91d73);" data-border-color="gradient" title="Gradient"></div>
+        </div>
+        <div class="slider-container" style="margin-top:8px;">
+          <span style="font-size:12px;">Thickness</span>
+          <input type="range" id="borderThicknessSlider" min="0" max="16" step="1" value="0">
+          <span id="borderThicknessValue" style="min-width:30px;">0px</span>
+        </div>
+      </div>
+
+      <!-- FEATURE 4: Text Label -->
+      <div class="control-group">
+        <div class="group-title">💬 Text Label</div>
+        <div class="label-row">
+          <input type="text" class="label-input" id="iconLabelInput" placeholder="e.g. PRO, v2.0, BETA…" maxlength="12">
+        </div>
+        <div class="slider-container" style="margin-top:8px;">
+          <span style="font-size:12px;">Font Size</span>
+          <input type="range" id="labelSizeSlider" min="10" max="28" step="1" value="16">
+          <span id="labelSizeValue" style="min-width:30px;">16px</span>
+        </div>
+        <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;" id="labelColorRow">
+          <div class="border-swatch selected" style="background:#ffffff;" data-label-color="#ffffff" title="White"></div>
+          <div class="border-swatch" style="background:#000000;" data-label-color="#000000" title="Black"></div>
+          <div class="border-swatch" style="background:#ffd200;" data-label-color="#ffd200" title="Yellow"></div>
+          <div class="border-swatch" style="background:#ff3b30;" data-label-color="#ff3b30" title="Red"></div>
+          <div class="border-swatch" style="background:#34c759;" data-label-color="#34c759" title="Green"></div>
+        </div>
+      </div>
+
+      <!-- Randomize button lives above download -->
+      <div style="margin-bottom: 8px;">
+        <button class="randomize-btn" id="randomizeBtn">🪄 Randomize Icon</button>
+      </div>
+
       <div class="download-area">
         <button class="download-btn" id="downloadBtn">⬇️ Download iOS Icon</button>
         <div class="filename-hint">Export as PNG – optimized for App Store</div>
@@ -616,6 +834,22 @@
     const customPngInput = document.getElementById('customPngInput');
     const customImageLabel = document.getElementById('customImageLabel');
 
+    // NEW feature DOM refs
+    const rotationSlider = document.getElementById('rotationSlider');
+    const rotationValueSpan = document.getElementById('rotationValue');
+    const gradientPresets = document.querySelectorAll('.grad-swatch');
+    const gradAngleSlider = document.getElementById('gradAngleSlider');
+    const gradAngleValueSpan = document.getElementById('gradAngleValue');
+    const borderSwatches = document.querySelectorAll('[data-border-color]');
+    const borderThicknessSlider = document.getElementById('borderThicknessSlider');
+    const borderThicknessValueSpan = document.getElementById('borderThicknessValue');
+    const iconLabelInput = document.getElementById('iconLabelInput');
+    const labelSizeSlider = document.getElementById('labelSizeSlider');
+    const labelSizeValueSpan = document.getElementById('labelSizeValue');
+    const labelColorSwatches = document.querySelectorAll('[data-label-color]');
+    const iconTextOverlay = document.getElementById('iconTextOverlay');
+    const randomizeBtn = document.getElementById('randomizeBtn');
+
     // State
     let currentBackground = '#007aff';
     let currentTexture = 'none';
@@ -626,26 +860,63 @@
     let iconScale = 1;
     let iconPaddingPercent = 20;
 
+    // NEW state
+    let currentRotation = 0;
+    let currentGradAngle = 135;
+    let activeGradPreset = null;   // gradient string if a preset is active
+    let currentBorderColor = 'none';
+    let currentBorderThickness = 0;
+    let currentLabelText = '';
+    let currentLabelSize = 16;
+    let currentLabelColor = '#ffffff';
+
     // Custom image state
     let useCustomImage = false;
     let customImageSrc = null;
 
     function updateIconPreview() {
-      // Background texture
+      // === NEW: Rotation ===
+      iconSymbolSpan.style.transition = 'transform 0.2s ease, filter 0.2s, text-shadow 0.2s';
+      const baseRotate = `rotate(${currentRotation}deg)`;
+
+      // === NEW: Border ===
+      if (currentBorderColor !== 'none' && currentBorderThickness > 0) {
+        if (currentBorderColor === 'gradient') {
+          iconPreviewDiv.style.outline = 'none';
+          iconPreviewDiv.style.boxShadow = `0 0 0 ${currentBorderThickness}px #f953c6, 0 20px 35px -12px rgba(0,0,0,0.25)`;
+        } else {
+          iconPreviewDiv.style.outline = `${currentBorderThickness}px solid ${currentBorderColor}`;
+          iconPreviewDiv.style.boxShadow = '0 20px 35px -12px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.05)';
+        }
+      } else {
+        iconPreviewDiv.style.outline = 'none';
+        iconPreviewDiv.style.boxShadow = '0 20px 35px -12px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.05)';
+      }
+
+      // === NEW: Text Label ===
+      iconTextOverlay.textContent = currentLabelText;
+      iconTextOverlay.style.fontSize = currentLabelSize + 'px';
+      iconTextOverlay.style.color = currentLabelColor;
+      iconTextOverlay.style.textShadow = currentLabelColor === '#ffffff'
+        ? '0 1px 4px rgba(0,0,0,0.4)' : '0 1px 4px rgba(255,255,255,0.3)';
+      iconTextOverlay.style.display = currentLabelText ? 'block' : 'none';
+
+      // Background texture — uses bgToUse which may be a gradient preset
+      let bgToUse = activeGradPreset || currentBackground;
       let bgStyle = '';
       if (currentTexture === 'none') {
-        bgStyle = currentBackground;
+        bgStyle = bgToUse;
       } else if (currentTexture === 'dots') {
-        bgStyle = `repeating-radial-gradient(circle at 20% 30%, rgba(0,0,0,0.1) 2px, transparent 4px), ${currentBackground}`;
+        bgStyle = `repeating-radial-gradient(circle at 20% 30%, rgba(0,0,0,0.1) 2px, transparent 4px), ${bgToUse}`;
       } else if (currentTexture === 'stripes') {
-        bgStyle = `repeating-linear-gradient(45deg, rgba(255,255,255,0.2) 0px, rgba(255,255,255,0.2) 8px, transparent 8px, transparent 16px), ${currentBackground}`;
+        bgStyle = `repeating-linear-gradient(45deg, rgba(255,255,255,0.2) 0px, rgba(255,255,255,0.2) 8px, transparent 8px, transparent 16px), ${bgToUse}`;
       } else if (currentTexture === 'waves') {
-        bgStyle = `repeating-linear-gradient(100deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 3px, transparent 3px, transparent 12px), ${currentBackground}`;
+        bgStyle = `repeating-linear-gradient(100deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 3px, transparent 3px, transparent 12px), ${bgToUse}`;
       } else if (currentTexture === 'halftone') {
-        bgStyle = `${currentBackground}, repeating-radial-gradient(circle at 30% 40%, rgba(0,0,0,0.08) 3px, transparent 8px)`;
+        bgStyle = `${bgToUse}, repeating-radial-gradient(circle at 30% 40%, rgba(0,0,0,0.08) 3px, transparent 8px)`;
         iconInner.style.backgroundBlendMode = 'overlay';
       } else {
-        bgStyle = currentBackground;
+        bgStyle = bgToUse;
       }
 
       iconInner.style.background = bgStyle;
@@ -653,21 +924,19 @@
         iconInner.style.backgroundBlendMode = 'normal';
       }
 
-      // Effect
-      iconSymbolSpan.style.transition = 'all 0.2s';
+      // Effect + Rotation combined on symbol
+      let filterVal = 'none';
+      let textShadowVal = 'none';
       if (currentEffect === 'shadow') {
-        iconSymbolSpan.style.filter = 'drop-shadow(0 8px 12px rgba(0,0,0,0.25))';
-        iconSymbolSpan.style.textShadow = 'none';
+        filterVal = 'drop-shadow(0 8px 12px rgba(0,0,0,0.25))';
       } else if (currentEffect === 'glow') {
-        iconSymbolSpan.style.filter = 'drop-shadow(0 0 5px rgba(255,255,200,0.7))';
-        iconSymbolSpan.style.textShadow = '0 0 8px rgba(255,215,0,0.5)';
+        filterVal = 'drop-shadow(0 0 5px rgba(255,255,200,0.7))';
+        textShadowVal = '0 0 8px rgba(255,215,0,0.5)';
       } else if (currentEffect === 'inner') {
-        iconSymbolSpan.style.filter = 'none';
-        iconSymbolSpan.style.textShadow = 'inset 0 1px 2px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.6)';
-      } else {
-        iconSymbolSpan.style.filter = 'none';
-        iconSymbolSpan.style.textShadow = 'none';
+        textShadowVal = 'inset 0 1px 2px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.6)';
       }
+      iconSymbolSpan.style.filter = filterVal;
+      iconSymbolSpan.style.textShadow = textShadowVal;
 
       // Shape
       let borderRadius = '';
@@ -689,14 +958,14 @@
         iconSymbolSpan.innerHTML = `<img src="${customImageSrc}" style="width: 100%; height: 100%; object-fit: contain; pointer-events: none;" />`;
         iconSymbolSpan.style.display = 'block';
         iconSymbolSpan.style.fontSize = '0';
-        iconSymbolSpan.style.transform = `scale(${iconScale})`;
+        iconSymbolSpan.style.transform = `scale(${iconScale}) rotate(${currentRotation}deg)`;
         iconSymbolSpan.style.transformOrigin = 'center center';
       } else {
         iconSymbolSpan.innerHTML = currentIconEmoji;
         iconSymbolSpan.style.display = '';
         iconSymbolSpan.style.fontSize = `${88 * iconScale}px`;
-        iconSymbolSpan.style.transform = `scale(${iconScale > 1 ? 1 : 1})`;
-        iconSymbolSpan.style.transformOrigin = 'initial';
+        iconSymbolSpan.style.transform = `rotate(${currentRotation}deg)`;
+        iconSymbolSpan.style.transformOrigin = 'center center';
       }
 
       // Badge
@@ -742,8 +1011,145 @@
       } else {
         currentBackground = colorOrGradient;
       }
+      activeGradPreset = null;
+      gradientPresets.forEach(g => g.classList.remove('selected'));
       updateIconPreview();
     }
+
+    // ===== NEW FEATURE LISTENERS =====
+
+    // FEATURE 1: Rotation
+    rotationSlider.addEventListener('input', (e) => {
+      currentRotation = parseInt(e.target.value, 10);
+      rotationValueSpan.textContent = currentRotation + '°';
+      updateIconPreview();
+    });
+
+    // FEATURE 2: Gradient presets
+    gradientPresets.forEach(g => {
+      g.addEventListener('click', () => {
+        const baseGrad = g.getAttribute('data-grad');
+        // Extract the color stops and re-apply with current angle
+        const stops = baseGrad.replace(/linear-gradient\([^,]+,/, '').replace(/\)$/, '').trim();
+        activeGradPreset = `linear-gradient(${currentGradAngle}deg, ${stops})`;
+        gradientPresets.forEach(x => x.classList.remove('selected'));
+        g.classList.add('selected');
+        // Store base stops for angle updates
+        g._baseStops = stops;
+        updateIconPreview();
+      });
+    });
+
+    gradAngleSlider.addEventListener('input', (e) => {
+      currentGradAngle = parseInt(e.target.value, 10);
+      gradAngleValueSpan.textContent = currentGradAngle + '°';
+      // If a preset is active, re-apply with new angle
+      const selected = document.querySelector('.grad-swatch.selected');
+      if (selected) {
+        const baseGrad = selected.getAttribute('data-grad');
+        const stops = baseGrad.replace(/linear-gradient\([^,]+,/, '').replace(/\)$/, '').trim();
+        activeGradPreset = `linear-gradient(${currentGradAngle}deg, ${stops})`;
+      }
+      updateIconPreview();
+    });
+
+    // FEATURE 3: Border swatches + thickness
+    borderSwatches.forEach(sw => {
+      sw.addEventListener('click', () => {
+        borderSwatches.forEach(s => s.classList.remove('selected'));
+        sw.classList.add('selected');
+        currentBorderColor = sw.getAttribute('data-border-color');
+        if (currentBorderThickness === 0) {
+          borderThicknessSlider.value = 4;
+          currentBorderThickness = 4;
+          borderThicknessValueSpan.textContent = '4px';
+        }
+        updateIconPreview();
+      });
+    });
+
+    borderThicknessSlider.addEventListener('input', (e) => {
+      currentBorderThickness = parseInt(e.target.value, 10);
+      borderThicknessValueSpan.textContent = currentBorderThickness + 'px';
+      updateIconPreview();
+    });
+
+    // FEATURE 4: Text label
+    iconLabelInput.addEventListener('input', (e) => {
+      currentLabelText = e.target.value;
+      updateIconPreview();
+    });
+
+    labelSizeSlider.addEventListener('input', (e) => {
+      currentLabelSize = parseInt(e.target.value, 10);
+      labelSizeValueSpan.textContent = currentLabelSize + 'px';
+      updateIconPreview();
+    });
+
+    labelColorSwatches.forEach(sw => {
+      sw.addEventListener('click', () => {
+        labelColorSwatches.forEach(s => s.classList.remove('selected'));
+        sw.classList.add('selected');
+        currentLabelColor = sw.getAttribute('data-label-color');
+        updateIconPreview();
+      });
+    });
+
+    // FEATURE 5: Randomize
+    const RANDOM_EMOJIS = ['🚀','🎯','🔮','🌊','⚡','🎸','🍀','🦋','🔥','💎','🌈','🎃','🧠','🦄','🎨','⚙️','🌙','🏆','🎵','❄️'];
+    const RANDOM_COLORS = ['#007aff','#34c759','#ff3b30','#ff9500','#af52de','#000000','#1c1c1e','#2c2c2e'];
+    const RANDOM_GRADS = [
+      'linear-gradient(135deg,#f953c6,#b91d73)',
+      'linear-gradient(135deg,#11998e,#38ef7d)',
+      'linear-gradient(135deg,#f7971e,#ffd200)',
+      'linear-gradient(135deg,#fc466b,#3f5efb)',
+      'linear-gradient(135deg,#ff6a00,#ee0979)',
+      'linear-gradient(135deg,#a8edea,#fed6e3)',
+      'linear-gradient(135deg,#0f0c29,#302b63)',
+    ];
+    const RANDOM_TEXTURES = ['none','none','dots','stripes','waves'];
+    const RANDOM_EFFECTS = ['shadow','shadow','glow','inner','none'];
+    const RANDOM_SHAPES = ['squircle','squircle','circle','square'];
+
+    randomizeBtn.addEventListener('click', () => {
+      const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+      // Emoji
+      useCustomImage = false;
+      customImageSrc = null;
+      currentIconEmoji = pick(RANDOM_EMOJIS);
+
+      // Background — 40% solid, 60% gradient
+      if (Math.random() > 0.4) {
+        activeGradPreset = pick(RANDOM_GRADS);
+        gradientPresets.forEach(g => {
+          g.classList.toggle('selected', g.getAttribute('data-grad') === activeGradPreset);
+        });
+      } else {
+        activeGradPreset = null;
+        currentBackground = pick(RANDOM_COLORS);
+        gradientPresets.forEach(g => g.classList.remove('selected'));
+      }
+
+      // Texture, Effect, Shape, Rotation
+      currentTexture = pick(RANDOM_TEXTURES);
+      currentEffect = pick(RANDOM_EFFECTS);
+      currentShape = pick(RANDOM_SHAPES);
+      currentRotation = [0, 0, 0, 15, -15, 45][Math.floor(Math.random() * 6)];
+
+      // Sync UI
+      textureItems.forEach(t => t.classList.toggle('active', t.getAttribute('data-texture') === currentTexture));
+      effectChips.forEach(c => c.classList.toggle('active', c.getAttribute('data-effect') === currentEffect));
+      shapeBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-shape') === currentShape));
+      rotationSlider.value = currentRotation;
+      rotationValueSpan.textContent = currentRotation + '°';
+
+      // Flash animation
+      randomizeBtn.textContent = '✨ Randomized!';
+      setTimeout(() => { randomizeBtn.textContent = '🪄 Randomize Icon'; }, 900);
+
+      updateIconPreview();
+    });
 
     // Texture
     textureItems.forEach(item => {
