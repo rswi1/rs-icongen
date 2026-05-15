@@ -489,13 +489,316 @@
       transition: all 0.2s;
     }
 
+    /* ======================================
+       MOBILE / iOS — Complete Overhaul
+       ====================================== */
+
+    /* Tablet (≤780px) */
     @media (max-width: 780px) {
+      body { padding: 12px; align-items: flex-start; }
+      .app-container { border-radius: 28px; }
+      .header { padding: 16px 20px 10px; gap: 10px; }
+      .two-columns { flex-direction: column; gap: 16px; padding: 16px 16px 24px; }
+      .preview-panel { border-radius: 24px; padding: 20px 16px; }
+      .icon-preview { width: 180px; height: 180px; }
+      .controls-panel { border-radius: 24px; padding: 8px 4px 16px; }
+    }
+
+    /* iPhone / small phones (≤430px) — full iOS native feel */
+    @media (max-width: 430px) {
+      /* Edge-to-edge layout */
+      html, body {
+        height: 100%;
+        overflow: hidden;
+      }
+      body {
+        padding: 0;
+        align-items: stretch;
+        background: #000;
+      }
+      .app-container {
+        border-radius: 0;
+        box-shadow: none;
+        height: 100vh;
+        height: 100dvh; /* dynamic viewport for iOS */
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* ── Header ── */
+      .header {
+        padding: 14px 16px 10px 16px;
+        padding-top: calc(14px + env(safe-area-inset-top));
+        flex-shrink: 0;
+        gap: 8px;
+        align-items: center;
+      }
+      .logo-icon { width: 36px; height: 36px; font-size: 20px; border-radius: 11px; }
+      .logo-text { font-size: 19px; }
+      /* Badge selector scrolls horizontally in header */
+      .badge-selector {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        flex-shrink: 0;
+      }
+      .badge-selector::-webkit-scrollbar { display: none; }
+      .badge-option {
+        white-space: nowrap;
+        padding: 6px 14px;
+        font-size: 13px;
+        min-height: 34px;
+      }
+
+      /* ── Sticky Icon Strip ── */
       .two-columns {
         flex-direction: column;
+        gap: 0;
+        padding: 0;
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+      }
+      .preview-panel {
+        flex-shrink: 0;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+        padding: 12px 16px 10px;
+        background: inherit;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+      }
+      .canvas-container {
+        margin-bottom: 0;
+        flex-shrink: 0;
       }
       .icon-preview {
-        width: 180px;
-        height: 180px;
+        width: 100px;
+        height: 100px;
+        border-radius: 24px;
+        box-shadow: 0 10px 24px -6px rgba(0,0,0,0.35);
+      }
+      /* Shape + badge note go beside the icon */
+      .preview-side-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .shape-selector {
+        margin: 0;
+        width: 100%;
+        background: rgba(120,120,128,0.12);
+        padding: 4px;
+        border-radius: 10px;
+        display: flex;
+        gap: 2px;
+      }
+      .shape-btn {
+        flex: 1;
+        padding: 7px 4px;
+        font-size: 12px;
+        gap: 4px;
+        justify-content: center;
+        border-radius: 8px;
+        min-height: 36px;
+      }
+      .badge-note {
+        font-size: 11px;
+        padding: 6px 10px;
+        border-radius: 10px;
+        line-height: 1.3;
+        margin-top: 0;
+      }
+
+      /* ── Controls: scrollable card list ── */
+      .controls-panel {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        border-radius: 20px 20px 0 0;
+        margin-top: 0;
+        padding: 0 0 calc(20px + env(safe-area-inset-bottom)) 0;
+        /* Subtle top separator line */
+        border-top: 1px solid rgba(120,120,128,0.2);
+      }
+
+      /* Collapsible sections via <details> */
+      .control-group {
+        margin-bottom: 0;
+        border-bottom: 1px solid rgba(120,120,128,0.18);
+        padding-bottom: 0;
+      }
+      /* Turn group-title into a tappable disclosure row */
+      .group-title {
+        font-size: 15px;
+        padding: 14px 16px;
+        margin-bottom: 0;
+        min-height: 52px; /* 44pt touch target */
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .group-title::after {
+        content: '›';
+        font-size: 20px;
+        font-weight: 300;
+        color: #8e8e93;
+        transition: transform 0.2s;
+        margin-left: auto;
+        padding-left: 8px;
+      }
+      .group-title.open::after {
+        transform: rotate(90deg);
+      }
+      /* Content hidden by default, shown when open */
+      .control-body {
+        display: none;
+        padding: 0 16px 16px;
+        animation: slideDown 0.18s ease;
+      }
+      .control-body.open {
+        display: block;
+      }
+      @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      /* ── Touch targets ── all interactive = min 44px ── */
+      .swatch, .grad-swatch {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+      }
+      .border-swatch {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+      }
+      .texture-item, .effect-chip {
+        padding: 9px 16px;
+        min-height: 38px;
+        font-size: 14px;
+      }
+      /* Horizontal scroll for chips — no wrap */
+      .texture-grid, .effect-buttons {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 4px;
+        gap: 8px;
+      }
+      .texture-grid::-webkit-scrollbar,
+      .effect-buttons::-webkit-scrollbar { display: none; }
+      .texture-item, .effect-chip { flex-shrink: 0; }
+
+      /* ── Sliders — bigger thumb for fat fingers ── */
+      input[type="range"] {
+        height: 6px;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        width: 28px;
+        height: 28px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      }
+      .slider-container {
+        gap: 10px;
+        margin-top: 14px;
+      }
+      .slider-container span { font-size: 13px; }
+
+      /* ── Emoji grid — bigger tap ── */
+      .grid-colors span[data-emoji] {
+        font-size: 30px;
+        min-width: 48px;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .grid-colors {
+        gap: 8px;
+      }
+
+      /* ── Text label input — 16px prevents iOS zoom ── */
+      .label-input {
+        font-size: 16px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        min-height: 44px;
+      }
+
+      /* ── Load PNG button ── */
+      #loadPngBtn {
+        min-height: 44px;
+        padding: 10px 18px;
+        font-size: 14px;
+        border-radius: 12px;
+      }
+
+      /* ── Randomize + Download — sticky at bottom ── */
+      .download-area {
+        margin-top: 0;
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+        position: sticky;
+        bottom: 0;
+        background: inherit;
+        border-top: 1px solid rgba(120,120,128,0.18);
+        z-index: 10;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      /* Push download area outside the controls-panel scroll for stickiness */
+      .randomize-btn {
+        margin-bottom: 8px;
+        min-height: 50px;
+        font-size: 16px;
+        border-radius: 14px;
+      }
+      .download-btn {
+        min-height: 50px;
+        font-size: 16px;
+        border-radius: 14px;
+      }
+      .filename-hint { margin-top: 8px; font-size: 11px; }
+
+      /* Gradient angle row */
+      .angle-row { flex-wrap: nowrap; }
+
+      /* Color preview dot in group title */
+      .color-preview { width: 24px; height: 24px; border-radius: 6px; }
+
+      /* Wrapper that holds controls-panel + sticky download bar */
+      .controls-wrapper {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-height: 0;
+      }
+      .controls-panel {
+        padding-bottom: 8px !important; /* override the big bottom padding — download bar handles safe area */
+      }
+      .download-area {
+        flex-shrink: 0;
+        margin-top: 0;
+        padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+        background: inherit;
+        border-top: 1px solid rgba(120,120,128,0.18);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      .two-columns {
+        min-height: 0; /* critical for flex child scrolling in iOS */
       }
     }
   </style>
@@ -648,171 +951,209 @@
           <div id="iconTextOverlay"></div>
         </div>
       </div>
-      <div class="shape-selector">
-        <button class="shape-btn active" data-shape="squircle">🍎 Squircle</button>
-        <button class="shape-btn" data-shape="circle">⚪ Circle</button>
-        <button class="shape-btn" data-shape="square">⬛ Square</button>
-      </div>
-      <div class="badge-note" id="badgeStatus">
-        ✨ No badge — clean iOS style
+      <div class="preview-side-info">
+        <div class="shape-selector">
+          <button class="shape-btn active" data-shape="squircle">🍎 Squircle</button>
+          <button class="shape-btn" data-shape="circle">⚪ Circle</button>
+          <button class="shape-btn" data-shape="square">⬛ Square</button>
+        </div>
+        <div class="badge-note" id="badgeStatus">
+          ✨ No badge — clean iOS style
+        </div>
       </div>
     </div>
 
+    <div class="controls-wrapper">
     <div class="controls-panel">
       <div class="control-group">
-        <div class="group-title"><span>🎨 Background</span> <span class="color-preview" id="bgColorPreview"></span></div>
-        <div class="grid-colors" id="colorGrid">
-          <div class="swatch" style="background: #007aff;" data-color="#007aff"></div>
-          <div class="swatch" style="background: #34c759;" data-color="#34c759"></div>
-          <div class="swatch" style="background: #ff3b30;" data-color="#ff3b30"></div>
-          <div class="swatch" style="background: #ff9500;" data-color="#ff9500"></div>
-          <div class="swatch" style="background: #af52de;" data-color="#af52de"></div>
-          <div class="swatch" style="background: #000000;" data-color="#000000"></div>
-          <div class="swatch" style="background: #ffffff; border:1px solid #ddd;" data-color="#ffffff"></div>
-          <div class="swatch" style="background: linear-gradient(135deg, #4158D0, #C850C0);" data-color="gradient1"></div>
-        </div>
-        <div class="slider-container">
-          <span style="font-size:12px;">🎨 Custom</span>
-          <input type="color" id="customColorPicker" value="#007aff">
-        </div>
-      </div>
-
-      <div class="control-group">
-        <div class="group-title">✨ Texture / Pattern</div>
-        <div class="texture-grid" id="textureGrid">
-          <div class="texture-item" data-texture="none">None</div>
-          <div class="texture-item" data-texture="dots">Dots</div>
-          <div class="texture-item" data-texture="stripes">Stripes</div>
-          <div class="texture-item" data-texture="waves">Waves</div>
-          <div class="texture-item" data-texture="halftone">Halftone</div>
+        <div class="group-title" data-section="bg"><span>🎨 Background</span> <span class="color-preview" id="bgColorPreview"></span></div>
+        <div class="control-body open" id="body-bg">
+          <div class="grid-colors" id="colorGrid">
+            <div class="swatch" style="background: #007aff;" data-color="#007aff"></div>
+            <div class="swatch" style="background: #34c759;" data-color="#34c759"></div>
+            <div class="swatch" style="background: #ff3b30;" data-color="#ff3b30"></div>
+            <div class="swatch" style="background: #ff9500;" data-color="#ff9500"></div>
+            <div class="swatch" style="background: #af52de;" data-color="#af52de"></div>
+            <div class="swatch" style="background: #000000;" data-color="#000000"></div>
+            <div class="swatch" style="background: #ffffff; border:1px solid #ddd;" data-color="#ffffff"></div>
+            <div class="swatch" style="background: linear-gradient(135deg, #4158D0, #C850C0);" data-color="gradient1"></div>
+          </div>
+          <div class="slider-container">
+            <span style="font-size:12px;">🎨 Custom</span>
+            <input type="color" id="customColorPicker" value="#007aff">
+          </div>
         </div>
       </div>
 
       <div class="control-group">
-        <div class="group-title">💎 Effect</div>
-        <div class="effect-buttons" id="effectGroup">
-          <div class="effect-chip" data-effect="none">None</div>
-          <div class="effect-chip active" data-effect="shadow">Drop Shadow</div>
-          <div class="effect-chip" data-effect="glow">Soft Glow</div>
-          <div class="effect-chip" data-effect="inner">Inner Light</div>
-        </div>
-        <div class="slider-container" style="margin-top: 12px;">
-          <span style="font-size:12px;">🔘 Icon Symbol</span>
-          <input type="range" id="iconScaleSlider" min="0.5" max="1.4" step="0.01" value="1">
-          <span id="scaleValue" style="min-width: 40px;">1.0</span>
-        </div>
-        <div class="slider-container">
-          <span style="font-size:12px;">🖌️ Padding / Size</span>
-          <input type="range" id="paddingSlider" min="10" max="35" step="1" value="20">
-          <span id="paddingValue">20%</span>
+        <div class="group-title" data-section="texture">✨ Texture / Pattern</div>
+        <div class="control-body" id="body-texture">
+          <div class="texture-grid" id="textureGrid">
+            <div class="texture-item" data-texture="none">None</div>
+            <div class="texture-item" data-texture="dots">Dots</div>
+            <div class="texture-item" data-texture="stripes">Stripes</div>
+            <div class="texture-item" data-texture="waves">Waves</div>
+            <div class="texture-item" data-texture="halftone">Halftone</div>
+          </div>
         </div>
       </div>
 
       <div class="control-group">
-        <div class="group-title">🌟 Icon Emoji / Symbol</div>
-        <div class="grid-colors" style="gap: 10px; flex-wrap: wrap;">
-          <span style="font-size: 26px; cursor: pointer;" data-emoji="📱">📱</span>
-          <span style="font-size: 26px; cursor: pointer;" data-emoji="🎵">🎵</span>
-          <span style="font-size: 26px; cursor: pointer;" data-emoji="⚙️">⚙️</span>
-          <span style="font-size: 26px; cursor: pointer;" data-emoji="❤️">❤️</span>
-          <span style="font-size: 26px; cursor: pointer;" data-emoji="🔥">🔥</span>
-          <span style="font-size: 26px; cursor: pointer;" data-emoji="🌟">🌟</span>
-          <span style="font-size: 26px; cursor: pointer;" data-emoji="🎮">🎮</span>
-          <span style="font-size: 26px; cursor: pointer;" data-emoji="☕">☕</span>
-          <span style="font-size: 26px; cursor: pointer;" data-emoji="✈️">✈️</span>
+        <div class="group-title" data-section="effect">💎 Effect</div>
+        <div class="control-body" id="body-effect">
+          <div class="effect-buttons" id="effectGroup">
+            <div class="effect-chip" data-effect="none">None</div>
+            <div class="effect-chip active" data-effect="shadow">Drop Shadow</div>
+            <div class="effect-chip" data-effect="glow">Soft Glow</div>
+            <div class="effect-chip" data-effect="inner">Inner Light</div>
+          </div>
+          <div class="slider-container" style="margin-top: 12px;">
+            <span style="font-size:12px;">🔘 Icon Symbol</span>
+            <input type="range" id="iconScaleSlider" min="0.5" max="1.4" step="0.01" value="1">
+            <span id="scaleValue" style="min-width: 40px;">1.0</span>
+          </div>
+          <div class="slider-container">
+            <span style="font-size:12px;">🖌️ Padding / Size</span>
+            <input type="range" id="paddingSlider" min="10" max="35" step="1" value="20">
+            <span id="paddingValue">20%</span>
+          </div>
         </div>
-        <div style="margin-top: 14px; display: flex; align-items: center; gap: 10px;">
-          <input type="file" id="customPngInput" accept="image/png" style="display:none;">
-          <button id="loadPngBtn" style="background:#f2f2f6; border:none; border-radius:28px; padding:8px 14px; font-size:13px; cursor:pointer;">📁 Load PNG</button>
-          <span id="customImageLabel" style="font-size:12px; color:#8e8e93;"></span>
+      </div>
+
+      <div class="control-group">
+        <div class="group-title" data-section="emoji">🌟 Icon Emoji / Symbol</div>
+        <div class="control-body" id="body-emoji">
+          <div class="grid-colors" style="gap: 10px; flex-wrap: wrap;">
+            <span style="font-size: 26px; cursor: pointer;" data-emoji="📱">📱</span>
+            <span style="font-size: 26px; cursor: pointer;" data-emoji="🎵">🎵</span>
+            <span style="font-size: 26px; cursor: pointer;" data-emoji="⚙️">⚙️</span>
+            <span style="font-size: 26px; cursor: pointer;" data-emoji="❤️">❤️</span>
+            <span style="font-size: 26px; cursor: pointer;" data-emoji="🔥">🔥</span>
+            <span style="font-size: 26px; cursor: pointer;" data-emoji="🌟">🌟</span>
+            <span style="font-size: 26px; cursor: pointer;" data-emoji="🎮">🎮</span>
+            <span style="font-size: 26px; cursor: pointer;" data-emoji="☕">☕</span>
+            <span style="font-size: 26px; cursor: pointer;" data-emoji="✈️">✈️</span>
+          </div>
+          <div style="margin-top: 14px; display: flex; align-items: center; gap: 10px;">
+            <input type="file" id="customPngInput" accept="image/png" style="display:none;">
+            <button id="loadPngBtn" style="background:#f2f2f6; border:none; border-radius:28px; padding:8px 14px; font-size:13px; cursor:pointer;">📁 Load PNG</button>
+            <span id="customImageLabel" style="font-size:12px; color:#8e8e93;"></span>
+          </div>
         </div>
       </div>
 
       <!-- FEATURE 1: Icon Rotation -->
       <div class="control-group">
-        <div class="group-title">🔄 Icon Rotation</div>
-        <div class="slider-container">
-          <span style="font-size:12px;">0°</span>
-          <input type="range" id="rotationSlider" min="0" max="360" step="1" value="0">
-          <span id="rotationValue" style="min-width:40px;">0°</span>
+        <div class="group-title" data-section="rotation">🔄 Icon Rotation</div>
+        <div class="control-body" id="body-rotation">
+          <div class="slider-container">
+            <span style="font-size:12px;">0°</span>
+            <input type="range" id="rotationSlider" min="0" max="360" step="1" value="0">
+            <span id="rotationValue" style="min-width:40px;">0°</span>
+          </div>
         </div>
       </div>
 
       <!-- FEATURE 2: Gradient Presets + Angle -->
       <div class="control-group">
-        <div class="group-title">🌈 Gradient Presets</div>
-        <div class="gradient-presets" id="gradientPresets">
-          <div class="grad-swatch" style="background:linear-gradient(135deg,#f953c6,#b91d73)" data-grad="linear-gradient(135deg,#f953c6,#b91d73)" title="Pink Blaze"></div>
-          <div class="grad-swatch" style="background:linear-gradient(135deg,#0f0c29,#302b63,#24243e)" data-grad="linear-gradient(135deg,#0f0c29,#302b63,#24243e)" title="Deep Space"></div>
-          <div class="grad-swatch" style="background:linear-gradient(135deg,#11998e,#38ef7d)" data-grad="linear-gradient(135deg,#11998e,#38ef7d)" title="Emerald"></div>
-          <div class="grad-swatch" style="background:linear-gradient(135deg,#f7971e,#ffd200)" data-grad="linear-gradient(135deg,#f7971e,#ffd200)" title="Citrus"></div>
-          <div class="grad-swatch" style="background:linear-gradient(135deg,#fc466b,#3f5efb)" data-grad="linear-gradient(135deg,#fc466b,#3f5efb)" title="Candy"></div>
-          <div class="grad-swatch" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)" data-grad="linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)" title="Midnight"></div>
-          <div class="grad-swatch" style="background:linear-gradient(135deg,#a8edea,#fed6e3)" data-grad="linear-gradient(135deg,#a8edea,#fed6e3)" title="Cotton Candy"></div>
-          <div class="grad-swatch" style="background:linear-gradient(135deg,#ff6a00,#ee0979)" data-grad="linear-gradient(135deg,#ff6a00,#ee0979)" title="Volcano"></div>
-        </div>
-        <div class="angle-row">
-          <span>📐 Angle</span>
-          <input type="range" id="gradAngleSlider" min="0" max="360" step="5" value="135" style="flex:1;">
-          <span id="gradAngleValue" style="min-width:36px;">135°</span>
+        <div class="group-title" data-section="gradient">🌈 Gradient Presets</div>
+        <div class="control-body" id="body-gradient">
+          <div class="gradient-presets" id="gradientPresets">
+            <div class="grad-swatch" style="background:linear-gradient(135deg,#f953c6,#b91d73)" data-grad="linear-gradient(135deg,#f953c6,#b91d73)" title="Pink Blaze"></div>
+            <div class="grad-swatch" style="background:linear-gradient(135deg,#0f0c29,#302b63,#24243e)" data-grad="linear-gradient(135deg,#0f0c29,#302b63,#24243e)" title="Deep Space"></div>
+            <div class="grad-swatch" style="background:linear-gradient(135deg,#11998e,#38ef7d)" data-grad="linear-gradient(135deg,#11998e,#38ef7d)" title="Emerald"></div>
+            <div class="grad-swatch" style="background:linear-gradient(135deg,#f7971e,#ffd200)" data-grad="linear-gradient(135deg,#f7971e,#ffd200)" title="Citrus"></div>
+            <div class="grad-swatch" style="background:linear-gradient(135deg,#fc466b,#3f5efb)" data-grad="linear-gradient(135deg,#fc466b,#3f5efb)" title="Candy"></div>
+            <div class="grad-swatch" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)" data-grad="linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)" title="Midnight"></div>
+            <div class="grad-swatch" style="background:linear-gradient(135deg,#a8edea,#fed6e3)" data-grad="linear-gradient(135deg,#a8edea,#fed6e3)" title="Cotton Candy"></div>
+            <div class="grad-swatch" style="background:linear-gradient(135deg,#ff6a00,#ee0979)" data-grad="linear-gradient(135deg,#ff6a00,#ee0979)" title="Volcano"></div>
+          </div>
+          <div class="angle-row">
+            <span>📐 Angle</span>
+            <input type="range" id="gradAngleSlider" min="0" max="360" step="5" value="135" style="flex:1;">
+            <span id="gradAngleValue" style="min-width:36px;">135°</span>
+          </div>
         </div>
       </div>
 
       <!-- FEATURE 3: Border / Frame -->
       <div class="control-group">
-        <div class="group-title">🖼️ Border Frame</div>
-        <div class="border-color-row" id="borderColorRow">
-          <div class="border-swatch selected" style="background:transparent;border:2px dashed #aaa;" data-border-color="none" title="No border"></div>
-          <div class="border-swatch" style="background:#ffffff;" data-border-color="#ffffff" title="White"></div>
-          <div class="border-swatch" style="background:#000000;" data-border-color="#000000" title="Black"></div>
-          <div class="border-swatch" style="background:#007aff;" data-border-color="#007aff" title="Blue"></div>
-          <div class="border-swatch" style="background:#ff9500;" data-border-color="#ff9500" title="Orange"></div>
-          <div class="border-swatch" style="background:#ff3b30;" data-border-color="#ff3b30" title="Red"></div>
-          <div class="border-swatch" style="background:linear-gradient(135deg,#f953c6,#b91d73);" data-border-color="gradient" title="Gradient"></div>
-        </div>
-        <div class="slider-container" style="margin-top:8px;">
-          <span style="font-size:12px;">Thickness</span>
-          <input type="range" id="borderThicknessSlider" min="0" max="16" step="1" value="0">
-          <span id="borderThicknessValue" style="min-width:30px;">0px</span>
+        <div class="group-title" data-section="border">🖼️ Border Frame</div>
+        <div class="control-body" id="body-border">
+          <div class="border-color-row" id="borderColorRow">
+            <div class="border-swatch selected" style="background:transparent;border:2px dashed #aaa;" data-border-color="none" title="No border"></div>
+            <div class="border-swatch" style="background:#ffffff;" data-border-color="#ffffff" title="White"></div>
+            <div class="border-swatch" style="background:#000000;" data-border-color="#000000" title="Black"></div>
+            <div class="border-swatch" style="background:#007aff;" data-border-color="#007aff" title="Blue"></div>
+            <div class="border-swatch" style="background:#ff9500;" data-border-color="#ff9500" title="Orange"></div>
+            <div class="border-swatch" style="background:#ff3b30;" data-border-color="#ff3b30" title="Red"></div>
+            <div class="border-swatch" style="background:linear-gradient(135deg,#f953c6,#b91d73);" data-border-color="gradient" title="Gradient"></div>
+          </div>
+          <div class="slider-container" style="margin-top:8px;">
+            <span style="font-size:12px;">Thickness</span>
+            <input type="range" id="borderThicknessSlider" min="0" max="16" step="1" value="0">
+            <span id="borderThicknessValue" style="min-width:30px;">0px</span>
+          </div>
         </div>
       </div>
 
       <!-- FEATURE 4: Text Label -->
       <div class="control-group">
-        <div class="group-title">💬 Text Label</div>
-        <div class="label-row">
-          <input type="text" class="label-input" id="iconLabelInput" placeholder="e.g. PRO, v2.0, BETA…" maxlength="12">
-        </div>
-        <div class="slider-container" style="margin-top:8px;">
-          <span style="font-size:12px;">Font Size</span>
-          <input type="range" id="labelSizeSlider" min="10" max="28" step="1" value="16">
-          <span id="labelSizeValue" style="min-width:30px;">16px</span>
-        </div>
-        <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;" id="labelColorRow">
-          <div class="border-swatch selected" style="background:#ffffff;" data-label-color="#ffffff" title="White"></div>
-          <div class="border-swatch" style="background:#000000;" data-label-color="#000000" title="Black"></div>
-          <div class="border-swatch" style="background:#ffd200;" data-label-color="#ffd200" title="Yellow"></div>
-          <div class="border-swatch" style="background:#ff3b30;" data-label-color="#ff3b30" title="Red"></div>
-          <div class="border-swatch" style="background:#34c759;" data-label-color="#34c759" title="Green"></div>
+        <div class="group-title" data-section="label">💬 Text Label</div>
+        <div class="control-body" id="body-label">
+          <div class="label-row">
+            <input type="text" class="label-input" id="iconLabelInput" placeholder="e.g. PRO, v2.0, BETA…" maxlength="12">
+          </div>
+          <div class="slider-container" style="margin-top:8px;">
+            <span style="font-size:12px;">Font Size</span>
+            <input type="range" id="labelSizeSlider" min="10" max="28" step="1" value="16">
+            <span id="labelSizeValue" style="min-width:30px;">16px</span>
+          </div>
+          <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;" id="labelColorRow">
+            <div class="border-swatch selected" style="background:#ffffff;" data-label-color="#ffffff" title="White"></div>
+            <div class="border-swatch" style="background:#000000;" data-label-color="#000000" title="Black"></div>
+            <div class="border-swatch" style="background:#ffd200;" data-label-color="#ffd200" title="Yellow"></div>
+            <div class="border-swatch" style="background:#ff3b30;" data-label-color="#ff3b30" title="Red"></div>
+            <div class="border-swatch" style="background:#34c759;" data-label-color="#34c759" title="Green"></div>
+          </div>
         </div>
       </div>
 
       <!-- Randomize button lives above download -->
-      <div style="margin-bottom: 8px;">
+      <div style="margin-bottom: 8px; padding: 0 8px;">
         <button class="randomize-btn" id="randomizeBtn">🪄 Randomize Icon</button>
       </div>
 
-      <div class="download-area">
-        <button class="download-btn" id="downloadBtn">⬇️ Download iOS Icon</button>
-        <div class="filename-hint">Export as PNG – optimized for App Store</div>
-      </div>
+    </div><!-- end controls-panel -->
+
+    <!-- Sticky download bar — outside scroll container -->
+    <div class="download-area" style="padding: 12px 16px;">
+      <button class="download-btn" id="downloadBtn">⬇️ Download iOS Icon</button>
+      <div class="filename-hint">Export as PNG – optimized for App Store</div>
     </div>
+    </div><!-- end controls-wrapper -->
   </div>
 </div>
 
 <script>
   (function() {
-    // DOM elements
+    // ── Collapsible sections (mobile) ──
+    document.querySelectorAll('.group-title[data-section]').forEach(title => {
+      title.addEventListener('click', () => {
+        const section = title.getAttribute('data-section');
+        const body = document.getElementById('body-' + section);
+        if (!body) return;
+        const isOpen = body.classList.contains('open');
+        body.classList.toggle('open', !isOpen);
+        title.classList.toggle('open', !isOpen);
+      });
+      // Mark already-open ones
+      const section = title.getAttribute('data-section');
+      const body = document.getElementById('body-' + section);
+      if (body && body.classList.contains('open')) title.classList.add('open');
+    });
+
+    // ── DOM elements ──
     const iconPreviewDiv = document.getElementById('iconPreview');
     const iconInner = document.getElementById('iconInner');
     const iconSymbolSpan = document.getElementById('iconSymbol');
