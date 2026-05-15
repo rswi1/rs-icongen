@@ -37,7 +37,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;          /* was center — allows scroll to work */
       min-height: 100vh;
       padding: 20px;
     }
@@ -48,7 +48,7 @@
       background: #ffffff;
       border-radius: 48px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 6px 12px rgba(0, 0, 0, 0.05);
-      overflow: hidden;
+      /* overflow:hidden removed — breaks position:sticky on child preview-panel */
       transition: all 0.2s ease;
     }
 
@@ -132,6 +132,10 @@
       padding: 24px 20px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02), inset 0 1px 0 #fff;
       border: 1px solid #efeff4;
+      /* Sticky on desktop so it follows scroll */
+      position: sticky;
+      top: 24px;
+      align-self: flex-start;
     }
 
     .canvas-container {
@@ -1129,7 +1133,8 @@
     <!-- Sticky download bar — outside scroll container -->
     <div class="download-area" style="padding: 12px 16px;">
       <button class="download-btn" id="downloadBtn">⬇️ Download iOS Icon</button>
-      <div class="filename-hint">Export as PNG – optimized for App Store</div>
+      <button class="download-btn" id="contentsJsonBtn" style="margin-top: 10px; background: #34c759; box-shadow: 0 2px 8px rgba(52,199,89,0.3);">📋 Gen Contents.json</button>
+      <div class="filename-hint">Exports 1024 × 1024 px PNG — App Store ready</div>
     </div>
     </div><!-- end controls-wrapper -->
   </div>
@@ -1600,37 +1605,329 @@
       customPngInput.value = '';
     });
 
-    // Download
+    // ── High-res native canvas export (1024×1024) ──
     downloadBtn.addEventListener('click', async () => {
-      const previewElement = document.getElementById('iconPreview');
-      if (!previewElement) return;
+      const origHTML = downloadBtn.innerHTML;
+      downloadBtn.textContent = '⏳ Rendering…';
+      downloadBtn.disabled = true;
 
-      if (typeof html2canvas === 'undefined') {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-        script.onload = () => capturePreview(previewElement);
-        document.head.appendChild(script);
-      } else {
-        capturePreview(previewElement);
-      }
-
-      function capturePreview(el) {
-        html2canvas(el, {
-          scale: 3,
-          backgroundColor: null,
-          useCORS: false,
-          logging: false
-        }).then(canvasResult => {
-          const link = document.createElement('a');
-          link.download = 'ios-icon.png';
-          link.href = canvasResult.toDataURL('image/png');
-          link.click();
-        }).catch(err => alert('Could not render icon to PNG, but you can screenshot.'));
+      try {
+        const canvas = await renderHighResIcon(1024);
+        const link = document.createElement('a');
+        link.download = 'ios-icon-1024.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } catch (err) {
+        alert('Export failed: ' + err.message);
+      } finally {
+        downloadBtn.innerHTML = origHTML;
+        downloadBtn.disabled = false;
       }
     });
 
-    // Initial render
-    updateIconPreview();
+    async function renderHighResIcon(S) {
+      const canvas = document.createElement('canvas');
+      canvas.width = S;
+      canvas.height = S;
+      const ctx = canvas.getContext('2d');
+      const scale = S / 220;
+
+      ctx.clearRect(0, 0, S, S);
+
+      // ── Shape clip path ──
+      const r = currentShape === 'circle' ? S / 2 :
+                currentShape === 'square' ? S * 0.08 :
+                S * 0.225; // squircle — matches iOS ~48px on 220px
+
+      function buildShapePath() {
+        ctx.beginPath();
+        if (typeof ctx.roundRect === 'function') {
+          ctx.roundRect(0, 0, S, S, r);
+        } else {
+          const k = r * 0.5523;
+          ctx.moveTo(r, 0);
+          ctx.lineTo(S - r, 0); ctx.bezierCurveTo(S - r + k, 0, S, r - k, S, r);
+          ctx.lineTo(S, S - r); ctx.bezierCurveTo(S, S - r + k, S - r + k, S, S - r, S);
+          ctx.lineTo(r, S);     ctx.bezierCurveTo(r - k, S, 0, S - r + k, 0, S - r);
+          ctx.lineTo(0, r);     ctx.bezierCurveTo(0, r - k, r - k, 0, r, 0);
+          ctx.closePath();
+        }
+      }
+
+      // ── Parse & create gradient ──
+      function makeGradient(bgStr) {
+        const m = bgStr.match(/linear-gradient\(\s*(\d+)deg\s*,\s*(.+)\)\s*$/s);
+        if (!m) return null;
+        const angle = parseInt(m[1]);
+        // Split stops safely (no rgba commas in this app's presets, all hex)
+        const stops = m[2].split(',').map(s => s.trim()).filter(Boolean);
+        const rad = (angle - 90) * Math.PI / 180;
+        const half = S * 0.7072;
+        const g = ctx.createLinearGradient(
+          S/2 - Math.cos(rad) * half, S/2 - Math.sin(rad) * half,
+          S/2 + Math.cos(rad) * half, S/2 + Math.sin(rad) * half
+        );
+        stops.forEach((c, i) => g.addColorStop(i / Math.max(1, stops.length - 1), c));
+        return g;
+      }
+
+      // ── 1. Background + texture (clipped to shape) ──
+      ctx.save();
+      buildShapePath();
+      ctx.clip();
+
+      const bgToUse = activeGradPreset || currentBackground;
+      ctx.fillStyle = makeGradient(bgToUse) || bgToUse;
+      ctx.fillRect(0, 0, S, S);
+
+      // Texture overlay
+      if (currentTexture !== 'none') {
+        ctx.save();
+        const step = S / 22;
+        if (currentTexture === 'dots') {
+          ctx.fillStyle = 'rgba(0,0,0,0.10)';
+          for (let x = step * 0.2; x < S; x += step)
+            for (let y = step * 0.3; y < S; y += step) {
+              ctx.beginPath(); ctx.arc(x, y, S / 110, 0, Math.PI * 2); ctx.fill();
+            }
+        } else if (currentTexture === 'stripes') {
+          ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+          ctx.lineWidth = S / 56;
+          for (let i = -S; i < S * 2; i += S / 14) {
+            ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i + S, S); ctx.stroke();
+          }
+        } else if (currentTexture === 'waves') {
+          ctx.strokeStyle = 'rgba(0,0,0,0.09)';
+          ctx.lineWidth = S / 100;
+          for (let i = -S / 8; i < S + S / 8; i += S / 9) {
+            ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(S, i + S * 0.11); ctx.stroke();
+          }
+        } else if (currentTexture === 'halftone') {
+          ctx.fillStyle = 'rgba(0,0,0,0.09)';
+          const hs = S / 16;
+          for (let x = 0; x < S; x += hs)
+            for (let y = 0; y < S; y += hs) {
+              ctx.beginPath(); ctx.arc(x + hs * 0.3, y + hs * 0.4, hs * 0.22, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+        ctx.restore();
+      }
+
+      ctx.restore(); // end background clip
+
+      // ── 2. Symbol — emoji or custom image ──
+      const pad = Math.max(12, Math.min(45, iconPaddingPercent)) / 100;
+      const symbolSize = S * (1 - pad * 2) * iconScale;
+
+      ctx.save();
+      ctx.translate(S / 2, S / 2);
+      ctx.rotate(currentRotation * Math.PI / 180);
+
+      if (currentEffect === 'shadow') {
+        ctx.shadowColor = 'rgba(0,0,0,0.30)';
+        ctx.shadowBlur = S * 0.055;
+        ctx.shadowOffsetY = S * 0.042;
+      } else if (currentEffect === 'glow') {
+        ctx.shadowColor = 'rgba(255,215,0,0.75)';
+        ctx.shadowBlur = S * 0.045;
+      }
+
+      if (useCustomImage && customImageSrc) {
+        const img = new Image();
+        await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = customImageSrc; });
+        ctx.drawImage(img, -symbolSize / 2, -symbolSize / 2, symbolSize, symbolSize);
+      } else {
+        // Draw emoji at generous size for crispness
+        const emojiSize = Math.round(symbolSize * 0.80);
+        ctx.font = `${emojiSize}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(currentIconEmoji, 0, emojiSize * 0.04); // tiny optical correction
+      }
+
+      ctx.restore();
+
+      // ── 3. Border / Frame ──
+      if (currentBorderColor !== 'none' && currentBorderThickness > 0) {
+        const bw = currentBorderThickness * scale;
+        ctx.save();
+        buildShapePath();
+        ctx.strokeStyle = currentBorderColor === 'gradient' ? '#f953c6' : currentBorderColor;
+        ctx.lineWidth = bw * 2; // centered stroke → double to inset
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // ── 4. Text label ──
+      if (currentLabelText) {
+        const labelFs = Math.round(currentLabelSize * scale * 1.1);
+        ctx.save();
+        ctx.font = `bold ${labelFs}px -apple-system, Helvetica, Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.shadowColor = currentLabelColor === '#ffffff' ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.35)';
+        ctx.shadowBlur = 5 * scale;
+        ctx.fillStyle = currentLabelColor;
+        ctx.fillText(currentLabelText.toUpperCase(), S / 2, S - 18 * scale);
+        ctx.restore();
+      }
+
+      // ── 5. Badge ──
+      if (currentBadge !== 'none') {
+        let badgeText = '', badgeBg = '#ff3b30';
+        if (currentBadge === 'beta')    { badgeText = 'BETA'; badgeBg = '#007aff'; }
+        else if (currentBadge === 'new') { badgeText = 'NEW';  badgeBg = '#34c759'; }
+        else                             { badgeText = '123';  badgeBg = '#ff9500'; }
+
+        const bfs = Math.round(13 * scale);
+        const pH = 4 * scale, pV = 12 * scale;
+        ctx.font = `bold ${bfs}px -apple-system, Helvetica, Arial, sans-serif`;
+        const tw = ctx.measureText(badgeText).width;
+        const bw2 = tw + pV * 2, bh2 = bfs + pH * 2;
+        const bx = S - 14 * scale - bw2, by = 14 * scale;
+        const br2 = bh2 / 2;
+
+        ctx.save();
+        ctx.shadowColor = 'rgba(0,0,0,0.22)';
+        ctx.shadowBlur = 8 * scale;
+        ctx.shadowOffsetY = 2 * scale;
+        ctx.beginPath();
+        if (typeof ctx.roundRect === 'function') {
+          ctx.roundRect(bx, by, bw2, bh2, br2);
+        } else {
+          const k2 = br2 * 0.5523;
+          ctx.moveTo(bx + br2, by);
+          ctx.lineTo(bx + bw2 - br2, by); ctx.bezierCurveTo(bx + bw2 - br2 + k2, by, bx + bw2, by + br2 - k2, bx + bw2, by + br2);
+          ctx.lineTo(bx + bw2, by + bh2 - br2); ctx.bezierCurveTo(bx + bw2, by + bh2 - br2 + k2, bx + bw2 - br2 + k2, by + bh2, bx + bw2 - br2, by + bh2);
+          ctx.lineTo(bx + br2, by + bh2); ctx.bezierCurveTo(bx + br2 - k2, by + bh2, bx, by + bh2 - br2 + k2, bx, by + bh2 - br2);
+          ctx.lineTo(bx, by + br2); ctx.bezierCurveTo(bx, by + br2 - k2, bx + br2 - k2, by, bx + br2, by);
+          ctx.closePath();
+        }
+        ctx.fillStyle = badgeBg;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(badgeText, bx + bw2 / 2, by + bh2 / 2);
+        ctx.restore();
+      }
+
+      return canvas;
+    }
+
+    // ── Gen Contents.json ──
+    document.getElementById('contentsJsonBtn').addEventListener('click', () => {
+      const contentsData = {
+        images: [
+          { idiom: "iphone",        scale: "2x", size: "20x20",    filename: "40.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "40"   },
+          { idiom: "iphone",        scale: "3x", size: "20x20",    filename: "60.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "60"   },
+          { idiom: "iphone",        scale: "2x", size: "29x29",    filename: "58.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "58"   },
+          { idiom: "iphone",        scale: "3x", size: "29x29",    filename: "87.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "87"   },
+          { idiom: "iphone",        scale: "1x", size: "29x29",    filename: "29.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "29"   },
+          { idiom: "iphone",        scale: "2x", size: "40x40",    filename: "80.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "80"   },
+          { idiom: "iphone",        scale: "3x", size: "40x40",    filename: "120.png",  folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "120"  },
+          { idiom: "iphone",        scale: "2x", size: "60x60",    filename: "120.png",  folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "120"  },
+          { idiom: "iphone",        scale: "3x", size: "60x60",    filename: "180.png",  folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "180"  },
+          { idiom: "iphone",        scale: "1x", size: "57x57",    filename: "57.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "57"   },
+          { idiom: "iphone",        scale: "2x", size: "57x57",    filename: "114.png",  folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "114"  },
+          { idiom: "ipad",          scale: "1x", size: "20x20",    filename: "20.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "20"   },
+          { idiom: "ipad",          scale: "2x", size: "20x20",    filename: "40.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "40"   },
+          { idiom: "ipad",          scale: "1x", size: "29x29",    filename: "29.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "29"   },
+          { idiom: "ipad",          scale: "2x", size: "29x29",    filename: "58.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "58"   },
+          { idiom: "ipad",          scale: "1x", size: "40x40",    filename: "40.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "40"   },
+          { idiom: "ipad",          scale: "2x", size: "40x40",    filename: "80.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "80"   },
+          { idiom: "ipad",          scale: "1x", size: "76x76",    filename: "76.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "76"   },
+          { idiom: "ipad",          scale: "2x", size: "76x76",    filename: "152.png",  folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "152"  },
+          { idiom: "ipad",          scale: "2x", size: "83.5x83.5",filename: "167.png",  folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "167"  },
+          { idiom: "ios-marketing", scale: "1x", size: "1024x1024",filename: "1024.png", folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "1024" }
+        ],
+        info: { author: "xcode", version: 1 }
+      };
+
+      const json = JSON.stringify(contentsData, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = 'Contents.json';
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      const btn = document.getElementById('contentsJsonBtn');
+      const orig = btn.innerHTML;
+      btn.textContent = '✅ Downloaded!';
+      setTimeout(() => { btn.innerHTML = orig; }, 1200);
+    });
+
+    // ── Desktop parallax: icon floats as user scrolls ──
+    (function initParallax() {
+      // Only run on non-touch desktop (pointer: fine)
+      if (!window.matchMedia('(pointer: fine)').matches) return;
+
+      const iconEl   = document.getElementById('iconPreview');
+      const panel    = iconEl.closest('.preview-panel');
+      if (!iconEl || !panel) return;
+
+      let ticking = false;
+      let lastY    = 0;
+
+      // Smooth lerp state
+      let currentY    = 0;
+      let currentTilt = 0;
+      let targetY     = 0;
+      let targetTilt  = 0;
+      let rafId       = null;
+
+      function lerp(a, b, t) { return a + (b - a) * t; }
+
+      function animate() {
+        currentY    = lerp(currentY,    targetY,    0.08);
+        currentTilt = lerp(currentTilt, targetTilt, 0.08);
+
+        iconEl.style.transform =
+          `translateY(${currentY.toFixed(2)}px) rotate3d(1, 0, 0, ${currentTilt.toFixed(2)}deg)`;
+
+        // Also shift shadow depth for realism
+        const shadow = Math.max(20, 35 - Math.abs(currentY) * 0.4);
+        iconEl.style.boxShadow =
+          `0 ${shadow}px ${shadow + 10}px -12px rgba(0,0,0,0.28), 0 1px 3px rgba(0,0,0,0.05)`;
+
+        if (Math.abs(currentY - targetY) > 0.05 || Math.abs(currentTilt - targetTilt) > 0.05) {
+          rafId = requestAnimationFrame(animate);
+        } else {
+          rafId = null;
+        }
+      }
+
+      function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          const scrollY = window.scrollY || window.pageYOffset;
+          const delta   = scrollY - lastY;
+          lastY = scrollY;
+
+          // Parallax: icon drifts up slightly on scroll down (−0.18× speed)
+          targetY    = Math.max(-28, Math.min(18, -scrollY * 0.18));
+          // Subtle tilt: tip back when scrolling down
+          targetTilt = Math.max(-6, Math.min(4, delta * 0.35));
+
+          if (!rafId) rafId = requestAnimationFrame(animate);
+          ticking = false;
+        });
+      }
+
+      // Micro-bounce on page load
+      setTimeout(() => {
+        targetY = -10; targetTilt = -3;
+        if (!rafId) rafId = requestAnimationFrame(animate);
+        setTimeout(() => { targetY = 0; targetTilt = 0; }, 500);
+      }, 320);
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+    })();
+
   })();
 </script>
 </body>
