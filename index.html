@@ -1133,8 +1133,8 @@
     <!-- Sticky download bar — outside scroll container -->
     <div class="download-area" style="padding: 12px 16px;">
       <button class="download-btn" id="downloadBtn">⬇️ Download iOS Icon</button>
-      <button class="download-btn" id="contentsJsonBtn" style="margin-top: 10px; background: #34c759; box-shadow: 0 2px 8px rgba(52,199,89,0.3);">📋 Gen Contents.json</button>
-      <div class="filename-hint">Exports 1024 × 1024 px PNG — App Store ready</div>
+      <button class="download-btn" id="contentsJsonBtn" style="margin-top: 10px; background: #34c759; box-shadow: 0 2px 8px rgba(52,199,89,0.3);">📦 Export All Icons (.zip)</button>
+      <div class="filename-hint">Exports 1024 × 1024 px PNG — App Store ready · ZIP includes all sizes + Contents.json</div>
     </div>
     </div><!-- end controls-wrapper -->
   </div>
@@ -1816,48 +1816,99 @@
       return canvas;
     }
 
-    // ── Gen Contents.json ──
-    document.getElementById('contentsJsonBtn').addEventListener('click', () => {
-      const contentsData = {
-        images: [
-          { idiom: "iphone",        scale: "2x", size: "20x20",    filename: "40.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "40"   },
-          { idiom: "iphone",        scale: "3x", size: "20x20",    filename: "60.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "60"   },
-          { idiom: "iphone",        scale: "2x", size: "29x29",    filename: "58.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "58"   },
-          { idiom: "iphone",        scale: "3x", size: "29x29",    filename: "87.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "87"   },
-          { idiom: "iphone",        scale: "1x", size: "29x29",    filename: "29.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "29"   },
-          { idiom: "iphone",        scale: "2x", size: "40x40",    filename: "80.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "80"   },
-          { idiom: "iphone",        scale: "3x", size: "40x40",    filename: "120.png",  folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "120"  },
-          { idiom: "iphone",        scale: "2x", size: "60x60",    filename: "120.png",  folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "120"  },
-          { idiom: "iphone",        scale: "3x", size: "60x60",    filename: "180.png",  folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "180"  },
-          { idiom: "iphone",        scale: "1x", size: "57x57",    filename: "57.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "57"   },
-          { idiom: "iphone",        scale: "2x", size: "57x57",    filename: "114.png",  folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "114"  },
-          { idiom: "ipad",          scale: "1x", size: "20x20",    filename: "20.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "20"   },
-          { idiom: "ipad",          scale: "2x", size: "20x20",    filename: "40.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "40"   },
-          { idiom: "ipad",          scale: "1x", size: "29x29",    filename: "29.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "29"   },
-          { idiom: "ipad",          scale: "2x", size: "29x29",    filename: "58.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "58"   },
-          { idiom: "ipad",          scale: "1x", size: "40x40",    filename: "40.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "40"   },
-          { idiom: "ipad",          scale: "2x", size: "40x40",    filename: "80.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "80"   },
-          { idiom: "ipad",          scale: "1x", size: "76x76",    filename: "76.png",   folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "76"   },
-          { idiom: "ipad",          scale: "2x", size: "76x76",    filename: "152.png",  folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "152"  },
-          { idiom: "ipad",          scale: "2x", size: "83.5x83.5",filename: "167.png",  folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "167"  },
-          { idiom: "ios-marketing", scale: "1x", size: "1024x1024",filename: "1024.png", folder: "Assets.xcassets/AppIcon.appiconset/", "expected-size": "1024" }
-        ],
-        info: { author: "xcode", version: 1 }
-      };
-
-      const json = JSON.stringify(contentsData, null, 2);
-      const blob = new Blob([json], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.download = 'Contents.json';
-      link.href = url;
-      link.click();
-      URL.revokeObjectURL(url);
-
+    // ── Gen Contents.json + All Icons ZIP ──
+    document.getElementById('contentsJsonBtn').addEventListener('click', async () => {
       const btn = document.getElementById('contentsJsonBtn');
       const orig = btn.innerHTML;
-      btn.textContent = '✅ Downloaded!';
-      setTimeout(() => { btn.innerHTML = orig; }, 1200);
+
+      const contentsImages = [
+        { idiom: "iphone",        scale: "2x", size: "20x20",    filename: "40.png",   "expected-size": "40"   },
+        { idiom: "iphone",        scale: "3x", size: "20x20",    filename: "60.png",   "expected-size": "60"   },
+        { idiom: "iphone",        scale: "2x", size: "29x29",    filename: "58.png",   "expected-size": "58"   },
+        { idiom: "iphone",        scale: "3x", size: "29x29",    filename: "87.png",   "expected-size": "87"   },
+        { idiom: "iphone",        scale: "1x", size: "29x29",    filename: "29.png",   "expected-size": "29"   },
+        { idiom: "iphone",        scale: "2x", size: "40x40",    filename: "80.png",   "expected-size": "80"   },
+        { idiom: "iphone",        scale: "3x", size: "40x40",    filename: "120.png",  "expected-size": "120"  },
+        { idiom: "iphone",        scale: "2x", size: "60x60",    filename: "120.png",  "expected-size": "120"  },
+        { idiom: "iphone",        scale: "3x", size: "60x60",    filename: "180.png",  "expected-size": "180"  },
+        { idiom: "iphone",        scale: "1x", size: "57x57",    filename: "57.png",   "expected-size": "57"   },
+        { idiom: "iphone",        scale: "2x", size: "57x57",    filename: "114.png",  "expected-size": "114"  },
+        { idiom: "ipad",          scale: "1x", size: "20x20",    filename: "20.png",   "expected-size": "20"   },
+        { idiom: "ipad",          scale: "2x", size: "20x20",    filename: "40.png",   "expected-size": "40"   },
+        { idiom: "ipad",          scale: "1x", size: "29x29",    filename: "29.png",   "expected-size": "29"   },
+        { idiom: "ipad",          scale: "2x", size: "29x29",    filename: "58.png",   "expected-size": "58"   },
+        { idiom: "ipad",          scale: "1x", size: "40x40",    filename: "40.png",   "expected-size": "40"   },
+        { idiom: "ipad",          scale: "2x", size: "40x40",    filename: "80.png",   "expected-size": "80"   },
+        { idiom: "ipad",          scale: "1x", size: "76x76",    filename: "76.png",   "expected-size": "76"   },
+        { idiom: "ipad",          scale: "2x", size: "76x76",    filename: "152.png",  "expected-size": "152"  },
+        { idiom: "ipad",          scale: "2x", size: "83.5x83.5",filename: "167.png",  "expected-size": "167"  },
+        { idiom: "ios-marketing", scale: "1x", size: "1024x1024",filename: "1024.png", "expected-size": "1024" }
+      ];
+
+      // Collect unique pixel sizes to render (deduplicated by filename)
+      const uniqueSizes = {};
+      contentsImages.forEach(img => {
+        const px = parseInt(img["expected-size"]);
+        uniqueSizes[img.filename] = px;
+      });
+
+      // Wait for JSZip to be available
+      if (typeof JSZip === 'undefined') {
+        alert('JSZip is still loading — please try again in a moment.');
+        return;
+      }
+
+      btn.disabled = true;
+
+      const total = Object.keys(uniqueSizes).length;
+      let done = 0;
+
+      try {
+        const zip = new JSZip();
+        const folder = zip.folder('AppIcon.appiconset');
+
+        // Render each unique size and add to zip
+        for (const [filename, px] of Object.entries(uniqueSizes)) {
+          done++;
+          btn.textContent = `⏳ Rendering ${done}/${total}…`;
+          // yield to UI between renders
+          await new Promise(r => setTimeout(r, 0));
+          const canvas = await renderHighResIcon(px);
+          const dataUrl = canvas.toDataURL('image/png');
+          const base64 = dataUrl.split(',')[1];
+          folder.file(filename, base64, { base64: true });
+        }
+
+        // Build Contents.json (without the folder field — Xcode doesn't want it)
+        const contentsData = {
+          images: contentsImages.map(img => ({
+            idiom: img.idiom,
+            scale: img.scale,
+            size: img.size,
+            filename: img.filename
+          })),
+          info: { author: "xcode", version: 1 }
+        };
+        folder.file('Contents.json', JSON.stringify(contentsData, null, 2));
+
+        btn.textContent = '📦 Compressing…';
+        await new Promise(r => setTimeout(r, 0));
+
+        const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+        const url = URL.createObjectURL(zipBlob);
+        const link = document.createElement('a');
+        link.download = 'AppIcon.appiconset.zip';
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+
+        btn.textContent = '✅ Downloaded!';
+        setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 1800);
+      } catch (err) {
+        alert('Export failed: ' + err.message);
+        btn.innerHTML = orig;
+        btn.disabled = false;
+      }
     });
 
     // ── Desktop parallax: icon floats as user scrolls ──
@@ -1930,5 +1981,6 @@
 
   })();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </body>
 </html>
