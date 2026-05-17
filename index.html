@@ -1063,8 +1063,9 @@
     <!-- Sticky download bar — outside scroll container -->
     <div class="download-area" style="padding: 12px 16px;">
       <button class="download-btn" id="downloadBtn">⬇️ Download iOS Icon</button>
-      <button class="download-btn" id="contentsJsonBtn" style="background: #34c759; box-shadow: 0 2px 8px rgba(52,199,89,0.3);">📦 Export All Icons (.zip)</button>
-      <div class="filename-hint">Exports 1024 × 1024 px PNG — App Store ready · ZIP includes all sizes + Contents.json</div>
+      <button class="download-btn" id="contentsJsonBtn" style="background: #34c759; box-shadow: 0 2px 8px rgba(52,199,89,0.3);">📦 Export iOS Icons (.zip)</button>
+      <button class="download-btn" id="macIconsBtn" style="background: #af52de; box-shadow: 0 2px 8px rgba(175,82,222,0.3); margin-top: 8px;">🖥️ Export Mac Icons (.zip)</button>
+      <div class="filename-hint">iOS ZIP · Mac ZIP — all sizes + Contents.json, Xcode ready</div>
     </div>
     </div><!-- end controls-wrapper -->
   </div>
@@ -1214,11 +1215,13 @@
       iconSymbolSpan.style.filter = filterVal;
       iconSymbolSpan.style.textShadow = textShadowVal;
 
-      // Shape
+      // Shape — use % so values scale correctly at both 220px (desktop) and 96px (mobile)
+      // 22% ≈ iOS squircle ratio; 50% = circle; 8% = near-square
       let borderRadius = '';
-      if (currentShape === 'squircle') borderRadius = '48px';
+      // 30% is the closest CSS approximation to the n=5 superellipse (Apple squircle)
+      if (currentShape === 'squircle') borderRadius = '30%';
       else if (currentShape === 'circle') borderRadius = '50%';
-      else borderRadius = '18px';
+      else borderRadius = '8%';
       iconPreviewDiv.style.borderRadius = borderRadius;
 
       // Padding
@@ -1562,25 +1565,47 @@
       const ctx = canvas.getContext('2d');
       const scale = S / 220;
 
+      // Snapshot shape NOW (synchronously, before any await) so the value
+      // can never be stale or zero inside the async body
+      const snapShape = currentShape || 'squircle';
+
       ctx.clearRect(0, 0, S, S);
 
       // ── Shape clip path ──
-      const r = currentShape === 'circle' ? S / 2 :
-                currentShape === 'square' ? S * 0.08 :
-                S * 0.225; // squircle — matches iOS ~48px on 220px
-
+      // squircle → Apple superellipse (n=5): NO straight edges, curvature flows
+      //            continuously from side to corner — exactly like macOS/iOS app icons
+      // circle   → perfect arc
+      // square   → roundRect with subtle rounding
       function buildShapePath() {
         ctx.beginPath();
-        if (typeof ctx.roundRect === 'function') {
-          ctx.roundRect(0, 0, S, S, r);
-        } else {
-          const k = r * 0.5523;
-          ctx.moveTo(r, 0);
-          ctx.lineTo(S - r, 0); ctx.bezierCurveTo(S - r + k, 0, S, r - k, S, r);
-          ctx.lineTo(S, S - r); ctx.bezierCurveTo(S, S - r + k, S - r + k, S, S - r, S);
-          ctx.lineTo(r, S);     ctx.bezierCurveTo(r - k, S, 0, S - r + k, 0, S - r);
-          ctx.lineTo(0, r);     ctx.bezierCurveTo(0, r - k, r - k, 0, r, 0);
+        if (snapShape === 'squircle') {
+          // Superellipse: x = cx + a·|cos t|^(2/n)·sign(cos t)
+          //               y = cy + a·|sin t|^(2/n)·sign(sin t)   n=5
+          const n = 5, cx = S / 2, cy = S / 2, a = S / 2;
+          for (let i = 0; i <= 512; i++) {
+            const t   = (i / 512) * Math.PI * 2;
+            const ct  = Math.cos(t), st = Math.sin(t);
+            const x   = cx + a * Math.sign(ct) * Math.pow(Math.abs(ct), 2 / n);
+            const y   = cy + a * Math.sign(st) * Math.pow(Math.abs(st), 2 / n);
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          }
           ctx.closePath();
+        } else if (snapShape === 'circle') {
+          ctx.arc(S / 2, S / 2, S / 2, 0, Math.PI * 2);
+        } else {
+          // Square with subtle rounding
+          const r = S * 0.08;
+          if (typeof ctx.roundRect === 'function') {
+            ctx.roundRect(0, 0, S, S, r);
+          } else {
+            const k = r * 0.5523;
+            ctx.moveTo(r, 0);
+            ctx.lineTo(S - r, 0); ctx.bezierCurveTo(S - r + k, 0, S, r - k, S, r);
+            ctx.lineTo(S, S - r); ctx.bezierCurveTo(S, S - r + k, S - r + k, S, S - r, S);
+            ctx.lineTo(r, S);     ctx.bezierCurveTo(r - k, S, 0, S - r + k, 0, S - r);
+            ctx.lineTo(0, r);     ctx.bezierCurveTo(0, r - k, r - k, 0, r, 0);
+            ctx.closePath();
+          }
         }
       }
 
@@ -1743,6 +1768,25 @@
         ctx.restore();
       }
 
+      // ── Final squircle mask ──
+      // destination-in keeps only pixels INSIDE the shape, cutting transparent
+      // corners out of every layer: background, custom image, emoji, badge, all.
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-in';
+      buildShapePath();
+      ctx.fillStyle = '#000';
+      ctx.fill();
+      ctx.restore();
+
+      // ── Final mask: destination-in punches the shape through every layer
+      // (background, custom image, emoji, badge) — corners become transparent.
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-in';
+      buildShapePath();
+      ctx.fillStyle = '#000';
+      ctx.fill();
+      ctx.restore();
+
       return canvas;
     }
 
@@ -1841,7 +1885,81 @@
       }
     });
 
-    // ── Desktop parallax: icon floats as user scrolls ──
+    // ── Mac Icons Export ──
+    document.getElementById('macIconsBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('macIconsBtn');
+      const orig = btn.innerHTML;
+
+      const macImages = [
+        { idiom: "mac", scale: "1x", size: "16x16",   filename: "icon_16x16.png",      px: 16   },
+        { idiom: "mac", scale: "2x", size: "16x16",   filename: "icon_16x16@2x.png",   px: 32   },
+        { idiom: "mac", scale: "1x", size: "32x32",   filename: "icon_32x32.png",      px: 32   },
+        { idiom: "mac", scale: "2x", size: "32x32",   filename: "icon_32x32@2x.png",   px: 64   },
+        { idiom: "mac", scale: "1x", size: "128x128", filename: "icon_128x128.png",    px: 128  },
+        { idiom: "mac", scale: "2x", size: "128x128", filename: "icon_128x128@2x.png", px: 256  },
+        { idiom: "mac", scale: "1x", size: "256x256", filename: "icon_256x256.png",    px: 256  },
+        { idiom: "mac", scale: "2x", size: "256x256", filename: "icon_256x256@2x.png", px: 512  },
+        { idiom: "mac", scale: "1x", size: "512x512", filename: "icon_512x512.png",    px: 512  },
+        { idiom: "mac", scale: "2x", size: "512x512", filename: "icon_512x512@2x.png", px: 1024 }
+      ];
+
+      if (typeof JSZip === 'undefined') {
+        alert('JSZip is still loading — please try again in a moment.');
+        return;
+      }
+
+      btn.disabled = true;
+      const total = macImages.length;
+      let done = 0;
+
+      try {
+        const zip = new JSZip();
+        const folder = zip.folder('AppIcon.appiconset');
+
+        for (const img of macImages) {
+          done++;
+          btn.textContent = `Rendering ${done}/${total}...`;
+          await new Promise(r => setTimeout(r, 0));
+          const canvas = await renderHighResIcon(img.px);
+          const base64 = canvas.toDataURL('image/png').split(',')[1];
+          folder.file(img.filename, base64, { base64: true });
+        }
+
+        // Contents.json — Mac format matching Xcode spec
+        const contentsData = {
+          images: macImages.map(img => ({
+            idiom:    img.idiom,
+            scale:    img.scale,
+            size:     img.size,
+            filename: img.filename
+          })),
+          info: { author: "xcode", version: 1 }
+        };
+        folder.file('Contents.json', JSON.stringify(contentsData, null, 2));
+
+        btn.textContent = 'Compressing...';
+        await new Promise(r => setTimeout(r, 0));
+
+        const zipBlob = await zip.generateAsync({
+          type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 }
+        });
+        const url = URL.createObjectURL(zipBlob);
+        const a = document.createElement('a');
+        a.download = 'AppIcon-Mac.appiconset.zip';
+        a.href = url;
+        a.click();
+        URL.revokeObjectURL(url);
+
+        btn.textContent = 'Downloaded!';
+        setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 1800);
+      } catch (err) {
+        alert('Export failed: ' + err.message);
+        btn.innerHTML = orig;
+        btn.disabled = false;
+      }
+    });
+
+        // ── Desktop parallax: icon floats as user scrolls ──
     (function initParallax() {
       // Only run on non-touch desktop (pointer: fine)
       if (!window.matchMedia('(pointer: fine)').matches) return;
