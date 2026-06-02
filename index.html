@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <!-- ===== ZERO-FAIL FAVICON STACK ===== -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <!-- ===== ZERO-FAIL FAVICON STACK ===== -->
 
 <!-- 1. ICO: Legacy IE & browsers that only sniff .ico -->
 <link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/RSWI1/RS-iconGEN@main/favicon.ico">
@@ -22,2231 +22,782 @@
 
 <!-- 6. Safari Pinned Tab (monochrome SVG, single-color paths only) -->
 <link rel="mask-icon" href="https://cdn.jsdelivr.net/gh/RSWI1/RSView@main/safari-pinned-tab.svg?v=2" color="#00fbff">
-
-  <title>RS IconGen– iOS Icon Studio</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      user-select: none;
-    }
-
-    body {
-      background: #f2f2f6;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;          /* was center — allows scroll to work */
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .app-container {
-      max-width: 1300px;
-      width: 100%;
-      background: #ffffff;
-      border-radius: 48px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 6px 12px rgba(0, 0, 0, 0.05);
-      /* overflow:hidden removed — breaks position:sticky on child preview-panel */
-      transition: all 0.2s ease;
-    }
-
-    .header {
-      padding: 24px 32px 12px 32px;
-      border-bottom: 1px solid #e9e9ef;
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-
-    .logo-area {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo-icon {
-      font-size: 32px;
-      font-weight: 600;
-      background: #007aff;
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-
-    .logo-text {
-      font-size: 24px;
-      font-weight: 600;
-      letter-spacing: -0.3px;
-      background: linear-gradient(135deg, #1c1c1e, #3a3a3e);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .badge-selector {
-      background: #f2f2f6;
-      border-radius: 30px;
-      padding: 4px;
-      display: inline-flex;
-      gap: 6px;
-    }
-
-    .badge-option {
-      padding: 6px 16px;
-      border-radius: 30px;
-      font-size: 14px;
-      font-weight: 500;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s;
-      color: #3a3a3e;
-    }
-
-    .badge-option.active {
-      background: #ffffff;
-      color: #007aff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-
-    .two-columns {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 24px;
-      padding: 28px 32px 32px 32px;
-    }
-
-    .preview-panel {
-      flex: 1.2;
-      min-width: 280px;
-      background: #fefefe;
-      border-radius: 36px;
-      padding: 24px 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02), inset 0 1px 0 #fff;
-      border: 1px solid #efeff4;
-      /* Sticky on desktop so it follows scroll */
-      position: sticky;
-      top: 24px;
-      align-self: flex-start;
-    }
-
-    .canvas-container {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 32px;
-      position: relative;
-    }
-
-    .icon-preview {
-      width: 220px;
-      height: 220px;
-      background: #f0f0f5;
-      border-radius: 48px;
-      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.05);
-      transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-      overflow: hidden;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .icon-inner {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-
-    .icon-symbol {
-      font-size: 88px;
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
-      transition: transform 0.2s ease;
-    }
-
-    .shape-selector {
-      display: flex;
-      justify-content: center;
-      gap: 24px;
-      margin: 28px 0 20px;
-      background: #f2f2f6;
-      border-radius: 100px;
-      padding: 6px 10px;
-      width: fit-content;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .shape-btn {
-      background: transparent;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 40px;
-      font-size: 14px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #5a5a5e;
-      cursor: pointer;
-      transition: 0.1s;
-    }
-
-    .shape-btn.active {
-      background: #fff;
-      color: #007aff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-
-    .badge-note {
-      text-align: center;
-      margin-top: 12px;
-      font-size: 13px;
-      color: #8e8e93;
-      background: #f8f8fc;
-      padding: 8px;
-      border-radius: 28px;
-    }
-
-    .controls-panel {
-      flex: 1;
-      min-width: 280px;
-      background: #ffffff;
-      border-radius: 36px;
-      padding: 12px 8px 20px 8px;
-    }
-
-    .control-group {
-      margin-bottom: 28px;
-      border-bottom: 1px solid #e9e9ef;
-      padding-bottom: 20px;
-    }
-
-    .group-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #1c1c1e;
-      margin-bottom: 16px;
-      letter-spacing: -0.2px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .color-preview {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      background: #007aff;
-      border: 1px solid #e9e9ef;
-    }
-
-    .grid-colors {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin: 12px 0 6px;
-    }
-
-    .swatch {
-      width: 44px;
-      height: 44px;
-      border-radius: 16px;
-      cursor: pointer;
-      transition: 0.1s;
-      border: 2px solid transparent;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    .swatch.selected {
-      border: 3px solid #fff;
-      box-shadow: 0 0 0 2px #007aff;
-      transform: scale(1.02);
-    }
-
-    .texture-grid {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    .texture-item {
-      background: #f2f2f6;
-      border-radius: 28px;
-      padding: 6px 16px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: 0.1s;
-      color: #2c2c2e;
-    }
-
-    .texture-item.active {
-      background: #007aff;
-      color: white;
-    }
-
-    .slider-container {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      margin-top: 12px;
-    }
-
-    input[type="range"] {
-      flex: 1;
-      height: 4px;
-      -webkit-appearance: none;
-      background: #d9d9df;
-      border-radius: 10px;
-    }
-
-    input[type="range"]:focus {
-      outline: none;
-    }
-
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 20px;
-      height: 20px;
-      background: #007aff;
-      border-radius: 30px;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
-
-    .effect-buttons {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .effect-chip {
-      background: #f2f2f6;
-      border-radius: 32px;
-      padding: 6px 16px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: 0.1s;
-    }
-
-    .effect-chip.active {
-      background: #1c1c1e;
-      color: white;
-    }
-
-    .download-area {
-      margin-top: 32px;
-      text-align: center;
-    }
-
-    .download-btn {
-      background: #007aff;
-      border: none;
-      border-radius: 44px;
-      padding: 12px 24px;
-      font-weight: 600;
-      font-size: 17px;
-      color: white;
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: 0.2s;
-      box-shadow: 0 2px 8px rgba(0,122,255,0.3);
-      width: 100%;
-      justify-content: center;
-    }
-
-    .download-btn:active {
-      transform: scale(0.97);
-    }
-
-    .filename-hint {
-      font-size: 12px;
-      color: #8e8e93;
-      margin-top: 12px;
-    }
-
-    hr {
-      margin: 6px 0;
-      border-color: #efeff4;
-    }
-
-    /* ===== NEW FEATURES ===== */
-
-    /* Gradient presets row */
-    .gradient-presets {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin: 10px 0 6px;
-    }
-    .grad-swatch {
-      width: 44px;
-      height: 44px;
-      border-radius: 16px;
-      cursor: pointer;
-      border: 2px solid transparent;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-      transition: 0.12s;
-    }
-    .grad-swatch.selected {
-      border: 3px solid #fff;
-      box-shadow: 0 0 0 2px #007aff;
-      transform: scale(1.04);
-    }
-    .angle-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 8px;
-      flex-wrap: wrap;
-    }
-    .angle-row span { font-size: 12px; }
-
-    /* Border/Frame */
-    .border-color-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin: 8px 0 6px;
-    }
-    .border-swatch {
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
-      cursor: pointer;
-      border: 2px solid transparent;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-      transition: 0.12s;
-    }
-    .border-swatch.selected {
-      border: 3px solid #fff;
-      box-shadow: 0 0 0 2px #007aff;
-    }
-
-    /* Text label */
-    .label-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-top: 8px;
-    }
-    .label-input {
-      flex: 1;
-      border: 1px solid #d9d9df;
-      border-radius: 16px;
-      padding: 7px 12px;
-      font-size: 14px;
-      font-family: inherit;
-      background: #f2f2f6;
-      color: #1c1c1e;
-      outline: none;
-      min-width: 100px;
-    }
-
-    /* Randomize button */
-    .randomize-btn {
-      background: linear-gradient(135deg, #ff9500, #ff3b30);
-      border: none;
-      border-radius: 44px;
-      padding: 10px 22px;
-      font-weight: 600;
-      font-size: 15px;
-      color: white;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: 0.2s;
-      box-shadow: 0 2px 8px rgba(255,80,0,0.3);
-      width: 100%;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-    .randomize-btn:active { transform: scale(0.97); }
-
-    /* Icon text overlay */
-    #iconTextOverlay {
-      position: absolute;
-      bottom: 18px;
-      left: 0; right: 0;
-      text-align: center;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      pointer-events: none;
-      z-index: 10;
-      text-transform: uppercase;
-      transition: all 0.2s;
-    }
-
-    /* ======================================
-       MOBILE / iOS — Complete Overhaul
-       ====================================== */
-
-    /* Tablet (≤780px) */
-    @media (max-width: 780px) {
-      body { padding: 12px; align-items: flex-start; }
-      .app-container { border-radius: 28px; }
-      .header { padding: 16px 20px 10px; gap: 10px; }
-      .two-columns { flex-direction: column; gap: 16px; padding: 16px 16px 24px; }
-      .preview-panel { border-radius: 24px; padding: 20px 16px; }
-      .icon-preview { width: 180px; height: 180px; }
-      .controls-panel { border-radius: 24px; padding: 8px 4px 16px; }
-    }
-
-    /* iPhone / small phones (<=430px) — Upgraded Layout */
-    @media (max-width: 430px) {
-
-      html, body { height: 100%; overflow: hidden; }
-      body { padding: 0; align-items: stretch; background: #000; }
-      .app-container {
-        border-radius: 0;
-        box-shadow: none;
-        height: 100vh;
-        height: 100dvh;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
-
-      .header {
-        padding: 10px 14px 8px 14px;
-        padding-top: calc(10px + env(safe-area-inset-top));
-        flex-shrink: 0;
-        gap: 10px;
-        align-items: center;
-        flex-wrap: nowrap;
-      }
-      .logo-icon { width: 34px; height: 34px; font-size: 18px; border-radius: 10px; flex-shrink: 0; }
-      .logo-text { font-size: 17px; white-space: nowrap; }
-      .badge-selector {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        flex-shrink: 1;
-        padding: 3px;
-        gap: 4px;
-      }
-      .badge-selector::-webkit-scrollbar { display: none; }
-      .badge-option { white-space: nowrap; padding: 5px 12px; font-size: 13px; min-height: 32px; }
-
-      .two-columns {
-        flex-direction: column;
-        gap: 0;
-        padding: 0;
-        flex: 1;
-        min-height: 0;
-        overflow: hidden;
-        display: flex;
-      }
-
-      /* KEY FIX: position:static kills the desktop sticky that caused the dead gray space */
-      .preview-panel {
-        position: static !important;
-        align-self: auto !important;
-        flex-shrink: 0;
-        border-radius: 0;
-        border: none;
-        border-bottom: 1px solid rgba(120,120,128,0.18);
-        box-shadow: none;
-        padding: 10px 14px;
-        background: inherit;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 14px;
-      }
-      .canvas-container {
-        margin-bottom: 0;
-        flex-shrink: 0;
-        width: 96px;
-        height: 96px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .icon-preview {
-        width: 96px;
-        height: 96px;
-        border-radius: 22px;
-        box-shadow: 0 8px 20px -4px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.15);
-      }
-      .preview-side-info {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        min-width: 0;
-      }
-      .shape-selector {
-        margin: 0;
-        width: 100%;
-        background: rgba(120,120,128,0.12);
-        padding: 3px;
-        border-radius: 10px;
-        display: flex;
-        gap: 2px;
-      }
-      .shape-btn {
-        flex: 1;
-        padding: 7px 2px;
-        font-size: 11px;
-        gap: 3px;
-        justify-content: center;
-        border-radius: 8px;
-        min-height: 36px;
-      }
-      .badge-note {
-        font-size: 11px;
-        padding: 6px 10px;
-        border-radius: 10px;
-        line-height: 1.3;
-        margin-top: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .controls-wrapper {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        min-height: 0;
-      }
-      .controls-panel {
-        flex: 1;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior: contain;
-        border-radius: 0;
-        padding: 0 0 4px 0 !important;
-      }
-
-      .control-group { margin-bottom: 0; border-bottom: 1px solid rgba(120,120,128,0.16); padding-bottom: 0; }
-      .group-title {
-        font-size: 15px;
-        padding: 13px 16px;
-        margin-bottom: 0;
-        min-height: 50px;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-      }
-      .group-title::after {
-        content: ">";
-        font-size: 18px;
-        font-weight: 300;
-        color: #8e8e93;
-        transition: transform 0.2s;
-        margin-left: auto;
-        padding-left: 8px;
-        flex-shrink: 0;
-      }
-      .group-title.open::after { transform: rotate(90deg); }
-      .control-body { display: none; padding: 4px 16px 16px; animation: slideDown 0.18s ease; }
-      .control-body.open { display: block; }
-      @keyframes slideDown {
-        from { opacity: 0; transform: translateY(-5px); }
-        to   { opacity: 1; transform: translateY(0); }
-      }
-
-      /* Sticky bottom action bar — two buttons side by side */
-      .download-area {
-        flex-shrink: 0;
-        margin-top: 0;
-        padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
-        background: inherit;
-        border-top: 1px solid rgba(120,120,128,0.18);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-      }
-      .randomize-btn {
-        grid-column: 1 / -1;
-        margin-bottom: 0;
-        min-height: 46px;
-        font-size: 15px;
-        border-radius: 13px;
-        padding: 10px 16px;
-      }
-      .download-btn {
-        min-height: 50px;
-        font-size: 14px;
-        font-weight: 600;
-        border-radius: 13px;
-        padding: 10px 6px;
-        width: 100%;
-        margin-top: 0 !important;
-      }
-      .filename-hint {
-        grid-column: 1 / -1;
-        margin-top: 0;
-        font-size: 10px;
-        line-height: 1.4;
-        text-align: center;
-      }
-
-      .swatch, .grad-swatch { width: 46px; height: 46px; border-radius: 14px; }
-      .border-swatch        { width: 42px; height: 42px; border-radius: 12px; }
-      .texture-item, .effect-chip { padding: 8px 14px; min-height: 36px; font-size: 13px; }
-      .texture-grid, .effect-buttons {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        padding-bottom: 4px;
-        gap: 8px;
-      }
-      .texture-grid::-webkit-scrollbar, .effect-buttons::-webkit-scrollbar { display: none; }
-      .texture-item, .effect-chip { flex-shrink: 0; }
-
-      input[type="range"] { height: 6px; }
-      input[type="range"]::-webkit-slider-thumb { width: 26px; height: 26px; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
-      .slider-container { gap: 10px; margin-top: 12px; }
-      .slider-container span { font-size: 12px; }
-
-      .grid-colors span[data-emoji] { font-size: 28px; min-width: 46px; min-height: 46px; display: flex; align-items: center; justify-content: center; }
-      .grid-colors { gap: 8px; }
-
-      .label-input { font-size: 16px; padding: 10px 14px; border-radius: 12px; min-height: 44px; }
-      #loadPngBtn { min-height: 44px; padding: 10px 18px; font-size: 14px; border-radius: 12px; }
-      .angle-row { flex-wrap: nowrap; }
-      .color-preview { width: 22px; height: 22px; border-radius: 6px; }
-    }
-  </style>
-
-    <!-- PREMIUM_DARK_MODE_INJECTED -->
-    <style>
-        /* === Apple System Dark Mode Color Mapping === */
-        body {
-            background: #000000 !important; /* System Background -*/
-        }
-
-        .app-container {
-            background: #1c1c1e !important; /* Secondary System Background */
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 6px 12px rgba(0, 0, 0, 0.4) !important;
-        }
-
-        .header {
-            border-bottom-color: #38383a !important; /* Opaque Separator */
-        }
-
-        .logo-text {
-            background: linear-gradient(135deg, #ffffff, #d1d1d6) !important;
-            -webkit-background-clip: text !important;
-            background-clip: text !important;
-        }
-
-        .badge-selector, .shape-selector {
-            background: #2c2c2e !important; /* Tertiary System Background */
-        }
-
-        .badge-option, .shape-btn {
-            color: #ebebf5 !important; /* Secondary Label */
-        }
-
-        .badge-option.active, .shape-btn.active {
-            background: #3a3a3c !important; 
-            color: #0a84ff !important; /* Dark Mode Apple Blue */
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4) !important;
-        }
-
-        .preview-panel {
-            background: #2c2c2e !important;
-            border-color: #38383a !important;
-            box-shadow: none !important;
-        }
-
-        .icon-preview {
-            background: #1c1c1e !important;
-            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.8), 0 1px 3px rgba(0,0,0,0.4) !important;
-        }
-
-        .badge-note {
-            color: #98989d !important;
-            background: #2c2c2e !important;
-        }
-
-        .controls-panel {
-            background: #1c1c1e !important;
-        }
-
-        .control-group {
-            border-bottom-color: #38383a !important;
-        }
-
-        .group-title {
-            color: #ffffff !important; /* Label */
-        }
-
-        .color-preview, .swatch {
-            border-color: #38383a !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
-        }
-
-        .swatch.selected {
-            border-color: #1c1c1e !important;
-            box-shadow: 0 0 0 2px #0a84ff !important;
-        }
-
-        .texture-item, .effect-chip, #loadPngBtn {
-            background: #2c2c2e !important;
-            color: #ffffff !important;
-        }
-
-        .texture-item.active {
-            background: #0a84ff !important;
-            color: white !important;
-        }
-
-        .effect-chip.active {
-            background: #e0e0e0 !important; /* Standout active chip */
-            color: #000000 !important;
-        }
-
-        input[type="range"] {
-            background: #39393d !important; /* Dark Mode Track */
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            background: #0a84ff !important;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.5) !important;
-        }
-
-        #downloadBtn {
-            background: #0a84ff !important; /* Dark Mode Apple Blue */
-            box-shadow: 0 2px 8px rgba(10,132,255,0.4) !important;
-        }
-        #contentsJsonBtn {
-            background: #30d158 !important; /* Dark Mode Apple Green */
-            box-shadow: 0 2px 8px rgba(48,209,88,0.4) !important;
-        }
-
-        .filename-hint {
-            color: #98989d !important;
-        }
-
-        /* Dark mode new features */
-        .label-input {
-          background: #2c2c2e !important;
-          border-color: #38383a !important;
-          color: #ffffff !important;
-        }
-        .randomize-btn {
-          background: linear-gradient(135deg, #ff9f0a, #ff453a) !important;
-          box-shadow: 0 2px 8px rgba(255,80,0,0.4) !important;
-        }
-        .border-swatch, .grad-swatch {
-          box-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
-        }
-    </style>
-
-    <!-- ===== WEBSITE OVERLAY STYLES ===== -->
-    <style>
-      /* Backdrop */
-      .web-overlay-backdrop {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.72);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        z-index: 2000;
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        padding: 0 16px max(24px, env(safe-area-inset-bottom));
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.28s ease;
-      }
-      .web-overlay-backdrop.open {
-        opacity: 1;
-        pointer-events: all;
-      }
-
-      /* Bottom sheet */
-      .web-overlay-sheet {
-        background: #1c1c1e;
-        border-radius: 28px 28px 22px 22px;
-        padding: 12px 20px 20px;
-        width: 100%;
-        max-width: 500px;
-        transform: translateY(50px);
-        transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
-        box-shadow: 0 -4px 40px rgba(0,0,0,0.6);
-      }
-      .web-overlay-backdrop.open .web-overlay-sheet {
-        transform: translateY(0);
-      }
-
-      /* Drag handle */
-      .web-overlay-handle {
-        width: 38px;
-        height: 4px;
-        background: #48484a;
-        border-radius: 4px;
-        margin: 0 auto 14px;
-      }
-
-      /* Sheet title */
-      .web-overlay-title {
-        font-size: 16px;
-        font-weight: 700;
-        color: #ebebf5;
-        text-align: center;
-        margin-bottom: 16px;
-        letter-spacing: -0.2px;
-      }
-
-      /* Individual website card */
-      .web-card {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        background: #2c2c2e;
-        border-radius: 18px;
-        padding: 13px 14px;
-        margin-bottom: 10px;
-        cursor: pointer;
-        text-decoration: none;
-        transition: background 0.14s, transform 0.14s;
-        -webkit-tap-highlight-color: transparent;
-      }
-      .web-card:last-of-type { margin-bottom: 0; }
-      .web-card:hover  { background: #3a3a3c; }
-      .web-card:active { background: #3a3a3c; transform: scale(0.97); }
-
-      /* Card icon badge */
-      .web-card-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 26px;
-        flex-shrink: 0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.35);
-      }
-
-      /* Card text */
-      .web-card-info { flex: 1; min-width: 0; }
-      .web-card-name {
-        font-size: 15px;
-        font-weight: 600;
-        color: #ffffff;
-        margin-bottom: 3px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .web-card-desc {
-        font-size: 12px;
-        color: #8e8e93;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      /* Chevron */
-      .web-card-chevron {
-        color: #3a3a3c;
-        font-size: 20px;
-        font-weight: 300;
-        flex-shrink: 0;
-        line-height: 1;
-      }
-
-      /* Close pill */
-      .web-overlay-close {
-        display: block;
-        width: 100%;
-        margin-top: 14px;
-        padding: 14px;
-        background: #2c2c2e;
-        border: none;
-        border-radius: 16px;
-        color: #0a84ff;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        font-family: inherit;
-        -webkit-tap-highlight-color: transparent;
-        transition: background 0.14s;
-      }
-      .web-overlay-close:hover  { background: #3a3a3c; }
-      .web-overlay-close:active { background: #3a3a3c; }
-
-      /* Trigger button in header */
-      .web-overlay-trigger {
-        background: #2c2c2e;
-        border: none;
-        cursor: pointer;
-        padding: 7px 10px;
-        border-radius: 12px;
-        font-size: 18px;
-        transition: background 0.14s, transform 0.14s;
-        -webkit-tap-highlight-color: transparent;
-        flex-shrink: 0;
-        line-height: 1;
-      }
-      .web-overlay-trigger:hover  { background: #3a3a3c; }
-      .web-overlay-trigger:active { transform: scale(0.93); }
-    </style>
-    </head>
+<title>Squircle Icon Generator</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{
+  --bg:#080a10;--bg2:#0e1119;--bg3:#151a28;--card:#1a2035;--card2:#202842;
+  --border:#283050;--border2:#354068;--fg:#e8ecf8;--fg2:#b8c4e0;--muted:#5a6888;
+  --accent:#ff6b35;--accent2:#ff8f5e;--accent-dim:rgba(255,107,53,.1);--accent-glow:rgba(255,107,53,.25);
+  --ios:#007aff;--android:#3ddc84;--macos:#bf5af2;--watch:#00d4aa;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden}
+h1,h2,h3,h4,h5{font-family:'Space Grotesk',sans-serif}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes orbF1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(50px,30px) scale(1.1)}}
+@keyframes orbF2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-40px,-50px) scale(1.05)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes toastIn{from{opacity:0;transform:translateX(30px) scale(.95)}to{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes toastOut{to{opacity:0;transform:translateX(30px) scale(.95)}}
+
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:.06}
+.orb1{width:500px;height:500px;background:var(--accent);top:-150px;left:-100px;animation:orbF1 20s ease-in-out infinite}
+.orb2{width:400px;height:400px;background:#6366f1;bottom:-100px;right:-80px;animation:orbF2 24s ease-in-out infinite}
+
+.container{max-width:1200px;margin:0 auto;padding:24px;position:relative;z-index:1}
+
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;animation:fadeUp .6s ease-out}
+.logo-row{display:flex;align-items:center;gap:12px}
+.logo-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#ff3d00);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(255,107,53,.2)}
+.logo-icon i{color:#fff;font-size:20px}
+.logo-text{font-size:22px;font-weight:800;letter-spacing:-0.5px}
+.logo-text span{color:var(--accent)}
+
+.main-grid{display:grid;grid-template-columns:1fr 360px;gap:24px;animation:fadeUp .6s ease-out .1s both}
+@media(max-width:900px){.main-grid{grid-template-columns:1fr}}
+
+.preview-panel{background:var(--bg2);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.preview-tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto}
+.preview-tab{padding:12px 18px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border:none;background:none;transition:all .2s;font-family:'Space Grotesk';white-space:nowrap;border-bottom:2px solid transparent}
+.preview-tab:hover{color:var(--fg)}
+.preview-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.preview-area{display:flex;align-items:center;justify-content:center;min-height:420px;padding:32px;position:relative}
+.preview-area canvas{max-width:100%;max-height:380px;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+
+.upload-zone{width:100%;max-width:340px;padding:48px 32px;border:2px dashed var(--border);border-radius:20px;text-align:center;cursor:pointer;transition:all .3s;background:var(--bg3)}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--accent);background:var(--accent-dim)}
+.upload-zone .uz-icon{width:64px;height:64px;border-radius:16px;margin:0 auto 16px;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;transition:transform .3s}
+.upload-zone:hover .uz-icon{transform:scale(1.1) rotate(-5deg)}
+.upload-zone h3{font-size:16px;font-weight:600;margin-bottom:6px}
+.upload-zone p{font-size:13px;color:var(--muted)}
+
+.size-grid-area{padding:16px 20px;border-top:1px solid var(--border)}
+.size-grid-area h5{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;font-weight:600}
+.size-grid{display:flex;gap:12px;flex-wrap:wrap;align-items:end}
+.size-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:transform .2s}
+.size-item:hover{transform:scale(1.08)}
+.size-item canvas{border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.size-item span{font-size:9px;color:var(--muted);font-family:'Space Grotesk';font-weight:600}
+
+.controls{display:flex;flex-direction:column;gap:16px}
+.ctrl-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px;transition:border-color .2s}
+.ctrl-card:hover{border-color:var(--border2)}
+.ctrl-card h4{font-size:12px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.8px;color:var(--fg2)}
+.ctrl-card h4 i{font-size:11px;color:var(--accent)}
+
+.slider-wrap{margin-bottom:14px}
+.slider-wrap:last-child{margin-bottom:0}
+.slider-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.slider-head label{font-size:12px;color:var(--fg2);font-weight:500}
+.slider-head .sval{font-size:11px;color:var(--accent);font-weight:700;font-family:'Space Grotesk';min-width:40px;text-align:right}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:var(--border);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);cursor:pointer;transition:box-shadow .2s}
+input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 4px var(--accent-glow)}
+
+.shape-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.shape-btn{padding:10px 6px;border-radius:10px;border:2px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Space Grotesk';text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
+.shape-btn:hover{border-color:var(--accent);color:var(--fg)}
+.shape-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.shape-btn canvas{border-radius:2px}
+
+.color-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.color-row label{font-size:12px;color:var(--fg2);min-width:70px}
+.color-row input[type=color]{width:36px;height:28px;border:1px solid var(--border);border-radius:6px;background:var(--card);cursor:pointer;padding:2px}
+.color-row .hex-input{flex:1;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--fg);font-size:12px;font-family:'Space Grotesk';outline:none}
+.color-row .hex-input:focus{border-color:var(--accent)}
+
+.grad-dir{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:10px}
+.grad-dir button{width:100%;aspect-ratio:1;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:10px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.grad-dir button:hover{border-color:var(--accent);color:var(--fg)}
+.grad-dir button.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+
+.platform-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;padding-right:4px}
+.platform-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:transparent;cursor:pointer;transition:all .2s}
+.platform-item:hover{border-color:var(--border2);background:rgba(255,255,255,.02)}
+.platform-item.active{border-color:var(--accent);background:var(--accent-dim)}
+.platform-item .pi-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.platform-item .pi-name{font-size:12px;font-weight:600;flex:1;white-space:nowrap}
+.platform-item .pi-badge{font-size:9px;padding:2px 8px;border-radius:4px;font-weight:700;font-family:'Space Grotesk'}
+.platform-item .pi-size{font-size:11px;color:var(--muted);font-family:'Space Grotesk'}
+
+.export-btns{display:flex;flex-direction:column;gap:8px}
+.exp-btn{padding:14px;border-radius:12px;border:none;font-size:13px;font-weight:700;font-family:'Space Grotesk';cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.exp-btn.primary{background:linear-gradient(135deg,var(--accent),#ff3d00);color:#fff;box-shadow:0 6px 24px rgba(255,107,53,.2)}
+.exp-btn.primary:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(255,107,53,.3)}
+.exp-btn.ghost{background:var(--card);color:var(--fg2);border:1px solid var(--border)}
+.exp-btn.ghost:hover{border-color:var(--accent);color:var(--fg)}
+.exp-btn.zip{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 6px 24px rgba(99,102,241,.2)}
+.exp-btn.zip:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(99,102,241,.3)}
+.exp-btn:disabled{opacity:.4;pointer-events:none}
+
+.compare-row{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:8px}
+.compare-item{display:flex;flex-direction:column;align-items:center;gap:4px}
+.compare-item span{font-size:10px;color:var(--muted);font-family:'Space Grotesk';font-weight:600}
+.compare-item canvas{border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+
+.toast-container{position:fixed;bottom:24px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:6px}
+.toast{padding:10px 18px;border-radius:10px;background:var(--card);border:1px solid var(--border);color:var(--fg);font-size:12px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.5);animation:toastIn .3s ease-out;display:flex;align-items:center;gap:8px}
+.toast.exit{animation:toastOut .2s ease-in forwards}
+
+.info-tip{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--card);color:var(--muted);font-size:9px;cursor:help;margin-left:4px;border:1px solid var(--border)}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
 <body>
 
-<div class="app-container">
-  <div class="header">
-    <div class="logo-area">
-      <div class="logo-icon">🎨</div>
-      <div class="logo-text">RS iconGen</div>
-    </div>
-    <div class="badge-selector">
-      <button class="badge-option active" data-badge="none">No Badge</button>
-      <button class="badge-option" data-badge="beta">BETA</button>
-      <button class="badge-option" data-badge="new">NEW</button>
-      <button class="badge-option" data-badge="numeric">123</button>
-    </div>
-    <!-- Image Resources trigger -->
-    <button class="web-overlay-trigger" id="webOverlayTrigger" title="Image Resources">🌐</button>
-  </div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
 
-  <div class="two-columns">
+<div class="container">
+  <header class="header">
+    <div class="logo-row">
+      <div class="logo-icon"><i class="fas fa-vector-square" style="font-size:18px"></i></div>
+      <h1 class="logo-text">Squircle<span>Lab</span></h1>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span style="font-size:11px;color:var(--muted)"><i class="fas fa-lock" style="color:var(--accent);margin-right:4px"></i>100% local processing</span>
+    </div>
+  </header>
+
+  <div class="main-grid">
+    <!-- Left: Preview -->
     <div class="preview-panel">
-      <div class="canvas-container">
-        <div class="icon-preview" id="iconPreview">
-          <div class="icon-inner" id="iconInner">
-            <div class="icon-symbol" id="iconSymbol">📱</div>
-          </div>
-          <div id="iconTextOverlay"></div>
-        </div>
+      <div class="preview-tabs">
+        <button class="preview-tab active" data-tab="preview">Preview</button>
+        <button class="preview-tab" data-tab="compare">Compare</button>
+        <button class="preview-tab" data-tab="sizes">All Sizes</button>
       </div>
-      <div class="preview-side-info">
-        <div class="shape-selector">
-          <button class="shape-btn active" data-shape="squircle">🍎 Squircle</button>
-          <button class="shape-btn" data-shape="circle">⚪ Circle</button>
-          <button class="shape-btn" data-shape="square">⬛ Square</button>
+
+      <div class="preview-area" id="previewArea">
+        <div class="upload-zone" id="uploadZone">
+          <div class="uz-icon"><i class="fas fa-cloud-arrow-up" style="color:var(--accent);font-size:28px"></i></div>
+          <h3>Drop your icon here</h3>
+          <p>or click to browse — PNG, JPG, SVG</p>
+          <input type="file" id="fileInput" accept="image/*" style="display:none">
         </div>
-        <div class="badge-note" id="badgeStatus">
-          ✨ No badge — clean iOS style
-        </div>
+        <canvas id="mainPreview" style="display:none"></canvas>
+      </div>
+
+      <div class="size-grid-area" id="sizeGridArea" style="display:none">
+        <h5>Generated Sizes</h5>
+        <div class="size-grid" id="sizeGrid"></div>
       </div>
     </div>
 
-    <div class="controls-wrapper">
-    <div class="controls-panel">
-      <div class="control-group">
-        <div class="group-title" data-section="bg"><span>🎨 Background</span> <span class="color-preview" id="bgColorPreview"></span></div>
-        <div class="control-body open" id="body-bg">
-          <div class="grid-colors" id="colorGrid">
-            <div class="swatch" style="background: #007aff;" data-color="#007aff"></div>
-            <div class="swatch" style="background: #34c759;" data-color="#34c759"></div>
-            <div class="swatch" style="background: #ff3b30;" data-color="#ff3b30"></div>
-            <div class="swatch" style="background: #ff9500;" data-color="#ff9500"></div>
-            <div class="swatch" style="background: #af52de;" data-color="#af52de"></div>
-            <div class="swatch" style="background: #000000;" data-color="#000000"></div>
-            <div class="swatch" style="background: #ffffff; border:1px solid #ddd;" data-color="#ffffff"></div>
-            <div class="swatch" style="background: linear-gradient(135deg, #4158D0, #C850C0);" data-color="gradient1"></div>
+    <!-- Right: Controls -->
+    <div class="controls">
+      <!-- Shape -->
+      <div class="ctrl-card">
+        <h4><i class="fas fa-shapes"></i> Shape</h4>
+        <div class="shape-grid" id="shapeGrid"></div>
+        <div class="slider-wrap" style="margin-top:14px">
+          <div class="slider-head">
+            <label>Corner Smoothness <span class="info-tip" title="Controls the squircle curvature. iOS uses ~0.7, Android uses ~0.9">?</span></label>
+            <span class="sval" id="smoothVal">0.70</span>
           </div>
-          <div class="slider-container">
-            <span style="font-size:12px;">🎨 Custom</span>
-            <input type="color" id="customColorPicker" value="#007aff">
+          <input type="range" id="smoothSlider" min="0" max="100" value="70">
+        </div>
+        <div class="slider-wrap">
+          <div class="slider-head">
+            <label>Icon Padding</label>
+            <span class="sval" id="paddingVal">10%</span>
           </div>
+          <input type="range" id="paddingSlider" min="0" max="40" value="10">
         </div>
       </div>
 
-      <div class="control-group">
-        <div class="group-title" data-section="texture">✨ Texture / Pattern</div>
-        <div class="control-body" id="body-texture">
-          <div class="texture-grid" id="textureGrid">
-            <div class="texture-item" data-texture="none">None</div>
-            <div class="texture-item" data-texture="dots">Dots</div>
-            <div class="texture-item" data-texture="stripes">Stripes</div>
-            <div class="texture-item" data-texture="waves">Waves</div>
-            <div class="texture-item" data-texture="halftone">Halftone</div>
+      <!-- Background -->
+      <div class="ctrl-card">
+        <h4><i class="fas fa-palette"></i> Background</h4>
+        <div class="shape-grid" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:12px">
+          <button class="shape-btn active" data-bg="solid">Solid</button>
+          <button class="shape-btn" data-bg="gradient">Gradient</button>
+          <button class="shape-btn" data-bg="transparent">None</button>
+        </div>
+        <div id="solidBg">
+          <div class="color-row">
+            <label>Color</label>
+            <input type="color" id="bgColor" value="#ffffff">
+            <input type="text" class="hex-input" id="bgHex" value="#ffffff" maxlength="7">
           </div>
+        </div>
+        <div id="gradientBg" style="display:none">
+          <div class="color-row">
+            <label>Start</label>
+            <input type="color" id="gradStart" value="#ff6b35">
+            <input type="text" class="hex-input" id="gradStartHex" value="#ff6b35" maxlength="7">
+          </div>
+          <div class="color-row">
+            <label>End</label>
+            <input type="color" id="gradEnd" value="#ff3d00">
+            <input type="text" class="hex-input" id="gradEndHex" value="#ff3d00" maxlength="7">
+          </div>
+          <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">Direction</label>
+          <div class="grad-dir" id="gradDir"></div>
         </div>
       </div>
 
-      <div class="control-group">
-        <div class="group-title" data-section="effect">💎 Effect</div>
-        <div class="control-body" id="body-effect">
-          <div class="effect-buttons" id="effectGroup">
-            <div class="effect-chip" data-effect="none">None</div>
-            <div class="effect-chip active" data-effect="shadow">Drop Shadow</div>
-            <div class="effect-chip" data-effect="glow">Soft Glow</div>
-            <div class="effect-chip" data-effect="inner">Inner Light</div>
-          </div>
-          <div class="slider-container" style="margin-top: 12px;">
-            <span style="font-size:12px;">🔘 Icon Symbol</span>
-            <input type="range" id="iconScaleSlider" min="0.5" max="1.4" step="0.01" value="1">
-            <span id="scaleValue" style="min-width: 40px;">1.0</span>
-          </div>
-          <div class="slider-container">
-            <span style="font-size:12px;">🖌️ Padding / Size</span>
-            <input type="range" id="paddingSlider" min="10" max="35" step="1" value="20">
-            <span id="paddingValue">20%</span>
-          </div>
+      <!-- Platform Presets -->
+      <div class="ctrl-card">
+        <h4><i class="fas fa-mobile-screen"></i> Platform Presets</h4>
+        <div class="platform-list" id="platformList"></div>
+      </div>
+
+      <!-- Export -->
+      <div class="ctrl-card">
+        <h4><i class="fas fa-download"></i> Export</h4>
+        <div class="export-btns">
+          <button class="exp-btn primary" id="exportCurrent" disabled><i class="fas fa-image"></i> Export Current PNG</button>
+          <button class="exp-btn zip" id="exportZip" disabled><i class="fas fa-file-zipper"></i> Export JSON + Icons (.zip)</button>
+          <button class="exp-btn ghost" id="exportAllPng" disabled><i class="fas fa-images"></i> Export All as Individual PNGs</button>
         </div>
       </div>
-
-      <div class="control-group">
-        <div class="group-title" data-section="emoji">🌟 Icon Emoji / Symbol</div>
-        <div class="control-body" id="body-emoji">
-          <div class="grid-colors" style="gap: 10px; flex-wrap: wrap;">
-            <span style="font-size: 26px; cursor: pointer;" data-emoji="📱">📱</span>
-            <span style="font-size: 26px; cursor: pointer;" data-emoji="🎵">🎵</span>
-            <span style="font-size: 26px; cursor: pointer;" data-emoji="⚙️">⚙️</span>
-            <span style="font-size: 26px; cursor: pointer;" data-emoji="❤️">❤️</span>
-            <span style="font-size: 26px; cursor: pointer;" data-emoji="🔥">🔥</span>
-            <span style="font-size: 26px; cursor: pointer;" data-emoji="🌟">🌟</span>
-            <span style="font-size: 26px; cursor: pointer;" data-emoji="🎮">🎮</span>
-            <span style="font-size: 26px; cursor: pointer;" data-emoji="☕">☕</span>
-            <span style="font-size: 26px; cursor: pointer;" data-emoji="✈️">✈️</span>
-          </div>
-          <div style="margin-top: 14px; display: flex; align-items: center; gap: 10px;">
-            <input type="file" id="customPngInput" accept="image/png" style="display:none;">
-            <button id="loadPngBtn" style="background:#f2f2f6; border:none; border-radius:28px; padding:8px 14px; font-size:13px; cursor:pointer;">📁 Load PNG</button>
-            <span id="customImageLabel" style="font-size:12px; color:#8e8e93;"></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- FEATURE 1: Icon Rotation -->
-      <div class="control-group">
-        <div class="group-title" data-section="rotation">🔄 Icon Rotation</div>
-        <div class="control-body" id="body-rotation">
-          <div class="slider-container">
-            <span style="font-size:12px;">0°</span>
-            <input type="range" id="rotationSlider" min="0" max="360" step="1" value="0">
-            <span id="rotationValue" style="min-width:40px;">0°</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- FEATURE 2: Gradient Presets + Angle -->
-      <div class="control-group">
-        <div class="group-title" data-section="gradient">🌈 Gradient Presets</div>
-        <div class="control-body" id="body-gradient">
-          <div class="gradient-presets" id="gradientPresets">
-            <div class="grad-swatch" style="background:linear-gradient(135deg,#f953c6,#b91d73)" data-grad="linear-gradient(135deg,#f953c6,#b91d73)" title="Pink Blaze"></div>
-            <div class="grad-swatch" style="background:linear-gradient(135deg,#0f0c29,#302b63,#24243e)" data-grad="linear-gradient(135deg,#0f0c29,#302b63,#24243e)" title="Deep Space"></div>
-            <div class="grad-swatch" style="background:linear-gradient(135deg,#11998e,#38ef7d)" data-grad="linear-gradient(135deg,#11998e,#38ef7d)" title="Emerald"></div>
-            <div class="grad-swatch" style="background:linear-gradient(135deg,#f7971e,#ffd200)" data-grad="linear-gradient(135deg,#f7971e,#ffd200)" title="Citrus"></div>
-            <div class="grad-swatch" style="background:linear-gradient(135deg,#fc466b,#3f5efb)" data-grad="linear-gradient(135deg,#fc466b,#3f5efb)" title="Candy"></div>
-            <div class="grad-swatch" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)" data-grad="linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)" title="Midnight"></div>
-            <div class="grad-swatch" style="background:linear-gradient(135deg,#a8edea,#fed6e3)" data-grad="linear-gradient(135deg,#a8edea,#fed6e3)" title="Cotton Candy"></div>
-            <div class="grad-swatch" style="background:linear-gradient(135deg,#ff6a00,#ee0979)" data-grad="linear-gradient(135deg,#ff6a00,#ee0979)" title="Volcano"></div>
-          </div>
-          <div class="angle-row">
-            <span>📐 Angle</span>
-            <input type="range" id="gradAngleSlider" min="0" max="360" step="5" value="135" style="flex:1;">
-            <span id="gradAngleValue" style="min-width:36px;">135°</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- FEATURE 3: Border / Frame -->
-      <div class="control-group">
-        <div class="group-title" data-section="border">🖼️ Border Frame</div>
-        <div class="control-body" id="body-border">
-          <div class="border-color-row" id="borderColorRow">
-            <div class="border-swatch selected" style="background:transparent;border:2px dashed #aaa;" data-border-color="none" title="No border"></div>
-            <div class="border-swatch" style="background:#ffffff;" data-border-color="#ffffff" title="White"></div>
-            <div class="border-swatch" style="background:#000000;" data-border-color="#000000" title="Black"></div>
-            <div class="border-swatch" style="background:#007aff;" data-border-color="#007aff" title="Blue"></div>
-            <div class="border-swatch" style="background:#ff9500;" data-border-color="#ff9500" title="Orange"></div>
-            <div class="border-swatch" style="background:#ff3b30;" data-border-color="#ff3b30" title="Red"></div>
-            <div class="border-swatch" style="background:linear-gradient(135deg,#f953c6,#b91d73);" data-border-color="gradient" title="Gradient"></div>
-          </div>
-          <div class="slider-container" style="margin-top:8px;">
-            <span style="font-size:12px;">Thickness</span>
-            <input type="range" id="borderThicknessSlider" min="0" max="16" step="1" value="0">
-            <span id="borderThicknessValue" style="min-width:30px;">0px</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- FEATURE 4: Text Label -->
-      <div class="control-group">
-        <div class="group-title" data-section="label">💬 Text Label</div>
-        <div class="control-body" id="body-label">
-          <div class="label-row">
-            <input type="text" class="label-input" id="iconLabelInput" placeholder="e.g. PRO, v2.0, BETA…" maxlength="12">
-          </div>
-          <div class="slider-container" style="margin-top:8px;">
-            <span style="font-size:12px;">Font Size</span>
-            <input type="range" id="labelSizeSlider" min="10" max="28" step="1" value="16">
-            <span id="labelSizeValue" style="min-width:30px;">16px</span>
-          </div>
-          <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;" id="labelColorRow">
-            <div class="border-swatch selected" style="background:#ffffff;" data-label-color="#ffffff" title="White"></div>
-            <div class="border-swatch" style="background:#000000;" data-label-color="#000000" title="Black"></div>
-            <div class="border-swatch" style="background:#ffd200;" data-label-color="#ffd200" title="Yellow"></div>
-            <div class="border-swatch" style="background:#ff3b30;" data-label-color="#ff3b30" title="Red"></div>
-            <div class="border-swatch" style="background:#34c759;" data-label-color="#34c759" title="Green"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Randomize button lives above download -->
-      <div style="margin-bottom: 8px; padding: 0 8px;">
-        <button class="randomize-btn" id="randomizeBtn">🪄 Randomize Icon</button>
-      </div>
-
-    </div><!-- end controls-panel -->
-
-    <!-- Sticky download bar — outside scroll container -->
-    <div class="download-area" style="padding: 12px 16px;">
-      <button class="download-btn" id="downloadBtn">⬇️ Download iOS Icon</button>
-      <button class="download-btn" id="contentsJsonBtn" style="background: #34c759; box-shadow: 0 2px 8px rgba(52,199,89,0.3);">📦 Export iOS Icons (.zip)</button>
-      <button class="download-btn" id="macIconsBtn" style="background: #af52de; box-shadow: 0 2px 8px rgba(175,82,222,0.3); margin-top: 8px;">🖥️ Export Mac Icons (.zip)</button>
-      <div class="filename-hint">iOS ZIP · Mac ZIP — all sizes + Contents.json, Xcode ready</div>
     </div>
-    </div><!-- end controls-wrapper -->
   </div>
 </div>
 
-<!-- ===== WEBSITE OVERLAY ===== -->
-<div class="web-overlay-backdrop" id="webOverlay">
-  <div class="web-overlay-sheet">
-    <div class="web-overlay-handle"></div>
-    <div class="web-overlay-title">🔗 Image Resources</div>
-
-    <!-- RS Icon Search -->
-    <a class="web-card" href="https://rs1.alsh3la.workers.dev/" target="_blank" rel="noopener noreferrer">
-      <div class="web-card-icon" style="background: linear-gradient(135deg, #0a84ff, #00c7be);">🔍</div>
-      <div class="web-card-info">
-        <div class="web-card-name">RS Icon Search</div>
-        <div class="web-card-desc">rs1.alsh3la.workers.dev</div>
-      </div>
-      <div class="web-card-chevron">›</div>
-    </a>
-
-    <!-- Yandex Images -->
-    <a class="web-card" href="https://yandex.com/images" target="_blank" rel="noopener noreferrer">
-      <div class="web-card-icon" style="background: linear-gradient(135deg, #ff453a, #ff9f0a);">🖼️</div>
-      <div class="web-card-info">
-        <div class="web-card-name">Yandex Images</div>
-        <div class="web-card-desc">yandex.com/images</div>
-      </div>
-      <div class="web-card-chevron">›</div>
-    </a>
-
-    <!-- Pinterest -->
-    <a class="web-card" href="https://www.pinterest.com/" target="_blank" rel="noopener noreferrer">
-      <div class="web-card-icon" style="background: linear-gradient(135deg, #e60023, #ad081b);">📌</div>
-      <div class="web-card-info">
-        <div class="web-card-name">Pinterest</div>
-        <div class="web-card-desc">pinterest.com</div>
-      </div>
-      <div class="web-card-chevron">›</div>
-    </a>
-
-    <button class="web-overlay-close" id="webOverlayClose">Close</button>
-  </div>
-</div>
+<div class="toast-container" id="toastContainer"></div>
 
 <script>
-  (function() {
-    // ── Collapsible sections (mobile) ──
-    document.querySelectorAll('.group-title[data-section]').forEach(title => {
-      title.addEventListener('click', () => {
-        const section = title.getAttribute('data-section');
-        const body = document.getElementById('body-' + section);
-        if (!body) return;
-        const isOpen = body.classList.contains('open');
-        body.classList.toggle('open', !isOpen);
-        title.classList.toggle('open', !isOpen);
-      });
-      // Mark already-open ones
-      const section = title.getAttribute('data-section');
-      const body = document.getElementById('body-' + section);
-      if (body && body.classList.contains('open')) title.classList.add('open');
+(function(){
+// ====== STATE ======
+let srcImg=null;
+let currentShape='squircle';
+let smoothness=0.7;
+let padding=0.1;
+let bgMode='solid';
+let bgColor='#ffffff';
+let gradStart='#ff6b35',gradEnd='#ff3d00',gradAngle=135;
+let currentPlatform='ios';
+let activeTab='preview';
+
+// Enhanced platform data with manifest metadata
+const PLATFORMS=[
+  // iOS
+  {id:'ios',name:'iOS App Store',size:1024,shape:'squircle',smooth:0.7,color:'#007aff',badge:'1024px',group:'ios',idiom:'universal',scale:'1x',logicalSize:'1024x1024',filename:'Icon-App-1024x1024.png'},
+  {id:'ios-180',name:'iOS App @3x',size:180,shape:'squircle',smooth:0.7,color:'#007aff',badge:'180px',group:'ios',idiom:'iphone',scale:'3x',logicalSize:'60x60',filename:'Icon-App-60x60@3x.png'},
+  {id:'ios-120',name:'iOS App @2x',size:120,shape:'squircle',smooth:0.7,color:'#007aff',badge:'120px',group:'ios',idiom:'iphone',scale:'2x',logicalSize:'60x60',filename:'Icon-App-60x60@2x.png'},
+  {id:'ios-spotlight-120',name:'iOS Spotlight @3x',size:120,shape:'squircle',smooth:0.7,color:'#007aff',badge:'120px',group:'ios',idiom:'iphone',scale:'3x',logicalSize:'40x40',filename:'Icon-Spotlight-40x40@3x.png'},
+  {id:'ios-spotlight-80',name:'iOS Spotlight @2x',size:80,shape:'squircle',smooth:0.7,color:'#007aff',badge:'80px',group:'ios',idiom:'iphone',scale:'2x',logicalSize:'40x40',filename:'Icon-Spotlight-40x40@2x.png'},
+  {id:'ios-settings-87',name:'iOS Settings @3x',size:87,shape:'squircle',smooth:0.7,color:'#007aff',badge:'87px',group:'ios',idiom:'iphone',scale:'3x',logicalSize:'29x29',filename:'Icon-Settings-29x29@3x.png'},
+  {id:'ios-settings-58',name:'iOS Settings @2x',size:58,shape:'squircle',smooth:0.7,color:'#007aff',badge:'58px',group:'ios',idiom:'iphone',scale:'2x',logicalSize:'29x29',filename:'Icon-Settings-29x29@2x.png'},
+  {id:'ios-notif-60',name:'iOS Notification @3x',size:60,shape:'squircle',smooth:0.7,color:'#007aff',badge:'60px',group:'ios',idiom:'iphone',scale:'3x',logicalSize:'20x20',filename:'Icon-Notification-20x20@3x.png'},
+  {id:'ios-notif-40',name:'iOS Notification @2x',size:40,shape:'squircle',smooth:0.7,color:'#007aff',badge:'40px',group:'ios',idiom:'iphone',scale:'2x',logicalSize:'20x20',filename:'Icon-Notification-20x20@2x.png'},
+  // Android
+  {id:'android-512',name:'Android Play Store',size:512,shape:'squircle',smooth:0.9,color:'#3ddc84',badge:'512px',group:'android',folder:'',filename:'ic_launcher.png'},
+  {id:'android-192',name:'Android xxxhdpi',size:192,shape:'squircle',smooth:0.9,color:'#3ddc84',badge:'192px',group:'android',folder:'mipmap-xxxhdpi',filename:'ic_launcher.png'},
+  {id:'android-144',name:'Android xxhdpi',size:144,shape:'squircle',smooth:0.9,color:'#3ddc84',badge:'144px',group:'android',folder:'mipmap-xxhdpi',filename:'ic_launcher.png'},
+  {id:'android-96',name:'Android xhdpi',size:96,shape:'squircle',smooth:0.9,color:'#3ddc84',badge:'96px',group:'android',folder:'mipmap-xhdpi',filename:'ic_launcher.png'},
+  {id:'android-72',name:'Android hdpi',size:72,shape:'squircle',smooth:0.9,color:'#3ddc84',badge:'72px',group:'android',folder:'mipmap-hdpi',filename:'ic_launcher.png'},
+  {id:'android-48',name:'Android mdpi',size:48,shape:'squircle',smooth:0.9,color:'#3ddc84',badge:'48px',group:'android',folder:'mipmap-mdpi',filename:'ic_launcher.png'},
+  // macOS
+  {id:'macos-16',name:'macOS 16px @1x',size:16,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'16px',group:'macos',idiom:'mac',scale:'1x',logicalSize:'16x16',filename:'icon_16x16.png'},
+  {id:'macos-32-2x',name:'macOS 16px @2x',size:32,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'32px',group:'macos',idiom:'mac',scale:'2x',logicalSize:'16x16',filename:'icon_16x16@2x.png'},
+  {id:'macos-32',name:'macOS 32px @1x',size:32,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'32px',group:'macos',idiom:'mac',scale:'1x',logicalSize:'32x32',filename:'icon_32x32.png'},
+  {id:'macos-64-2x',name:'macOS 32px @2x',size:64,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'64px',group:'macos',idiom:'mac',scale:'2x',logicalSize:'32x32',filename:'icon_32x32@2x.png'},
+  {id:'macos-128',name:'macOS 128px @1x',size:128,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'128px',group:'macos',idiom:'mac',scale:'1x',logicalSize:'128x128',filename:'icon_128x128.png'},
+  {id:'macos-256-2x',name:'macOS 128px @2x',size:256,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'256px',group:'macos',idiom:'mac',scale:'2x',logicalSize:'128x128',filename:'icon_128x128@2x.png'},
+  {id:'macos-256',name:'macOS 256px @1x',size:256,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'256px',group:'macos',idiom:'mac',scale:'1x',logicalSize:'256x256',filename:'icon_256x256.png'},
+  {id:'macos-512-2x',name:'macOS 256px @2x',size:512,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'512px',group:'macos',idiom:'mac',scale:'2x',logicalSize:'256x256',filename:'icon_256x256@2x.png'},
+  {id:'macos-512',name:'macOS 512px @1x',size:512,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'512px',group:'macos',idiom:'mac',scale:'1x',logicalSize:'512x512',filename:'icon_512x512.png'},
+  {id:'macos-1024-2x',name:'macOS 512px @2x',size:1024,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'1024px',group:'macos',idiom:'mac',scale:'2x',logicalSize:'512x512',filename:'icon_512x512@2x.png'},
+  // PWA
+  {id:'pwa-512',name:'PWA Icon 512',size:512,shape:'squircle',smooth:0.7,color:'#fbbf24',badge:'512px',group:'pwa',filename:'icon-512x512.png'},
+  {id:'pwa-192',name:'PWA Icon 192',size:192,shape:'squircle',smooth:0.7,color:'#fbbf24',badge:'192px',group:'pwa',filename:'icon-192x192.png'},
+];
+
+// ====== SQUIRCLE MATH ======
+function createSquirclePath(ctx, cx, cy, size, smooth) {
+  const r = size / 2;
+  const n = 2 + (1 - smooth) * 8;
+  ctx.beginPath();
+  const steps = 360;
+  for (let i = 0; i <= steps; i++) {
+    const t = (i / steps) * Math.PI * 2;
+    const cosT = Math.cos(t), sinT = Math.sin(t);
+    const x = Math.sign(cosT) * Math.pow(Math.abs(cosT), 2/n) * r;
+    const y = Math.sign(sinT) * Math.pow(Math.abs(sinT), 2/n) * r;
+    if (i === 0) ctx.moveTo(cx + x, cy + y); else ctx.lineTo(cx + x, cy + y);
+  }
+  ctx.closePath();
+}
+
+function createRoundRectPath(ctx, cx, cy, size, radius) {
+  const r = size / 2, cr = r * radius;
+  const x = cx - r, y = cy - r, w = size, h = size;
+  ctx.beginPath();
+  ctx.moveTo(x + cr, y); ctx.lineTo(x + w - cr, y); ctx.arcTo(x + w, y, x + w, y + cr, cr);
+  ctx.lineTo(x + w, y + h - cr); ctx.arcTo(x + w, y + h, x + w - cr, y + h, cr);
+  ctx.lineTo(x + cr, y + h); ctx.arcTo(x, y + h, x, y + h - cr, cr);
+  ctx.lineTo(x, y + cr); ctx.arcTo(x, y, x + cr, y, cr); ctx.closePath();
+}
+
+function createCirclePath(ctx, cx, cy, size) {
+  ctx.beginPath(); ctx.arc(cx, cy, size / 2, 0, Math.PI * 2); ctx.closePath();
+}
+
+function createShapePath(ctx, cx, cy, size, shape, smooth) {
+  switch (shape) {
+    case 'squircle': createSquirclePath(ctx, cx, cy, size, smooth); break;
+    case 'roundrect': createRoundRectPath(ctx, cx, cy, size, smooth * 0.5); break;
+    case 'circle': createCirclePath(ctx, cx, cy, size); break;
+    case 'square': ctx.beginPath(); ctx.rect(cx - size/2, cy - size/2, size, size); ctx.closePath(); break;
+    default: createSquirclePath(ctx, cx, cy, size, smooth);
+  }
+}
+
+// ====== RENDER ======
+function renderIcon(canvas, size, shape, smooth, pad, bg, gStart, gEnd, gAngle, bgM, img) {
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, size, size);
+  const iconSize = size * (1 - pad);
+  const cx = size / 2, cy = size / 2;
+
+  createShapePath(ctx, cx, cy, iconSize, shape, smooth);
+  if (bgM === 'solid') { ctx.fillStyle = bg; ctx.fill(); }
+  else if (bgM === 'gradient') {
+    const rad = (gAngle * Math.PI) / 180;
+    const dx = Math.cos(rad) * iconSize / 2, dy = Math.sin(rad) * iconSize / 2;
+    const grad = ctx.createLinearGradient(cx - dx, cy - dy, cx + dx, cy + dy);
+    grad.addColorStop(0, gStart); grad.addColorStop(1, gEnd);
+    ctx.fillStyle = grad; ctx.fill();
+  } else {
+    ctx.save(); ctx.clip();
+    const cs = Math.max(4, size / 32);
+    for (let y = 0; y < size; y += cs) for (let x = 0; x < size; x += cs) {
+      ctx.fillStyle = (Math.floor(x/cs) + Math.floor(y/cs)) % 2 === 0 ? '#1a1d28' : '#22263a';
+      ctx.fillRect(x, y, cs, cs);
+    }
+    ctx.restore();
+  }
+
+  if (img) {
+    ctx.save();
+    createShapePath(ctx, cx, cy, iconSize, shape, smooth);
+    ctx.clip();
+    const imgAspect = img.width / img.height;
+    let drawW, drawH;
+    if (imgAspect > 1) { drawH = iconSize; drawW = iconSize * imgAspect; }
+    else { drawW = iconSize; drawH = iconSize / imgAspect; }
+    ctx.drawImage(img, cx - drawW / 2, cy - drawH / 2, drawW, drawH);
+    ctx.restore();
+  }
+
+  if (shape === 'squircle' || shape === 'roundrect') {
+    createShapePath(ctx, cx, cy, iconSize, shape, smooth);
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = Math.max(1, size / 512); ctx.stroke();
+  }
+}
+
+function renderPreview() {
+  if (!srcImg) return;
+  const canvas = document.getElementById('mainPreview');
+  renderIcon(canvas, 512, currentShape, smoothness, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
+  document.getElementById('exportCurrent').disabled = false;
+  document.getElementById('exportZip').disabled = false;
+  document.getElementById('exportAllPng').disabled = false;
+}
+
+function renderSizeGrid() {
+  if (!srcImg) return;
+  const grid = document.getElementById('sizeGrid');
+  grid.innerHTML = '';
+  PLATFORMS.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'size-item';
+    const c = document.createElement('canvas');
+    const displayDim = Math.min(p.size, 64);
+    c.style.width = displayDim + 'px'; c.style.height = displayDim + 'px';
+    renderIcon(c, p.size, currentShape, smoothness, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
+    const label = document.createElement('span');
+    label.textContent = p.size + 'px';
+    item.appendChild(c); item.appendChild(label);
+    item.addEventListener('click', () => exportSingle(p.size, p.filename || `icon-${p.size}x${p.size}.png`));
+    grid.appendChild(item);
+  });
+}
+
+// ====== FILE HANDLING ======
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const mainPreview = document.getElementById('mainPreview');
+
+uploadZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => { if (e.target.files[0]) loadImage(e.target.files[0]) });
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover') });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('dragover'); if (e.dataTransfer.files[0]) loadImage(e.dataTransfer.files[0]) });
+document.addEventListener('paste', e => {
+  const items = e.clipboardData && e.clipboardData.items; if (!items) return;
+  for (const item of items) { if (item.type.startsWith('image/')) { loadImage(item.getAsFile()); break } }
+});
+
+function loadImage(file) {
+  if (!file.type.startsWith('image/')) { showToast('Not a valid image file', 'error'); return }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      srcImg = img;
+      uploadZone.style.display = 'none'; mainPreview.style.display = 'block';
+      renderPreview();
+      if (activeTab === 'sizes') renderSizeGrid();
+      showToast('Image loaded — adjust shape and export', 'success');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ====== SHAPE PREVIEW BUTTONS ======
+function buildShapeGrid() {
+  const grid = document.getElementById('shapeGrid');
+  const shapes = [
+    { id: 'squircle', name: 'Squircle' },
+    { id: 'roundrect', name: 'Round Rect' },
+    { id: 'circle', name: 'Circle' },
+    { id: 'square', name: 'Square' },
+    { id: 'ios', name: 'iOS Style' },
+    { id: 'android', name: 'Android' },
+  ];
+  shapes.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'shape-btn' + (s.id === 'squircle' ? ' active' : '');
+    btn.dataset.shape = s.id;
+    const c = document.createElement('canvas');
+    c.width = 28; c.height = 28;
+    const ctx = c.getContext('2d');
+    let shape = s.id, smooth = smoothness;
+    if (s.id === 'ios') { shape = 'squircle'; smooth = 0.7; }
+    else if (s.id === 'android') { shape = 'squircle'; smooth = 0.9; }
+    else if (s.id === 'roundrect') { smooth = 0.45; }
+    createShapePath(ctx, 14, 14, 24, shape, smooth);
+    ctx.fillStyle = '#ff6b35'; ctx.fill();
+    btn.appendChild(c);
+    const span = document.createElement('span'); span.textContent = s.name; span.style.fontSize = '9px';
+    btn.appendChild(span);
+    btn.addEventListener('click', () => {
+      grid.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (s.id === 'ios') { currentShape = 'squircle'; smoothness = 0.7; document.getElementById('smoothSlider').value = 70; document.getElementById('smoothVal').textContent = '0.70'; }
+      else if (s.id === 'android') { currentShape = 'squircle'; smoothness = 0.9; document.getElementById('smoothSlider').value = 90; document.getElementById('smoothVal').textContent = '0.90'; }
+      else if (s.id === 'roundrect') { currentShape = 'roundrect'; smoothness = 0.45; document.getElementById('smoothSlider').value = 45; document.getElementById('smoothVal').textContent = '0.45'; }
+      else { currentShape = s.id; }
+      renderPreview(); if (activeTab === 'sizes') renderSizeGrid();
+    });
+    grid.appendChild(btn);
+  });
+}
+buildShapeGrid();
+
+// ====== SLIDERS ======
+document.getElementById('smoothSlider').addEventListener('input', e => {
+  smoothness = e.target.value / 100; document.getElementById('smoothVal').textContent = smoothness.toFixed(2);
+  renderPreview(); if (activeTab === 'sizes') renderSizeGrid();
+});
+document.getElementById('paddingSlider').addEventListener('input', e => {
+  padding = e.target.value / 100; document.getElementById('paddingVal').textContent = Math.round(padding * 100) + '%';
+  renderPreview(); if (activeTab === 'sizes') renderSizeGrid();
+});
+
+// ====== BACKGROUND ======
+document.querySelectorAll('[data-bg]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-bg]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active'); bgMode = btn.dataset.bg;
+    document.getElementById('solidBg').style.display = bgMode === 'solid' ? '' : 'none';
+    document.getElementById('gradientBg').style.display = bgMode === 'gradient' ? '' : 'none';
+    renderPreview(); if (activeTab === 'sizes') renderSizeGrid();
+  });
+});
+
+function syncColor(pickerId, hexId, setter) {
+  const picker = document.getElementById(pickerId), hex = document.getElementById(hexId);
+  picker.addEventListener('input', () => { hex.value = picker.value; setter(picker.value); renderPreview(); if (activeTab === 'sizes') renderSizeGrid() });
+  hex.addEventListener('input', () => { if (/^#[0-9a-fA-F]{6}$/.test(hex.value)) { picker.value = hex.value; setter(hex.value); renderPreview(); if (activeTab === 'sizes') renderSizeGrid() } });
+}
+syncColor('bgColor', 'bgHex', v => bgColor = v);
+syncColor('gradStart', 'gradStartHex', v => gradStart = v);
+syncColor('gradEnd', 'gradEndHex', v => gradEnd = v);
+
+function buildGradDir() {
+  const container = document.getElementById('gradDir');
+  const dirs = [0, 45, 90, 135, 180, 225, 270, 315];
+  const arrows = ['→', '↗', '↑', '↖', '←', '↙', '↓', '↘'];
+  dirs.forEach((d, i) => {
+    const btn = document.createElement('button'); btn.textContent = arrows[i]; btn.title = d + '°';
+    if (d === gradAngle) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active'); gradAngle = d; renderPreview(); if (activeTab === 'sizes') renderSizeGrid();
+    });
+    container.appendChild(btn);
+  });
+}
+buildGradDir();
+
+// ====== PLATFORM LIST ======
+function buildPlatformList() {
+  const list = document.getElementById('platformList');
+  // Show group headers + items
+  const groups = {ios:'Apple iOS', android:'Android', macos:'macOS', pwa:'Progressive Web App'};
+  const shown = {};
+  PLATFORMS.forEach(p => {
+    if (!shown[p.group]) {
+      shown[p.group] = true;
+      const hdr = document.createElement('div');
+      hdr.style.cssText = 'font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:8px 12px 2px;';
+      hdr.textContent = groups[p.group] || p.group;
+      list.appendChild(hdr);
+    }
+    const item = document.createElement('div');
+    item.className = 'platform-item' + (p.id === 'ios' ? ' active' : '');
+    item.dataset.platform = p.id;
+    item.innerHTML = `
+      <span class="pi-dot" style="background:${p.color}"></span>
+      <span class="pi-name">${p.name}</span>
+      <span class="pi-badge" style="background:${p.color}22;color:${p.color}">${p.badge}</span>
+    `;
+    item.addEventListener('click', () => {
+      list.querySelectorAll('.platform-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active'); currentPlatform = p.id;
+      currentShape = p.shape; smoothness = p.smooth;
+      document.getElementById('smoothSlider').value = Math.round(smoothness * 100);
+      document.getElementById('smoothVal').textContent = smoothness.toFixed(2);
+      document.querySelectorAll('#shapeGrid .shape-btn').forEach(b => b.classList.remove('active'));
+      renderPreview(); if (activeTab === 'sizes') renderSizeGrid();
+      showToast(`Preset: ${p.name}`, 'info');
+    });
+    list.appendChild(item);
+  });
+}
+buildPlatformList();
+
+// ====== PREVIEW TABS ======
+document.querySelectorAll('.preview-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active'); activeTab = tab.dataset.tab;
+    document.getElementById('sizeGridArea').style.display = activeTab === 'sizes' ? '' : 'none';
+    if (activeTab === 'sizes' && srcImg) renderSizeGrid();
+    if (activeTab === 'compare' && srcImg) renderCompare();
+  });
+});
+
+function renderCompare() {
+  if (!srcImg) return;
+  const area = document.getElementById('previewArea');
+  const existing = area.querySelector('.compare-row');
+  if (existing) existing.remove();
+  const row = document.createElement('div');
+  row.className = 'compare-row'; row.style.cssText = 'position:absolute;bottom:16px;left:50%;transform:translateX(-50%)';
+  [{name:'Square',shape:'square',s:0},{name:'Round Rect',shape:'roundrect',s:0.45},{name:'Squircle',shape:'squircle',s:smoothness},{name:'Circle',shape:'circle',s:1}].forEach(s => {
+    const item = document.createElement('div'); item.className = 'compare-item';
+    const c = document.createElement('canvas'); c.style.width = '48px'; c.style.height = '48px';
+    renderIcon(c, 128, s.shape, s.s, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
+    const label = document.createElement('span'); label.textContent = s.name;
+    item.appendChild(c); item.appendChild(label); row.appendChild(item);
+  });
+  area.appendChild(row);
+}
+
+// ====== EXPORT SINGLE PNG ======
+function exportSingle(size, filename) {
+  if (!srcImg) return;
+  const c = document.createElement('canvas');
+  renderIcon(c, size, currentShape, smoothness, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
+  c.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = filename || `icon-${size}x${size}.png`;
+    a.click(); URL.revokeObjectURL(url);
+    showToast(`Exported ${size}x${size} PNG`, 'success');
+  }, 'image/png');
+}
+
+document.getElementById('exportCurrent').addEventListener('click', () => {
+  const p = PLATFORMS.find(p => p.id === currentPlatform) || PLATFORMS[0];
+  exportSingle(p.size, p.filename);
+});
+
+document.getElementById('exportAllPng').addEventListener('click', () => {
+  if (!srcImg) return;
+  PLATFORMS.forEach((p, i) => {
+    setTimeout(() => {
+      const c = document.createElement('canvas');
+      renderIcon(c, p.size, p.shape, p.smooth, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
+      c.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = p.filename || `${p.id}-icon-${p.size}x${p.size}.png`;
+        a.click(); URL.revokeObjectURL(url);
+      }, 'image/png');
+    }, i * 300);
+  });
+  showToast(`Exporting ${PLATFORMS.length} individual PNGs...`, 'success');
+});
+
+// ====== EXPORT JSON + ZIP ======
+function generateIosContentsJson(files) {
+  const images = files.map(f => ({
+    filename: f.filename, idiom: f.idiom || 'universal', scale: f.scale || '1x', size: f.logicalSize || `${f.size}x${f.size}`
+  }));
+  return JSON.stringify({ images: images, info: { author: "squirclelab", version: 1 } }, null, 2);
+}
+
+function generateMacContentsJson(files) {
+  const images = files.map(f => ({
+    idiom: "mac",
+    size: f.logicalSize || `${f.size}x${f.size}`,
+    scale: f.scale || '1x',
+    filename: f.filename
+  }));
+  return JSON.stringify({ images: images, info: { version: 1, author: "xcode" } }, null, 2);
+}
+
+function generatePwaManifest(files) {
+  const icons = files.map(f => ({ src: "icons/" + f.filename, sizes: `${f.size}x${f.size}`, type: "image/png" }));
+  return JSON.stringify({
+    name: "App", short_name: "App", display: "standalone",
+    background_color: bgMode === 'solid' ? bgColor : "#ffffff",
+    theme_color: bgMode === 'solid' ? bgColor : "#ffffff",
+    icons: icons
+  }, null, 2);
+}
+
+document.getElementById('exportZip').addEventListener('click', async () => {
+  if (!srcImg) return;
+  const btn = document.getElementById('exportZip');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating ZIP...';
+
+  try {
+    const zip = new JSZip();
+    const groups = {};
+
+    // Group platforms
+    PLATFORMS.forEach(p => {
+      if (!groups[p.group]) groups[p.group] = [];
+      groups[p.group].push(p);
     });
 
-    // ── DOM elements ──
-    const iconPreviewDiv = document.getElementById('iconPreview');
-    const iconInner = document.getElementById('iconInner');
-    const iconSymbolSpan = document.getElementById('iconSymbol');
-    const bgColorPreviewSpan = document.getElementById('bgColorPreview');
-    const colorSwatches = document.querySelectorAll('.swatch');
-    const customColorPicker = document.getElementById('customColorPicker');
-    const textureItems = document.querySelectorAll('.texture-item');
-    const effectChips = document.querySelectorAll('.effect-chip');
-    const shapeBtns = document.querySelectorAll('.shape-btn');
-    const badgeOptions = document.querySelectorAll('.badge-option');
-    const badgeStatusDiv = document.getElementById('badgeStatus');
-    const iconScaleSlider = document.getElementById('iconScaleSlider');
-    const scaleValueSpan = document.getElementById('scaleValue');
-    const paddingSlider = document.getElementById('paddingSlider');
-    const paddingValueSpan = document.getElementById('paddingValue');
-    const emojiSelectors = document.querySelectorAll('[data-emoji]');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const loadPngBtn = document.getElementById('loadPngBtn');
-    const customPngInput = document.getElementById('customPngInput');
-    const customImageLabel = document.getElementById('customImageLabel');
-
-    // NEW feature DOM refs
-    const rotationSlider = document.getElementById('rotationSlider');
-    const rotationValueSpan = document.getElementById('rotationValue');
-    const gradientPresets = document.querySelectorAll('.grad-swatch');
-    const gradAngleSlider = document.getElementById('gradAngleSlider');
-    const gradAngleValueSpan = document.getElementById('gradAngleValue');
-    const borderSwatches = document.querySelectorAll('[data-border-color]');
-    const borderThicknessSlider = document.getElementById('borderThicknessSlider');
-    const borderThicknessValueSpan = document.getElementById('borderThicknessValue');
-    const iconLabelInput = document.getElementById('iconLabelInput');
-    const labelSizeSlider = document.getElementById('labelSizeSlider');
-    const labelSizeValueSpan = document.getElementById('labelSizeValue');
-    const labelColorSwatches = document.querySelectorAll('[data-label-color]');
-    const iconTextOverlay = document.getElementById('iconTextOverlay');
-    const randomizeBtn = document.getElementById('randomizeBtn');
-
-    // State
-    let currentBackground = '#007aff';
-    let currentTexture = 'none';
-    let currentEffect = 'shadow';
-    let currentShape = 'squircle';
-    let currentBadge = 'none';
-    let currentIconEmoji = '📱';
-    let iconScale = 1;
-    let iconPaddingPercent = 20;
-
-    // NEW state
-    let currentRotation = 0;
-    let currentGradAngle = 135;
-    let activeGradPreset = null;   // gradient string if a preset is active
-    let currentBorderColor = 'none';
-    let currentBorderThickness = 0;
-    let currentLabelText = '';
-    let currentLabelSize = 16;
-    let currentLabelColor = '#ffffff';
-
-    // Custom image state
-    let useCustomImage = false;
-    let customImageSrc = null;
-
-    function updateIconPreview() {
-      // === NEW: Rotation ===
-      iconSymbolSpan.style.transition = 'transform 0.2s ease, filter 0.2s, text-shadow 0.2s';
-      const baseRotate = `rotate(${currentRotation}deg)`;
-
-      // === NEW: Border ===
-      if (currentBorderColor !== 'none' && currentBorderThickness > 0) {
-        if (currentBorderColor === 'gradient') {
-          iconPreviewDiv.style.outline = 'none';
-          iconPreviewDiv.style.boxShadow = `0 0 0 ${currentBorderThickness}px #f953c6, 0 20px 35px -12px rgba(0,0,0,0.25)`;
-        } else {
-          iconPreviewDiv.style.outline = `${currentBorderThickness}px solid ${currentBorderColor}`;
-          iconPreviewDiv.style.boxShadow = '0 20px 35px -12px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.05)';
-        }
-      } else {
-        iconPreviewDiv.style.outline = 'none';
-        iconPreviewDiv.style.boxShadow = '0 20px 35px -12px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.05)';
+    // Generate iOS Assets.xcassets
+    if (groups.ios) {
+      const iosFolder = zip.folder("Assets.xcassets").folder("AppIcon.appiconset");
+      const iosFiles = [];
+      for (const p of groups.ios) {
+        const canvas = document.createElement('canvas');
+        renderIcon(canvas, p.size, currentShape, smoothness, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
+        const blob = await canvasToBlob(canvas);
+        iosFolder.file(p.filename, blob);
+        iosFiles.push(p);
       }
-
-      // === NEW: Text Label ===
-      iconTextOverlay.textContent = currentLabelText;
-      iconTextOverlay.style.fontSize = currentLabelSize + 'px';
-      iconTextOverlay.style.color = currentLabelColor;
-      iconTextOverlay.style.textShadow = currentLabelColor === '#ffffff'
-        ? '0 1px 4px rgba(0,0,0,0.4)' : '0 1px 4px rgba(255,255,255,0.3)';
-      iconTextOverlay.style.display = currentLabelText ? 'block' : 'none';
-
-      // Background texture — uses bgToUse which may be a gradient preset
-      let bgToUse = activeGradPreset || currentBackground;
-      let bgStyle = '';
-      if (currentTexture === 'none') {
-        bgStyle = bgToUse;
-      } else if (currentTexture === 'dots') {
-        bgStyle = `repeating-radial-gradient(circle at 20% 30%, rgba(0,0,0,0.1) 2px, transparent 4px), ${bgToUse}`;
-      } else if (currentTexture === 'stripes') {
-        bgStyle = `repeating-linear-gradient(45deg, rgba(255,255,255,0.2) 0px, rgba(255,255,255,0.2) 8px, transparent 8px, transparent 16px), ${bgToUse}`;
-      } else if (currentTexture === 'waves') {
-        bgStyle = `repeating-linear-gradient(100deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 3px, transparent 3px, transparent 12px), ${bgToUse}`;
-      } else if (currentTexture === 'halftone') {
-        bgStyle = `${bgToUse}, repeating-radial-gradient(circle at 30% 40%, rgba(0,0,0,0.08) 3px, transparent 8px)`;
-        iconInner.style.backgroundBlendMode = 'overlay';
-      } else {
-        bgStyle = bgToUse;
-      }
-
-      iconInner.style.background = bgStyle;
-      if (currentTexture !== 'halftone') {
-        iconInner.style.backgroundBlendMode = 'normal';
-      }
-
-      // Effect + Rotation combined on symbol
-      let filterVal = 'none';
-      let textShadowVal = 'none';
-      if (currentEffect === 'shadow') {
-        filterVal = 'drop-shadow(0 8px 12px rgba(0,0,0,0.25))';
-      } else if (currentEffect === 'glow') {
-        filterVal = 'drop-shadow(0 0 5px rgba(255,255,200,0.7))';
-        textShadowVal = '0 0 8px rgba(255,215,0,0.5)';
-      } else if (currentEffect === 'inner') {
-        textShadowVal = 'inset 0 1px 2px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.6)';
-      }
-      iconSymbolSpan.style.filter = filterVal;
-      iconSymbolSpan.style.textShadow = textShadowVal;
-
-      // Shape — use % so values scale correctly at both 220px (desktop) and 96px (mobile)
-      // 22% ≈ iOS squircle ratio; 50% = circle; 8% = near-square
-      let borderRadius = '';
-      // 30% is the closest CSS approximation to the n=5 superellipse (Apple squircle)
-      if (currentShape === 'squircle') borderRadius = '30%';
-      else if (currentShape === 'circle') borderRadius = '50%';
-      else borderRadius = '8%';
-      iconPreviewDiv.style.borderRadius = borderRadius;
-
-      // Padding
-      const innerPaddingValue = Math.max(12, Math.min(45, iconPaddingPercent));
-      iconInner.style.padding = `${innerPaddingValue}%`;
-      iconInner.style.display = 'flex';
-      iconInner.style.alignItems = 'center';
-      iconInner.style.justifyContent = 'center';
-      iconInner.style.boxSizing = 'border-box';
-
-      // Symbol content (emoji or custom PNG)
-      if (useCustomImage && customImageSrc) {
-        iconSymbolSpan.innerHTML = `<img src="${customImageSrc}" style="width: 100%; height: 100%; object-fit: contain; pointer-events: none;" />`;
-        iconSymbolSpan.style.display = 'block';
-        iconSymbolSpan.style.fontSize = '0';
-        iconSymbolSpan.style.transform = `scale(${iconScale}) rotate(${currentRotation}deg)`;
-        iconSymbolSpan.style.transformOrigin = 'center center';
-      } else {
-        iconSymbolSpan.innerHTML = currentIconEmoji;
-        iconSymbolSpan.style.display = '';
-        iconSymbolSpan.style.fontSize = `${88 * iconScale}px`;
-        iconSymbolSpan.style.transform = `rotate(${currentRotation}deg)`;
-        iconSymbolSpan.style.transformOrigin = 'center center';
-      }
-
-      // Badge
-      const oldBadge = iconPreviewDiv.querySelector('.dynamic-badge');
-      if (oldBadge) oldBadge.remove();
-
-      if (currentBadge !== 'none') {
-        const badgeDiv = document.createElement('div');
-        badgeDiv.className = 'dynamic-badge';
-        let text = '';
-        let bgColor = '#ff3b30';
-        if (currentBadge === 'beta') { text = 'BETA'; bgColor = '#007aff'; }
-        else if (currentBadge === 'new') { text = 'NEW'; bgColor = '#34c759'; }
-        else if (currentBadge === 'numeric') { text = '123'; bgColor = '#ff9500'; }
-        badgeDiv.innerText = text;
-        badgeDiv.style.position = 'absolute';
-        badgeDiv.style.top = '14px';
-        badgeDiv.style.right = '14px';
-        badgeDiv.style.background = bgColor;
-        badgeDiv.style.color = 'white';
-        badgeDiv.style.fontSize = '13px';
-        badgeDiv.style.fontWeight = 'bold';
-        badgeDiv.style.padding = '4px 12px';
-        badgeDiv.style.borderRadius = '40px';
-        badgeDiv.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
-        badgeDiv.style.zIndex = '20';
-        badgeDiv.style.fontFamily = 'inherit';
-        iconPreviewDiv.style.position = 'relative';
-        iconPreviewDiv.appendChild(badgeDiv);
-      }
-
-      bgColorPreviewSpan.style.background = (currentBackground.startsWith('#')) ? currentBackground : 'linear-gradient(45deg,#4158D0,#C850C0)';
-
-      if (currentBadge === 'none') badgeStatusDiv.innerHTML = '✨ No badge — clean iOS style';
-      else if (currentBadge === 'beta') badgeStatusDiv.innerHTML = '🔵 BETA badge · perfect for testing';
-      else if (currentBadge === 'new') badgeStatusDiv.innerHTML = '🟢 NEW badge · highlight freshness';
-      else badgeStatusDiv.innerHTML = '🟠 Numeric badge 123 · attention grabber';
+      iosFolder.file("Contents.json", generateIosContentsJson(iosFiles));
     }
 
-    function setBackground(colorOrGradient, isGradient = false) {
-      if (isGradient) {
-        currentBackground = 'linear-gradient(135deg, #4158D0, #C850C0)';
-      } else {
-        currentBackground = colorOrGradient;
+    // Generate Android mipmaps
+    if (groups.android) {
+      for (const p of groups.android) {
+        const canvas = document.createElement('canvas');
+        renderIcon(canvas, p.size, currentShape, smoothness, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
+        const blob = await canvasToBlob(canvas);
+        const folderName = p.folder ? `android/${p.folder}` : 'android';
+        zip.folder(folderName).file(p.filename, blob);
       }
-      activeGradPreset = null;
-      gradientPresets.forEach(g => g.classList.remove('selected'));
-      updateIconPreview();
     }
 
-    // ===== NEW FEATURE LISTENERS =====
-
-    // FEATURE 1: Rotation
-    rotationSlider.addEventListener('input', (e) => {
-      currentRotation = parseInt(e.target.value, 10);
-      rotationValueSpan.textContent = currentRotation + '°';
-      updateIconPreview();
-    });
-
-    // FEATURE 2: Gradient presets
-    gradientPresets.forEach(g => {
-      g.addEventListener('click', () => {
-        const baseGrad = g.getAttribute('data-grad');
-        // Extract the color stops and re-apply with current angle
-        const stops = baseGrad.replace(/linear-gradient\([^,]+,/, '').replace(/\)$/, '').trim();
-        activeGradPreset = `linear-gradient(${currentGradAngle}deg, ${stops})`;
-        gradientPresets.forEach(x => x.classList.remove('selected'));
-        g.classList.add('selected');
-        // Store base stops for angle updates
-        g._baseStops = stops;
-        updateIconPreview();
-      });
-    });
-
-    gradAngleSlider.addEventListener('input', (e) => {
-      currentGradAngle = parseInt(e.target.value, 10);
-      gradAngleValueSpan.textContent = currentGradAngle + '°';
-      // If a preset is active, re-apply with new angle
-      const selected = document.querySelector('.grad-swatch.selected');
-      if (selected) {
-        const baseGrad = selected.getAttribute('data-grad');
-        const stops = baseGrad.replace(/linear-gradient\([^,]+,/, '').replace(/\)$/, '').trim();
-        activeGradPreset = `linear-gradient(${currentGradAngle}deg, ${stops})`;
+    // Generate macOS
+    if (groups.macos) {
+      const macFolder = zip.folder("macos").folder("AppIcon.appiconset");
+      const macFiles = [];
+      for (const p of groups.macos) {
+        const canvas = document.createElement('canvas');
+        renderIcon(canvas, p.size, currentShape, smoothness, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
+        const blob = await canvasToBlob(canvas);
+        macFolder.file(p.filename, blob);
+        macFiles.push(p);
       }
-      updateIconPreview();
-    });
-
-    // FEATURE 3: Border swatches + thickness
-    borderSwatches.forEach(sw => {
-      sw.addEventListener('click', () => {
-        borderSwatches.forEach(s => s.classList.remove('selected'));
-        sw.classList.add('selected');
-        currentBorderColor = sw.getAttribute('data-border-color');
-        if (currentBorderThickness === 0) {
-          borderThicknessSlider.value = 4;
-          currentBorderThickness = 4;
-          borderThicknessValueSpan.textContent = '4px';
-        }
-        updateIconPreview();
-      });
-    });
-
-    borderThicknessSlider.addEventListener('input', (e) => {
-      currentBorderThickness = parseInt(e.target.value, 10);
-      borderThicknessValueSpan.textContent = currentBorderThickness + 'px';
-      updateIconPreview();
-    });
-
-    // FEATURE 4: Text label
-    iconLabelInput.addEventListener('input', (e) => {
-      currentLabelText = e.target.value;
-      updateIconPreview();
-    });
-
-    labelSizeSlider.addEventListener('input', (e) => {
-      currentLabelSize = parseInt(e.target.value, 10);
-      labelSizeValueSpan.textContent = currentLabelSize + 'px';
-      updateIconPreview();
-    });
-
-    labelColorSwatches.forEach(sw => {
-      sw.addEventListener('click', () => {
-        labelColorSwatches.forEach(s => s.classList.remove('selected'));
-        sw.classList.add('selected');
-        currentLabelColor = sw.getAttribute('data-label-color');
-        updateIconPreview();
-      });
-    });
-
-    // FEATURE 5: Randomize
-    const RANDOM_EMOJIS = ['🚀','🎯','🔮','🌊','⚡','🎸','🍀','🦋','🔥','💎','🌈','🎃','🧠','🦄','🎨','⚙️','🌙','🏆','🎵','❄️'];
-    const RANDOM_COLORS = ['#007aff','#34c759','#ff3b30','#ff9500','#af52de','#000000','#1c1c1e','#2c2c2e'];
-    const RANDOM_GRADS = [
-      'linear-gradient(135deg,#f953c6,#b91d73)',
-      'linear-gradient(135deg,#11998e,#38ef7d)',
-      'linear-gradient(135deg,#f7971e,#ffd200)',
-      'linear-gradient(135deg,#fc466b,#3f5efb)',
-      'linear-gradient(135deg,#ff6a00,#ee0979)',
-      'linear-gradient(135deg,#a8edea,#fed6e3)',
-      'linear-gradient(135deg,#0f0c29,#302b63)',
-    ];
-    const RANDOM_TEXTURES = ['none','none','dots','stripes','waves'];
-    const RANDOM_EFFECTS = ['shadow','shadow','glow','inner','none'];
-    const RANDOM_SHAPES = ['squircle','squircle','circle','square'];
-
-    randomizeBtn.addEventListener('click', () => {
-      const pick = arr => arr[Math.floor(Math.random() * arr.length)];
-
-      // Emoji
-      useCustomImage = false;
-      customImageSrc = null;
-      currentIconEmoji = pick(RANDOM_EMOJIS);
-
-      // Background — 40% solid, 60% gradient
-      if (Math.random() > 0.4) {
-        activeGradPreset = pick(RANDOM_GRADS);
-        gradientPresets.forEach(g => {
-          g.classList.toggle('selected', g.getAttribute('data-grad') === activeGradPreset);
-        });
-      } else {
-        activeGradPreset = null;
-        currentBackground = pick(RANDOM_COLORS);
-        gradientPresets.forEach(g => g.classList.remove('selected'));
-      }
-
-      // Texture, Effect, Shape, Rotation
-      currentTexture = pick(RANDOM_TEXTURES);
-      currentEffect = pick(RANDOM_EFFECTS);
-      currentShape = pick(RANDOM_SHAPES);
-      currentRotation = [0, 0, 0, 15, -15, 45][Math.floor(Math.random() * 6)];
-
-      // Sync UI
-      textureItems.forEach(t => t.classList.toggle('active', t.getAttribute('data-texture') === currentTexture));
-      effectChips.forEach(c => c.classList.toggle('active', c.getAttribute('data-effect') === currentEffect));
-      shapeBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-shape') === currentShape));
-      rotationSlider.value = currentRotation;
-      rotationValueSpan.textContent = currentRotation + '°';
-
-      // Flash animation
-      randomizeBtn.textContent = '✨ Randomized!';
-      setTimeout(() => { randomizeBtn.textContent = '🪄 Randomize Icon'; }, 900);
-
-      updateIconPreview();
-    });
-
-    // Texture
-    textureItems.forEach(item => {
-      item.addEventListener('click', () => {
-        textureItems.forEach(t => t.classList.remove('active'));
-        item.classList.add('active');
-        currentTexture = item.getAttribute('data-texture');
-        updateIconPreview();
-      });
-    });
-
-    // Effect
-    effectChips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        effectChips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        currentEffect = chip.getAttribute('data-effect');
-        updateIconPreview();
-      });
-    });
-
-    // Shape
-    shapeBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        shapeBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentShape = btn.getAttribute('data-shape');
-        updateIconPreview();
-      });
-    });
-
-    // Badge
-    badgeOptions.forEach(badge => {
-      badge.addEventListener('click', () => {
-        badgeOptions.forEach(b => b.classList.remove('active'));
-        badge.classList.add('active');
-        currentBadge = badge.getAttribute('data-badge');
-        updateIconPreview();
-      });
-    });
-
-    // Color swatches
-    colorSwatches.forEach(swatch => {
-      swatch.addEventListener('click', () => {
-        const colorVal = swatch.getAttribute('data-color');
-        if (colorVal === 'gradient1') {
-          setBackground('', true);
-        } else {
-          setBackground(colorVal, false);
-          customColorPicker.value = colorVal;
-        }
-      });
-    });
-
-    customColorPicker.addEventListener('input', (e) => {
-      setBackground(e.target.value, false);
-    });
-
-    // Icon scale
-    iconScaleSlider.addEventListener('input', (e) => {
-      iconScale = parseFloat(e.target.value);
-      scaleValueSpan.innerText = iconScale.toFixed(2);
-      updateIconPreview();
-    });
-
-    // Padding
-    paddingSlider.addEventListener('input', (e) => {
-      iconPaddingPercent = parseInt(e.target.value, 10);
-      paddingValueSpan.innerText = iconPaddingPercent + '%';
-      updateIconPreview();
-    });
-
-    // Emoji picker
-    emojiSelectors.forEach(em => {
-      em.addEventListener('click', () => {
-        useCustomImage = false;
-        customImageSrc = null;
-        customImageLabel.textContent = '';
-        currentIconEmoji = em.getAttribute('data-emoji');
-        updateIconPreview();
-      });
-    });
-
-    // Custom PNG upload
-    loadPngBtn.addEventListener('click', () => {
-      customPngInput.click();
-    });
-
-    customPngInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const dataUrl = ev.target.result;
-        const img = new Image();
-        img.onload = () => {
-          customImageSrc = dataUrl;
-          useCustomImage = true;
-          updateIconPreview();
-          customImageLabel.textContent = 'Custom image loaded';
-        };
-        img.src = dataUrl;
-      };
-      reader.readAsDataURL(file);
-      // Reset input so the same file can be selected again
-      customPngInput.value = '';
-    });
-
-    // ── High-res native canvas export (1024×1024) ──
-    downloadBtn.addEventListener('click', async () => {
-      const origHTML = downloadBtn.innerHTML;
-      downloadBtn.textContent = '⏳ Rendering…';
-      downloadBtn.disabled = true;
-
-      try {
-        const canvas = await renderHighResIcon(1024);
-        const link = document.createElement('a');
-        link.download = 'ios-icon-1024.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-      } catch (err) {
-        alert('Export failed: ' + err.message);
-      } finally {
-        downloadBtn.innerHTML = origHTML;
-        downloadBtn.disabled = false;
-      }
-    });
-
-    async function renderHighResIcon(S) {
-      const canvas = document.createElement('canvas');
-      canvas.width = S;
-      canvas.height = S;
-      const ctx = canvas.getContext('2d');
-      const scale = S / 220;
-
-      // Snapshot shape NOW (synchronously, before any await) so the value
-      // can never be stale or zero inside the async body
-      const snapShape = currentShape || 'squircle';
-
-      ctx.clearRect(0, 0, S, S);
-
-      // ── Shape clip path ──
-      // squircle → Apple superellipse (n=5): NO straight edges, curvature flows
-      //            continuously from side to corner — exactly like macOS/iOS app icons
-      // circle   → perfect arc
-      // square   → roundRect with subtle rounding
-      function buildShapePath() {
-        ctx.beginPath();
-        if (snapShape === 'squircle') {
-          // Superellipse: x = cx + a·|cos t|^(2/n)·sign(cos t)
-          //               y = cy + a·|sin t|^(2/n)·sign(sin t)   n=5
-          const n = 5, cx = S / 2, cy = S / 2, a = S / 2;
-          for (let i = 0; i <= 512; i++) {
-            const t   = (i / 512) * Math.PI * 2;
-            const ct  = Math.cos(t), st = Math.sin(t);
-            const x   = cx + a * Math.sign(ct) * Math.pow(Math.abs(ct), 2 / n);
-            const y   = cy + a * Math.sign(st) * Math.pow(Math.abs(st), 2 / n);
-            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-          }
-          ctx.closePath();
-        } else if (snapShape === 'circle') {
-          ctx.arc(S / 2, S / 2, S / 2, 0, Math.PI * 2);
-        } else {
-          // Square with subtle rounding
-          const r = S * 0.08;
-          if (typeof ctx.roundRect === 'function') {
-            ctx.roundRect(0, 0, S, S, r);
-          } else {
-            const k = r * 0.5523;
-            ctx.moveTo(r, 0);
-            ctx.lineTo(S - r, 0); ctx.bezierCurveTo(S - r + k, 0, S, r - k, S, r);
-            ctx.lineTo(S, S - r); ctx.bezierCurveTo(S, S - r + k, S - r + k, S, S - r, S);
-            ctx.lineTo(r, S);     ctx.bezierCurveTo(r - k, S, 0, S - r + k, 0, S - r);
-            ctx.lineTo(0, r);     ctx.bezierCurveTo(0, r - k, r - k, 0, r, 0);
-            ctx.closePath();
-          }
-        }
-      }
-
-      // ── Parse & create gradient ──
-      function makeGradient(bgStr) {
-        const m = bgStr.match(/linear-gradient\(\s*(\d+)deg\s*,\s*(.+)\)\s*$/s);
-        if (!m) return null;
-        const angle = parseInt(m[1]);
-        // Split stops safely (no rgba commas in this app's presets, all hex)
-        const stops = m[2].split(',').map(s => s.trim()).filter(Boolean);
-        const rad = (angle - 90) * Math.PI / 180;
-        const half = S * 0.7072;
-        const g = ctx.createLinearGradient(
-          S/2 - Math.cos(rad) * half, S/2 - Math.sin(rad) * half,
-          S/2 + Math.cos(rad) * half, S/2 + Math.sin(rad) * half
-        );
-        stops.forEach((c, i) => g.addColorStop(i / Math.max(1, stops.length - 1), c));
-        return g;
-      }
-
-      // ── 1. Background + texture (clipped to shape) ──
-      ctx.save();
-      buildShapePath();
-      ctx.clip();
-
-      const bgToUse = activeGradPreset || currentBackground;
-      ctx.fillStyle = makeGradient(bgToUse) || bgToUse;
-      ctx.fillRect(0, 0, S, S);
-
-      // Texture overlay
-      if (currentTexture !== 'none') {
-        ctx.save();
-        const step = S / 22;
-        if (currentTexture === 'dots') {
-          ctx.fillStyle = 'rgba(0,0,0,0.10)';
-          for (let x = step * 0.2; x < S; x += step)
-            for (let y = step * 0.3; y < S; y += step) {
-              ctx.beginPath(); ctx.arc(x, y, S / 110, 0, Math.PI * 2); ctx.fill();
-            }
-        } else if (currentTexture === 'stripes') {
-          ctx.strokeStyle = 'rgba(255,255,255,0.22)';
-          ctx.lineWidth = S / 56;
-          for (let i = -S; i < S * 2; i += S / 14) {
-            ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i + S, S); ctx.stroke();
-          }
-        } else if (currentTexture === 'waves') {
-          ctx.strokeStyle = 'rgba(0,0,0,0.09)';
-          ctx.lineWidth = S / 100;
-          for (let i = -S / 8; i < S + S / 8; i += S / 9) {
-            ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(S, i + S * 0.11); ctx.stroke();
-          }
-        } else if (currentTexture === 'halftone') {
-          ctx.fillStyle = 'rgba(0,0,0,0.09)';
-          const hs = S / 16;
-          for (let x = 0; x < S; x += hs)
-            for (let y = 0; y < S; y += hs) {
-              ctx.beginPath(); ctx.arc(x + hs * 0.3, y + hs * 0.4, hs * 0.22, 0, Math.PI * 2); ctx.fill();
-            }
-        }
-        ctx.restore();
-      }
-
-      ctx.restore(); // end background clip
-
-      // ── 2. Symbol — emoji or custom image ──
-      const pad = Math.max(12, Math.min(45, iconPaddingPercent)) / 100;
-      const symbolSize = S * (1 - pad * 2) * iconScale;
-
-      ctx.save();
-      ctx.translate(S / 2, S / 2);
-      ctx.rotate(currentRotation * Math.PI / 180);
-
-      if (currentEffect === 'shadow') {
-        ctx.shadowColor = 'rgba(0,0,0,0.30)';
-        ctx.shadowBlur = S * 0.055;
-        ctx.shadowOffsetY = S * 0.042;
-      } else if (currentEffect === 'glow') {
-        ctx.shadowColor = 'rgba(255,215,0,0.75)';
-        ctx.shadowBlur = S * 0.045;
-      }
-
-      if (useCustomImage && customImageSrc) {
-        const img = new Image();
-        await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = customImageSrc; });
-        ctx.drawImage(img, -symbolSize / 2, -symbolSize / 2, symbolSize, symbolSize);
-      } else {
-        // Draw emoji at generous size for crispness
-        const emojiSize = Math.round(symbolSize * 0.80);
-        ctx.font = `${emojiSize}px serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(currentIconEmoji, 0, emojiSize * 0.04); // tiny optical correction
-      }
-
-      ctx.restore();
-
-      // ── 3. Border / Frame ──
-      if (currentBorderColor !== 'none' && currentBorderThickness > 0) {
-        const bw = currentBorderThickness * scale;
-        ctx.save();
-        buildShapePath();
-        ctx.strokeStyle = currentBorderColor === 'gradient' ? '#f953c6' : currentBorderColor;
-        ctx.lineWidth = bw * 2; // centered stroke → double to inset
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      // ── 4. Text label ──
-      if (currentLabelText) {
-        const labelFs = Math.round(currentLabelSize * scale * 1.1);
-        ctx.save();
-        ctx.font = `bold ${labelFs}px -apple-system, Helvetica, Arial, sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        ctx.shadowColor = currentLabelColor === '#ffffff' ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.35)';
-        ctx.shadowBlur = 5 * scale;
-        ctx.fillStyle = currentLabelColor;
-        ctx.fillText(currentLabelText.toUpperCase(), S / 2, S - 18 * scale);
-        ctx.restore();
-      }
-
-      // ── 5. Badge ──
-      if (currentBadge !== 'none') {
-        let badgeText = '', badgeBg = '#ff3b30';
-        if (currentBadge === 'beta')    { badgeText = 'BETA'; badgeBg = '#007aff'; }
-        else if (currentBadge === 'new') { badgeText = 'NEW';  badgeBg = '#34c759'; }
-        else                             { badgeText = '123';  badgeBg = '#ff9500'; }
-
-        const bfs = Math.round(13 * scale);
-        const pH = 4 * scale, pV = 12 * scale;
-        ctx.font = `bold ${bfs}px -apple-system, Helvetica, Arial, sans-serif`;
-        const tw = ctx.measureText(badgeText).width;
-        const bw2 = tw + pV * 2, bh2 = bfs + pH * 2;
-        const bx = S - 14 * scale - bw2, by = 14 * scale;
-        const br2 = bh2 / 2;
-
-        ctx.save();
-        ctx.shadowColor = 'rgba(0,0,0,0.22)';
-        ctx.shadowBlur = 8 * scale;
-        ctx.shadowOffsetY = 2 * scale;
-        ctx.beginPath();
-        if (typeof ctx.roundRect === 'function') {
-          ctx.roundRect(bx, by, bw2, bh2, br2);
-        } else {
-          const k2 = br2 * 0.5523;
-          ctx.moveTo(bx + br2, by);
-          ctx.lineTo(bx + bw2 - br2, by); ctx.bezierCurveTo(bx + bw2 - br2 + k2, by, bx + bw2, by + br2 - k2, bx + bw2, by + br2);
-          ctx.lineTo(bx + bw2, by + bh2 - br2); ctx.bezierCurveTo(bx + bw2, by + bh2 - br2 + k2, bx + bw2 - br2 + k2, by + bh2, bx + bw2 - br2, by + bh2);
-          ctx.lineTo(bx + br2, by + bh2); ctx.bezierCurveTo(bx + br2 - k2, by + bh2, bx, by + bh2 - br2 + k2, bx, by + bh2 - br2);
-          ctx.lineTo(bx, by + br2); ctx.bezierCurveTo(bx, by + br2 - k2, bx + br2 - k2, by, bx + br2, by);
-          ctx.closePath();
-        }
-        ctx.fillStyle = badgeBg;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(badgeText, bx + bw2 / 2, by + bh2 / 2);
-        ctx.restore();
-      }
-
-      // ── Final squircle mask ──
-      // destination-in keeps only pixels INSIDE the shape, cutting transparent
-      // corners out of every layer: background, custom image, emoji, badge, all.
-      ctx.save();
-      ctx.globalCompositeOperation = 'destination-in';
-      buildShapePath();
-      ctx.fillStyle = '#000';
-      ctx.fill();
-      ctx.restore();
-
-      // ── Final mask: destination-in punches the shape through every layer
-      // (background, custom image, emoji, badge) — corners become transparent.
-      ctx.save();
-      ctx.globalCompositeOperation = 'destination-in';
-      buildShapePath();
-      ctx.fillStyle = '#000';
-      ctx.fill();
-      ctx.restore();
-
-      return canvas;
+      macFolder.file("Contents.json", generateMacContentsJson(macFiles));
     }
 
-    // ── Gen Contents.json + All Icons ZIP ──
-    document.getElementById('contentsJsonBtn').addEventListener('click', async () => {
-      const btn = document.getElementById('contentsJsonBtn');
-      const orig = btn.innerHTML;
-
-      const contentsImages = [
-        { idiom: "iphone",        scale: "2x", size: "20x20",    filename: "40.png",   "expected-size": "40"   },
-        { idiom: "iphone",        scale: "3x", size: "20x20",    filename: "60.png",   "expected-size": "60"   },
-        { idiom: "iphone",        scale: "2x", size: "29x29",    filename: "58.png",   "expected-size": "58"   },
-        { idiom: "iphone",        scale: "3x", size: "29x29",    filename: "87.png",   "expected-size": "87"   },
-        { idiom: "iphone",        scale: "1x", size: "29x29",    filename: "29.png",   "expected-size": "29"   },
-        { idiom: "iphone",        scale: "2x", size: "40x40",    filename: "80.png",   "expected-size": "80"   },
-        { idiom: "iphone",        scale: "3x", size: "40x40",    filename: "120.png",  "expected-size": "120"  },
-        { idiom: "iphone",        scale: "2x", size: "60x60",    filename: "120.png",  "expected-size": "120"  },
-        { idiom: "iphone",        scale: "3x", size: "60x60",    filename: "180.png",  "expected-size": "180"  },
-        { idiom: "iphone",        scale: "1x", size: "57x57",    filename: "57.png",   "expected-size": "57"   },
-        { idiom: "iphone",        scale: "2x", size: "57x57",    filename: "114.png",  "expected-size": "114"  },
-        { idiom: "ipad",          scale: "1x", size: "20x20",    filename: "20.png",   "expected-size": "20"   },
-        { idiom: "ipad",          scale: "2x", size: "20x20",    filename: "40.png",   "expected-size": "40"   },
-        { idiom: "ipad",          scale: "1x", size: "29x29",    filename: "29.png",   "expected-size": "29"   },
-        { idiom: "ipad",          scale: "2x", size: "29x29",    filename: "58.png",   "expected-size": "58"   },
-        { idiom: "ipad",          scale: "1x", size: "40x40",    filename: "40.png",   "expected-size": "40"   },
-        { idiom: "ipad",          scale: "2x", size: "40x40",    filename: "80.png",   "expected-size": "80"   },
-        { idiom: "ipad",          scale: "1x", size: "76x76",    filename: "76.png",   "expected-size": "76"   },
-        { idiom: "ipad",          scale: "2x", size: "76x76",    filename: "152.png",  "expected-size": "152"  },
-        { idiom: "ipad",          scale: "2x", size: "83.5x83.5",filename: "167.png",  "expected-size": "167"  },
-        { idiom: "ios-marketing", scale: "1x", size: "1024x1024",filename: "1024.png", "expected-size": "1024" }
-      ];
-
-      // Collect unique pixel sizes to render (deduplicated by filename)
-      const uniqueSizes = {};
-      contentsImages.forEach(img => {
-        const px = parseInt(img["expected-size"]);
-        uniqueSizes[img.filename] = px;
-      });
-
-      // Wait for JSZip to be available
-      if (typeof JSZip === 'undefined') {
-        alert('JSZip is still loading — please try again in a moment.');
-        return;
+    // Generate PWA
+    if (groups.pwa) {
+      const pwaFolder = zip.folder("pwa").folder("icons");
+      const pwaFiles = [];
+      for (const p of groups.pwa) {
+        const canvas = document.createElement('canvas');
+        renderIcon(canvas, p.size, currentShape, smoothness, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
+        const blob = await canvasToBlob(canvas);
+        pwaFolder.file(p.filename, blob);
+        pwaFiles.push(p);
       }
+      zip.folder("pwa").file("manifest.json", generatePwaManifest(pwaFiles));
+    }
 
-      btn.disabled = true;
+    // Generate and download
+    const content = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(content);
+    const a = document.createElement('a'); a.href = url; a.download = "app-icons.zip";
+    a.click(); URL.revokeObjectURL(url);
 
-      const total = Object.keys(uniqueSizes).length;
-      let done = 0;
+    showToast('ZIP with JSON manifests exported successfully!', 'success');
+  } catch (err) {
+    showToast('Error generating ZIP: ' + err.message, 'error');
+    console.error(err);
+  }
 
-      try {
-        const zip = new JSZip();
-        const folder = zip.folder('AppIcon.appiconset');
+  btn.disabled = false; btn.innerHTML = '<i class="fas fa-file-zipper"></i> Export JSON + Icons (.zip)';
+});
 
-        // Render each unique size and add to zip
-        for (const [filename, px] of Object.entries(uniqueSizes)) {
-          done++;
-          btn.textContent = `⏳ Rendering ${done}/${total}…`;
-          // yield to UI between renders
-          await new Promise(r => setTimeout(r, 0));
-          const canvas = await renderHighResIcon(px);
-          const dataUrl = canvas.toDataURL('image/png');
-          const base64 = dataUrl.split(',')[1];
-          folder.file(filename, base64, { base64: true });
-        }
+function canvasToBlob(canvas) {
+  return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+}
 
-        // Build Contents.json (without the folder field — Xcode doesn't want it)
-        const contentsData = {
-          images: contentsImages.map(img => ({
-            idiom: img.idiom,
-            scale: img.scale,
-            size: img.size,
-            filename: img.filename
-          })),
-          info: { author: "xcode", version: 1 }
-        };
-        folder.file('Contents.json', JSON.stringify(contentsData, null, 2));
+// ====== TOAST ======
+function showToast(msg, type = 'info') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div'); t.className = 'toast';
+  const icons = { success: 'fa-check-circle', warning: 'fa-exclamation-triangle', error: 'fa-times-circle', info: 'fa-info-circle' };
+  const colors = { success: '#00e8a2', warning: '#ffb830', error: '#ff4477', info: '#38bdf8' };
+  t.innerHTML = `<i class="fas ${icons[type]||icons.info}" style="color:${colors[type]||colors.info}"></i><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => { t.classList.add('exit'); setTimeout(() => t.remove(), 200) }, 3200);
+}
 
-        btn.textContent = '📦 Compressing…';
-        await new Promise(r => setTimeout(r, 0));
+// ====== INTERACTIVE PREVIEW ======
+mainPreview.addEventListener('click', () => {
+  if (!srcImg) return;
+  if (mainPreview.dataset.showing === 'original') {
+    mainPreview.dataset.showing = 'squircle'; renderPreview();
+  } else {
+    mainPreview.dataset.showing = 'original';
+    const ctx = mainPreview.getContext('2d');
+    mainPreview.width = 512; mainPreview.height = 512; ctx.clearRect(0, 0, 512, 512);
+    const imgAspect = srcImg.width / srcImg.height;
+    let dw, dh;
+    if (imgAspect > 1) { dw = 512; dh = 512 / imgAspect; } else { dh = 512; dw = 512 * imgAspect; }
+    ctx.drawImage(srcImg, (512 - dw) / 2, (512 - dh) / 2, dw, dh);
+  }
+});
 
-        const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
-        const url = URL.createObjectURL(zipBlob);
-        const link = document.createElement('a');
-        link.download = 'AppIcon.appiconset.zip';
-        link.href = url;
-        link.click();
-        URL.revokeObjectURL(url);
+// Particles
+(function createParticles() {
+  const shapes = ['fa-square', 'fa-circle', 'fa-diamond'];
+  for (let i = 0; i < 6; i++) {
+    const el = document.createElement('i');
+    el.className = `fas ${shapes[i % shapes.length]}`;
+    el.style.cssText = `position:fixed;font-size:${12+Math.random()*14}px;opacity:0.03;color:var(--accent);pointer-events:none;z-index:0;left:${Math.random()*100}vw;top:${Math.random()*100}vh;animation:orbF1 ${15+Math.random()*20}s ease-in-out infinite;animation-delay:${Math.random()*-20}s;`;
+    document.body.appendChild(el);
+  }
+})();
 
-        btn.textContent = '✅ Downloaded!';
-        setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 1800);
-      } catch (err) {
-        alert('Export failed: ' + err.message);
-        btn.innerHTML = orig;
-        btn.disabled = false;
-      }
-    });
-
-    // ── Mac Icons Export ──
-    document.getElementById('macIconsBtn').addEventListener('click', async () => {
-      const btn = document.getElementById('macIconsBtn');
-      const orig = btn.innerHTML;
-
-      const macImages = [
-        { idiom: "mac", scale: "1x", size: "16x16",   filename: "icon_16x16.png",      px: 16   },
-        { idiom: "mac", scale: "2x", size: "16x16",   filename: "icon_16x16@2x.png",   px: 32   },
-        { idiom: "mac", scale: "1x", size: "32x32",   filename: "icon_32x32.png",      px: 32   },
-        { idiom: "mac", scale: "2x", size: "32x32",   filename: "icon_32x32@2x.png",   px: 64   },
-        { idiom: "mac", scale: "1x", size: "128x128", filename: "icon_128x128.png",    px: 128  },
-        { idiom: "mac", scale: "2x", size: "128x128", filename: "icon_128x128@2x.png", px: 256  },
-        { idiom: "mac", scale: "1x", size: "256x256", filename: "icon_256x256.png",    px: 256  },
-        { idiom: "mac", scale: "2x", size: "256x256", filename: "icon_256x256@2x.png", px: 512  },
-        { idiom: "mac", scale: "1x", size: "512x512", filename: "icon_512x512.png",    px: 512  },
-        { idiom: "mac", scale: "2x", size: "512x512", filename: "icon_512x512@2x.png", px: 1024 }
-      ];
-
-      if (typeof JSZip === 'undefined') {
-        alert('JSZip is still loading — please try again in a moment.');
-        return;
-      }
-
-      btn.disabled = true;
-      const total = macImages.length;
-      let done = 0;
-
-      try {
-        const zip = new JSZip();
-        const folder = zip.folder('AppIcon.appiconset');
-
-        for (const img of macImages) {
-          done++;
-          btn.textContent = `Rendering ${done}/${total}...`;
-          await new Promise(r => setTimeout(r, 0));
-          const canvas = await renderHighResIcon(img.px);
-          const base64 = canvas.toDataURL('image/png').split(',')[1];
-          folder.file(img.filename, base64, { base64: true });
-        }
-
-        // Contents.json — Mac format matching Xcode spec
-        const contentsData = {
-          images: macImages.map(img => ({
-            idiom:    img.idiom,
-            scale:    img.scale,
-            size:     img.size,
-            filename: img.filename
-          })),
-          info: { author: "xcode", version: 1 }
-        };
-        folder.file('Contents.json', JSON.stringify(contentsData, null, 2));
-
-        btn.textContent = 'Compressing...';
-        await new Promise(r => setTimeout(r, 0));
-
-        const zipBlob = await zip.generateAsync({
-          type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 }
-        });
-        const url = URL.createObjectURL(zipBlob);
-        const a = document.createElement('a');
-        a.download = 'AppIcon-Mac.appiconset.zip';
-        a.href = url;
-        a.click();
-        URL.revokeObjectURL(url);
-
-        btn.textContent = 'Downloaded!';
-        setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 1800);
-      } catch (err) {
-        alert('Export failed: ' + err.message);
-        btn.innerHTML = orig;
-        btn.disabled = false;
-      }
-    });
-
-        // ── Desktop parallax: icon floats as user scrolls ──
-    (function initParallax() {
-      // Only run on non-touch desktop (pointer: fine)
-      if (!window.matchMedia('(pointer: fine)').matches) return;
-
-      const iconEl   = document.getElementById('iconPreview');
-      const panel    = iconEl.closest('.preview-panel');
-      if (!iconEl || !panel) return;
-
-      let ticking = false;
-      let lastY    = 0;
-
-      // Smooth lerp state
-      let currentY    = 0;
-      let currentTilt = 0;
-      let targetY     = 0;
-      let targetTilt  = 0;
-      let rafId       = null;
-
-      function lerp(a, b, t) { return a + (b - a) * t; }
-
-      function animate() {
-        currentY    = lerp(currentY,    targetY,    0.08);
-        currentTilt = lerp(currentTilt, targetTilt, 0.08);
-
-        iconEl.style.transform =
-          `translateY(${currentY.toFixed(2)}px) rotate3d(1, 0, 0, ${currentTilt.toFixed(2)}deg)`;
-
-        // Also shift shadow depth for realism
-        const shadow = Math.max(20, 35 - Math.abs(currentY) * 0.4);
-        iconEl.style.boxShadow =
-          `0 ${shadow}px ${shadow + 10}px -12px rgba(0,0,0,0.28), 0 1px 3px rgba(0,0,0,0.05)`;
-
-        if (Math.abs(currentY - targetY) > 0.05 || Math.abs(currentTilt - targetTilt) > 0.05) {
-          rafId = requestAnimationFrame(animate);
-        } else {
-          rafId = null;
-        }
-      }
-
-      function onScroll() {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(() => {
-          const scrollY = window.scrollY || window.pageYOffset;
-          const delta   = scrollY - lastY;
-          lastY = scrollY;
-
-          // Parallax: icon drifts up slightly on scroll down (−0.18× speed)
-          targetY    = Math.max(-28, Math.min(18, -scrollY * 0.18));
-          // Subtle tilt: tip back when scrolling down
-          targetTilt = Math.max(-6, Math.min(4, delta * 0.35));
-
-          if (!rafId) rafId = requestAnimationFrame(animate);
-          ticking = false;
-        });
-      }
-
-      // Micro-bounce on page load
-      setTimeout(() => {
-        targetY = -10; targetTilt = -3;
-        if (!rafId) rafId = requestAnimationFrame(animate);
-        setTimeout(() => { targetY = 0; targetTilt = 0; }, 500);
-      }, 320);
-
-      window.addEventListener('scroll', onScroll, { passive: true });
-    })();
-
-    // ── Website Overlay ──
-    (function() {
-      const overlay  = document.getElementById('webOverlay');
-      const trigger  = document.getElementById('webOverlayTrigger');
-      const closeBtn = document.getElementById('webOverlayClose');
-
-      function openOverlay()  { overlay.classList.add('open');    document.body.style.overflow = 'hidden'; }
-      function closeOverlay() { overlay.classList.remove('open'); document.body.style.overflow = ''; }
-
-      trigger.addEventListener('click', openOverlay);
-      closeBtn.addEventListener('click', closeOverlay);
-
-      // Close on backdrop tap (outside the sheet)
-      overlay.addEventListener('click', function(e) {
-        if (e.target === overlay) closeOverlay();
-      });
-
-      // Close on Escape key
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeOverlay();
-      });
-    })();
-
-  })();
+})();
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </body>
 </html>
