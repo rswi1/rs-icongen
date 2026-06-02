@@ -22,780 +22,1350 @@
 
 <!-- 6. Safari Pinned Tab (monochrome SVG, single-color paths only) -->
 <link rel="mask-icon" href="https://cdn.jsdelivr.net/gh/RSWI1/RSView@main/safari-pinned-tab.svg?v=2" color="#00fbff">
-<title>Squircle Icon Generator</title>
+ <title>SquircleLab — Icon Generator</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-:root{
-  --bg:#080a10;--bg2:#0e1119;--bg3:#151a28;--card:#1a2035;--card2:#202842;
-  --border:#283050;--border2:#354068;--fg:#e8ecf8;--fg2:#b8c4e0;--muted:#5a6888;
-  --accent:#ff6b35;--accent2:#ff8f5e;--accent-dim:rgba(255,107,53,.1);--accent-glow:rgba(255,107,53,.25);
-  --ios:#007aff;--android:#3ddc84;--macos:#bf5af2;--watch:#00d4aa;
+:root {
+  --bg: #070a10;
+  --surface: #0d1018;
+  --surface2: #131824;
+  --card: #181e30;
+  --border: #232c48;
+  --border-hi: #2e3a5c;
+  --fg: #e8edf6;
+  --fg2: #a8b4d0;
+  --muted: #546288;
+  --accent: #ff6b35;
+  --accent-dim: rgba(255,107,53,0.1);
+  --accent-glow: rgba(255,107,53,0.25);
+  --ios: #0a84ff;
+  --mac: #bf5af2;
+  --droid: #3ddc84;
+  --pwa: #fbbf24;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden}
-h1,h2,h3,h4,h5{font-family:'Space Grotesk',sans-serif}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes orbF1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(50px,30px) scale(1.1)}}
-@keyframes orbF2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-40px,-50px) scale(1.05)}}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes toastIn{from{opacity:0;transform:translateX(30px) scale(.95)}to{opacity:1;transform:translateX(0) scale(1)}}
-@keyframes toastOut{to{opacity:0;transform:translateX(30px) scale(.95)}}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:.06}
-.orb1{width:500px;height:500px;background:var(--accent);top:-150px;left:-100px;animation:orbF1 20s ease-in-out infinite}
-.orb2{width:400px;height:400px;background:#6366f1;bottom:-100px;right:-80px;animation:orbF2 24s ease-in-out infinite}
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-.container{max-width:1200px;margin:0 auto;padding:24px;position:relative;z-index:1}
+h1, h2, h3, h4, h5 {
+  font-family: 'Space Grotesk', sans-serif;
+}
 
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;animation:fadeUp .6s ease-out}
-.logo-row{display:flex;align-items:center;gap:12px}
-.logo-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#ff3d00);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(255,107,53,.2)}
-.logo-icon i{color:#fff;font-size:20px}
-.logo-text{font-size:22px;font-weight:800;letter-spacing:-0.5px}
-.logo-text span{color:var(--accent)}
+/* ── Ambient background ── */
+.bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(140px);
+  pointer-events: none;
+  z-index: 0;
+}
 
-.main-grid{display:grid;grid-template-columns:1fr 360px;gap:24px;animation:fadeUp .6s ease-out .1s both}
-@media(max-width:900px){.main-grid{grid-template-columns:1fr}}
+/* ── Shared animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes toastOut {
+  to { opacity: 0; transform: translateX(24px); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-.preview-panel{background:var(--bg2);border:1px solid var(--border);border-radius:20px;overflow:hidden}
-.preview-tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto}
-.preview-tab{padding:12px 18px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border:none;background:none;transition:all .2s;font-family:'Space Grotesk';white-space:nowrap;border-bottom:2px solid transparent}
-.preview-tab:hover{color:var(--fg)}
-.preview-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.preview-area{display:flex;align-items:center;justify-content:center;min-height:420px;padding:32px;position:relative}
-.preview-area canvas{max-width:100%;max-height:380px;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+/* ── Layout shell ── */
+.shell {
+  position: relative;
+  z-index: 1;
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 20px 24px;
+}
 
-.upload-zone{width:100%;max-width:340px;padding:48px 32px;border:2px dashed var(--border);border-radius:20px;text-align:center;cursor:pointer;transition:all .3s;background:var(--bg3)}
-.upload-zone:hover,.upload-zone.dragover{border-color:var(--accent);background:var(--accent-dim)}
-.upload-zone .uz-icon{width:64px;height:64px;border-radius:16px;margin:0 auto 16px;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;transition:transform .3s}
-.upload-zone:hover .uz-icon{transform:scale(1.1) rotate(-5deg)}
-.upload-zone h3{font-size:16px;font-weight:600;margin-bottom:6px}
-.upload-zone p{font-size:13px;color:var(--muted)}
+/* ── Header ── */
+.hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  animation: fadeUp 0.5s ease-out both;
+}
+.hdr-left { display: flex; align-items: center; gap: 12px; }
+.hdr-logo {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), #d44010);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 24px rgba(255,107,53,0.18);
+}
+.hdr-logo i { color: #fff; font-size: 18px; }
+.hdr-title { font-size: 22px; font-weight: 800; letter-spacing: -0.8px; }
+.hdr-title span { color: var(--accent); }
+.hdr-badges { display: flex; gap: 8px; }
+.hdr-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: 20px;
+  font-size: 10px; font-weight: 700; font-family: 'Space Grotesk';
+  letter-spacing: 0.4px;
+}
+.badge-local {
+  background: var(--accent-dim);
+  border: 1px solid rgba(255,107,53,0.15);
+  color: var(--accent);
+}
+.badge-zip {
+  background: rgba(99,102,241,0.08);
+  border: 1px solid rgba(99,102,241,0.15);
+  color: #818cf8;
+}
 
-.size-grid-area{padding:16px 20px;border-top:1px solid var(--border)}
-.size-grid-area h5{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;font-weight:600}
-.size-grid{display:flex;gap:12px;flex-wrap:wrap;align-items:end}
-.size-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:transform .2s}
-.size-item:hover{transform:scale(1.08)}
-.size-item canvas{border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.size-item span{font-size:9px;color:var(--muted);font-family:'Space Grotesk';font-weight:600}
+/* ── Main grid ── */
+.grid-main {
+  display: grid;
+  grid-template-columns: 1fr 370px;
+  gap: 20px;
+  animation: fadeUp 0.5s ease-out 0.08s both;
+}
+@media (max-width: 960px) {
+  .grid-main { grid-template-columns: 1fr; }
+}
 
-.controls{display:flex;flex-direction:column;gap:16px}
-.ctrl-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px;transition:border-color .2s}
-.ctrl-card:hover{border-color:var(--border2)}
-.ctrl-card h4{font-size:12px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.8px;color:var(--fg2)}
-.ctrl-card h4 i{font-size:11px;color:var(--accent)}
+/* ── Preview panel ── */
+.panel-prev {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  position: relative;
+}
+.panel-prev::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,107,53,0.12), transparent);
+}
 
-.slider-wrap{margin-bottom:14px}
-.slider-wrap:last-child{margin-bottom:0}
-.slider-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.slider-head label{font-size:12px;color:var(--fg2);font-weight:500}
-.slider-head .sval{font-size:11px;color:var(--accent);font-weight:700;font-family:'Space Grotesk';min-width:40px;text-align:right}
-input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:var(--border);outline:none;cursor:pointer}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);cursor:pointer;transition:box-shadow .2s}
-input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 4px var(--accent-glow)}
+/* Tabs */
+.ptabs { display: flex; border-bottom: 1px solid var(--border); }
+.ptab {
+  padding: 12px 18px; border: none; background: none;
+  font-size: 12px; font-weight: 600; font-family: 'Space Grotesk';
+  color: var(--muted); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+.ptab:hover { color: var(--fg2); }
+.ptab.on { color: var(--accent); border-bottom-color: var(--accent); }
 
-.shape-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
-.shape-btn{padding:10px 6px;border-radius:10px;border:2px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Space Grotesk';text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
-.shape-btn:hover{border-color:var(--accent);color:var(--fg)}
-.shape-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
-.shape-btn canvas{border-radius:2px}
+/* Preview body */
+.pbody {
+  min-height: 420px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 28px;
+  position: relative;
+}
 
-.color-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.color-row label{font-size:12px;color:var(--fg2);min-width:70px}
-.color-row input[type=color]{width:36px;height:28px;border:1px solid var(--border);border-radius:6px;background:var(--card);cursor:pointer;padding:2px}
-.color-row .hex-input{flex:1;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--fg);font-size:12px;font-family:'Space Grotesk';outline:none}
-.color-row .hex-input:focus{border-color:var(--accent)}
+/* Upload zone */
+.upzone {
+  width: 100%; max-width: 340px;
+  padding: 48px 32px;
+  border: 2px dashed var(--border);
+  border-radius: 22px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.3s, background 0.3s, transform 0.2s;
+  background: var(--surface2);
+}
+.upzone:hover, .upzone.drag {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  transform: scale(1.01);
+}
+.upzone-icon {
+  width: 64px; height: 64px;
+  border-radius: 18px;
+  margin: 0 auto 16px;
+  background: var(--accent-dim);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.3s;
+}
+.upzone:hover .upzone-icon { transform: scale(1.1) rotate(-4deg); }
+.upzone h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.upzone p  { font-size: 13px; color: var(--muted); }
+.upzone-fmts {
+  display: flex; gap: 6px; justify-content: center; margin-top: 14px;
+}
+.upzone-fmt {
+  padding: 3px 10px; border-radius: 5px;
+  background: var(--card); border: 1px solid var(--border);
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  font-family: 'Space Grotesk';
+}
 
-.grad-dir{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:10px}
-.grad-dir button{width:100%;aspect-ratio:1;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:10px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
-.grad-dir button:hover{border-color:var(--accent);color:var(--fg)}
-.grad-dir button.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+/* Preview canvas */
+#previewCanvas {
+  max-width: 100%; max-height: 390px;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  animation: scaleIn 0.35s ease-out;
+  cursor: pointer;
+  transition: transform 0.25s;
+}
+#previewCanvas:hover { transform: scale(1.005); }
 
-.platform-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;padding-right:4px}
-.platform-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:transparent;cursor:pointer;transition:all .2s}
-.platform-item:hover{border-color:var(--border2);background:rgba(255,255,255,.02)}
-.platform-item.active{border-color:var(--accent);background:var(--accent-dim)}
-.platform-item .pi-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.platform-item .pi-name{font-size:12px;font-weight:600;flex:1;white-space:nowrap}
-.platform-item .pi-badge{font-size:9px;padding:2px 8px;border-radius:4px;font-weight:700;font-family:'Space Grotesk'}
-.platform-item .pi-size{font-size:11px;color:var(--muted);font-family:'Space Grotesk'}
+/* Size grid */
+.sgrid-wrap {
+  padding: 14px 18px;
+  border-top: 1px solid var(--border);
+}
+.sgrid-wrap h5 {
+  font-size: 9px; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--muted); font-weight: 700; margin-bottom: 10px;
+}
+.sgrid {
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;
+}
+.sitem {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  cursor: pointer; transition: transform 0.2s;
+}
+.sitem:hover { transform: scale(1.1); }
+.sitem canvas { border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+.sitem span {
+  font-size: 8px; color: var(--muted);
+  font-family: 'Space Grotesk'; font-weight: 700;
+}
 
-.export-btns{display:flex;flex-direction:column;gap:8px}
-.exp-btn{padding:14px;border-radius:12px;border:none;font-size:13px;font-weight:700;font-family:'Space Grotesk';cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
-.exp-btn.primary{background:linear-gradient(135deg,var(--accent),#ff3d00);color:#fff;box-shadow:0 6px 24px rgba(255,107,53,.2)}
-.exp-btn.primary:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(255,107,53,.3)}
-.exp-btn.ghost{background:var(--card);color:var(--fg2);border:1px solid var(--border)}
-.exp-btn.ghost:hover{border-color:var(--accent);color:var(--fg)}
-.exp-btn.zip{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 6px 24px rgba(99,102,241,.2)}
-.exp-btn.zip:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(99,102,241,.3)}
-.exp-btn:disabled{opacity:.4;pointer-events:none}
+/* JSON preview */
+.json-wrap {
+  padding: 18px; max-height: 400px; overflow: auto;
+}
+.json-wrap pre {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 11px; line-height: 1.8;
+  color: var(--fg2); white-space: pre-wrap; word-break: break-all;
+}
 
-.compare-row{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:8px}
-.compare-item{display:flex;flex-direction:column;align-items:center;gap:4px}
-.compare-item span{font-size:10px;color:var(--muted);font-family:'Space Grotesk';font-weight:600}
-.compare-item canvas{border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+/* ── Controls sidebar ── */
+.ctrls {
+  display: flex; flex-direction: column; gap: 14px;
+  max-height: calc(100vh - 90px); overflow-y: auto;
+  padding-right: 4px;
+}
+.ctrls::-webkit-scrollbar { width: 3px; }
+.ctrls::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-.toast-container{position:fixed;bottom:24px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:6px}
-.toast{padding:10px 18px;border-radius:10px;background:var(--card);border:1px solid var(--border);color:var(--fg);font-size:12px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.5);animation:toastIn .3s ease-out;display:flex;align-items:center;gap:8px}
-.toast.exit{animation:toastOut .2s ease-in forwards}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 18px;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: var(--border-hi); }
+.card-title {
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.9px;
+  color: var(--fg2); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-title i {
+  font-size: 11px; color: var(--accent);
+  width: 20px; height: 20px; border-radius: 6px;
+  background: var(--accent-dim);
+  display: flex; align-items: center; justify-content: center;
+}
 
-.info-tip{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--card);color:var(--muted);font-size:9px;cursor:help;margin-left:4px;border:1px solid var(--border)}
+/* Shape selector */
+.shape-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 5px; }
+.sbtn {
+  padding: 10px 4px 8px; border-radius: 10px;
+  border: 2px solid var(--border); background: transparent;
+  color: var(--muted); font-size: 9px; font-weight: 700;
+  font-family: 'Space Grotesk'; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  transition: all 0.2s;
+}
+.sbtn:hover { border-color: var(--border-hi); color: var(--fg2); }
+.sbtn.on {
+  border-color: var(--accent); color: var(--accent);
+  background: var(--accent-dim);
+  box-shadow: 0 0 14px rgba(255,107,53,0.06);
+}
+.sbtn canvas { border-radius: 3px; }
 
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+/* Slider */
+.sld { margin-bottom: 13px; }
+.sld:last-child { margin-bottom: 0; }
+.sld-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 7px;
+}
+.sld-head label { font-size: 12px; color: var(--fg2); font-weight: 500; }
+.sld-head .sv {
+  font-size: 11px; color: var(--accent); font-weight: 700;
+  font-family: 'Space Grotesk'; min-width: 40px; text-align: right;
+}
+input[type="range"] {
+  -webkit-appearance: none; width: 100%; height: 5px;
+  border-radius: 3px; background: var(--border);
+  outline: none; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 17px; height: 17px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #e04a10);
+  border: 3px solid var(--bg);
+  box-shadow: 0 2px 8px rgba(255,107,53,0.2);
+  cursor: pointer; transition: box-shadow 0.2s, transform 0.15s;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 5px var(--accent-glow);
+  transform: scale(1.1);
+}
+
+/* Color row */
+.crow { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.crow label { font-size: 11px; color: var(--fg2); min-width: 52px; font-weight: 500; }
+.crow input[type="color"] {
+  width: 32px; height: 26px;
+  border: 1px solid var(--border); border-radius: 6px;
+  background: var(--card); cursor: padding: 2px;
+}
+.crow .chex {
+  flex: 1; padding: 5px 10px; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--fg); font-size: 11px; font-family: 'Space Grotesk';
+  outline: none;
+}
+.crow .chex:focus { border-color: var(--accent); }
+
+/* Gradient direction */
+.gdir { display: grid; grid-template-columns: repeat(8,1fr); gap: 3px; margin-top: 8px; }
+.gdir button {
+  width: 100%; aspect-ratio: 1; border-radius: 5px;
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--muted); font-size: 10px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.gdir button:hover { border-color: var(--border-hi); color: var(--fg2); }
+.gdir button.on { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* Platform list */
+.plat-list {
+  display: flex; flex-direction: column; gap: 3px;
+  max-height: 260px; overflow-y: auto; padding-right: 2px;
+}
+.plat-list::-webkit-scrollbar { width: 3px; }
+.plat-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.plat-grp {
+  font-size: 9px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 1px;
+  padding: 8px 10px 3px;
+  display: flex; align-items: center; gap: 6px;
+}
+.plat-grp::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.pitem {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border-radius: 9px;
+  border: 1px solid transparent; background: transparent;
+  cursor: pointer; transition: all 0.2s;
+}
+.pitem:hover { background: rgba(255,255,255,0.015); border-color: var(--border); }
+.pitem.on { background: var(--accent-dim); border-color: rgba(255,107,53,0.18); }
+.pitem .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.pitem .pname { font-size: 12px; font-weight: 600; flex: 1; white-space: nowrap; }
+.pitem .pbadge {
+  font-size: 8px; padding: 2px 7px; border-radius: 4px;
+  font-weight: 800; font-family: 'Space Grotesk'; letter-spacing: 0.3px;
+}
+
+/* Export */
+.exps { display: flex; flex-direction: column; gap: 8px; }
+.ebtn {
+  padding: 13px; border-radius: 12px; border: none;
+  font-size: 13px; font-weight: 700; font-family: 'Space Grotesk';
+  cursor: pointer; transition: all 0.25s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  position: relative; overflow: hidden;
+}
+.ebtn::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent);
+  opacity: 0; transition: opacity 0.2s;
+}
+.ebtn:hover::after { opacity: 1; }
+.ebtn-zip {
+  background: linear-gradient(135deg, #6366f1, #7c3aed);
+  color: #fff; box-shadow: 0 6px 22px rgba(99,102,241,0.12);
+}
+.ebtn-zip:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(99,102,241,0.2); }
+.ebtn-pri {
+  background: linear-gradient(135deg, var(--accent), #d44010);
+  color: #fff; box-shadow: 0 6px 22px rgba(255,107,53,0.15);
+}
+.ebtn-pri:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,107,53,0.25); }
+.ebtn-ghost {
+  background: var(--card); color: var(--fg2);
+  border: 1px solid var(--border);
+}
+.ebtn-ghost:hover { border-color: var(--accent); color: var(--fg); }
+.ebtn:disabled { opacity: 0.35; pointer-events: none; }
+.ebtn .spinner { animation: spin 0.8s linear infinite; }
+
+/* Compare overlay */
+.cmp-box {
+  position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+  background: rgba(13,16,24,0.85); backdrop-filter: blur(12px);
+  border: 1px solid var(--border); border-radius: 14px;
+  padding: 12px 18px;
+  display: flex; gap: 14px; align-items: center;
+}
+.cmp-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.cmp-item canvas { border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.cmp-item span { font-size: 9px; color: var(--muted); font-family: 'Space Grotesk'; font-weight: 700; }
+
+/* Toast */
+.toast-box {
+  position: fixed; bottom: 20px; right: 16px; z-index: 9999;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.toast {
+  padding: 10px 18px; border-radius: 10px;
+  background: var(--card); border: 1px solid var(--border-hi);
+  color: var(--fg); font-size: 12px; font-weight: 500;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.5);
+  animation: toastIn 0.3s ease-out;
+  display: flex; align-items: center; gap: 8px;
+}
+.toast.out { animation: toastOut 0.2s ease-in forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 </style>
 </head>
 <body>
 
-<div class="orb orb1"></div>
-<div class="orb orb2"></div>
+<!-- Ambient orbs -->
+<div class="bg-orb" style="width:550px;height:550px;background:var(--accent);top:-180px;left:-120px;opacity:0.045;animation:none"></div>
+<div class="bg-orb" style="width:420px;height:420px;background:#6366f1;bottom:-120px;right:-90px;opacity:0.035;animation:none"></div>
 
-<div class="container">
-  <header class="header">
-    <div class="logo-row">
-      <div class="logo-icon"><i class="fas fa-vector-square" style="font-size:18px"></i></div>
-      <h1 class="logo-text">Squircle<span>Lab</span></h1>
+<div class="shell">
+  <!-- Header -->
+  <header class="hdr">
+    <div class="hdr-left">
+      <div class="hdr-logo"><i class="fas fa-vector-square"></i></div>
+      <h1 class="hdr-title">Squircle<span>Lab</span></h1>
     </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <span style="font-size:11px;color:var(--muted)"><i class="fas fa-lock" style="color:var(--accent);margin-right:4px"></i>100% local processing</span>
+    <div class="hdr-badges">
+      <span class="hdr-badge badge-local"><i class="fas fa-lock"></i> Local</span>
+      <span class="hdr-badge badge-zip"><i class="fas fa-file-zipper"></i> JSON+ZIP</span>
     </div>
   </header>
 
-  <div class="main-grid">
+  <!-- Main -->
+  <div class="grid-main">
+
     <!-- Left: Preview -->
-    <div class="preview-panel">
-      <div class="preview-tabs">
-        <button class="preview-tab active" data-tab="preview">Preview</button>
-        <button class="preview-tab" data-tab="compare">Compare</button>
-        <button class="preview-tab" data-tab="sizes">All Sizes</button>
+    <div class="panel-prev">
+      <div class="ptabs" id="ptabs">
+        <button class="ptab on" data-t="preview"><i class="fas fa-eye" style="margin-right:4px;font-size:10px"></i>Preview</button>
+        <button class="ptab" data-t="compare"><i class="fas fa-columns" style="margin-right:4px;font-size:10px"></i>Compare</button>
+        <button class="ptab" data-t="sizes"><i class="fas fa-grip" style="margin-right:4px;font-size:10px"></i>All Sizes</button>
+        <button class="ptab" data-t="json"><i class="fas fa-code" style="margin-right:4px;font-size:10px"></i>JSON</button>
       </div>
 
-      <div class="preview-area" id="previewArea">
-        <div class="upload-zone" id="uploadZone">
-          <div class="uz-icon"><i class="fas fa-cloud-arrow-up" style="color:var(--accent);font-size:28px"></i></div>
+      <div class="pbody" id="pbody">
+        <!-- Upload zone -->
+        <div class="upzone" id="upzone">
+          <div class="upzone-icon"><i class="fas fa-cloud-arrow-up" style="color:var(--accent);font-size:28px"></i></div>
           <h3>Drop your icon here</h3>
-          <p>or click to browse — PNG, JPG, SVG</p>
-          <input type="file" id="fileInput" accept="image/*" style="display:none">
+          <p>or click to browse files</p>
+          <div class="upzone-fmts">
+            <span class="upzone-fmt">PNG</span>
+            <span class="upzone-fmt">JPG</span>
+            <span class="upzone-fmt">SVG</span>
+            <span class="upzone-fmt">WebP</span>
+          </div>
+          <input type="file" id="fileIn" accept="image/*" style="display:none">
         </div>
-        <canvas id="mainPreview" style="display:none"></canvas>
+        <!-- Canvas -->
+        <canvas id="previewCanvas" style="display:none"></canvas>
       </div>
 
-      <div class="size-grid-area" id="sizeGridArea" style="display:none">
+      <!-- Size grid (hidden by default) -->
+      <div class="sgrid-wrap" id="sgridWrap" style="display:none">
         <h5>Generated Sizes</h5>
-        <div class="size-grid" id="sizeGrid"></div>
+        <div class="sgrid" id="sgrid"></div>
+      </div>
+
+      <!-- JSON preview (hidden by default) -->
+      <div class="json-wrap" id="jsonWrap" style="display:none">
+        <pre id="jsonPre"></pre>
       </div>
     </div>
 
     <!-- Right: Controls -->
-    <div class="controls">
+    <div class="ctrls" id="ctrls">
+
       <!-- Shape -->
-      <div class="ctrl-card">
-        <h4><i class="fas fa-shapes"></i> Shape</h4>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-shapes"></i> Shape</div>
         <div class="shape-grid" id="shapeGrid"></div>
-        <div class="slider-wrap" style="margin-top:14px">
-          <div class="slider-head">
-            <label>Corner Smoothness <span class="info-tip" title="Controls the squircle curvature. iOS uses ~0.7, Android uses ~0.9">?</span></label>
-            <span class="sval" id="smoothVal">0.70</span>
+        <div class="sld" style="margin-top:14px">
+          <div class="sld-head">
+            <label>Curvature</label>
+            <span class="sv" id="smoothVal">0.70</span>
           </div>
-          <input type="range" id="smoothSlider" min="0" max="100" value="70">
+          <input type="range" id="smoothRange" min="0" max="100" value="70">
         </div>
-        <div class="slider-wrap">
-          <div class="slider-head">
-            <label>Icon Padding</label>
-            <span class="sval" id="paddingVal">10%</span>
+        <div class="sld">
+          <div class="sld-head">
+            <label>Padding</label>
+            <span class="sv" id="padVal">10%</span>
           </div>
-          <input type="range" id="paddingSlider" min="0" max="40" value="10">
+          <input type="range" id="padRange" min="0" max="40" value="10">
         </div>
       </div>
 
       <!-- Background -->
-      <div class="ctrl-card">
-        <h4><i class="fas fa-palette"></i> Background</h4>
-        <div class="shape-grid" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:12px">
-          <button class="shape-btn active" data-bg="solid">Solid</button>
-          <button class="shape-btn" data-bg="gradient">Gradient</button>
-          <button class="shape-btn" data-bg="transparent">None</button>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-palette"></i> Background</div>
+        <div class="shape-grid" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:12px" id="bgBtns">
+          <button class="sbtn on" data-bg="solid">Solid</button>
+          <button class="sbtn" data-bg="gradient">Gradient</button>
+          <button class="sbtn" data-bg="transparent">None</button>
         </div>
-        <div id="solidBg">
-          <div class="color-row">
+        <div id="solidUI">
+          <div class="crow">
             <label>Color</label>
-            <input type="color" id="bgColor" value="#ffffff">
-            <input type="text" class="hex-input" id="bgHex" value="#ffffff" maxlength="7">
+            <input type="color" id="bgColorPick" value="#ffffff">
+            <input type="text" class="chex" id="bgColorHex" value="#ffffff" maxlength="7">
           </div>
         </div>
-        <div id="gradientBg" style="display:none">
-          <div class="color-row">
+        <div id="gradUI" style="display:none">
+          <div class="crow">
             <label>Start</label>
-            <input type="color" id="gradStart" value="#ff6b35">
-            <input type="text" class="hex-input" id="gradStartHex" value="#ff6b35" maxlength="7">
+            <input type="color" id="gradStartPick" value="#ff6b35">
+            <input type="text" class="chex" id="gradStartHex" value="#ff6b35" maxlength="7">
           </div>
-          <div class="color-row">
+          <div class="crow">
             <label>End</label>
-            <input type="color" id="gradEnd" value="#ff3d00">
-            <input type="text" class="hex-input" id="gradEndHex" value="#ff3d00" maxlength="7">
+            <input type="color" id="gradEndPick" value="#d44010">
+            <input type="text" class="chex" id="gradEndHex" value="#d44010" maxlength="7">
           </div>
-          <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">Direction</label>
-          <div class="grad-dir" id="gradDir"></div>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:3px;font-weight:600">Direction</div>
+          <div class="gdir" id="gdir"></div>
         </div>
       </div>
 
-      <!-- Platform Presets -->
-      <div class="ctrl-card">
-        <h4><i class="fas fa-mobile-screen"></i> Platform Presets</h4>
-        <div class="platform-list" id="platformList"></div>
+      <!-- Platforms -->
+      <div class="card">
+        <div class="card-title"><i class="fas fa-mobile-screen-button"></i> Platforms</div>
+        <div class="plat-list" id="platList"></div>
       </div>
 
       <!-- Export -->
-      <div class="ctrl-card">
-        <h4><i class="fas fa-download"></i> Export</h4>
-        <div class="export-btns">
-          <button class="exp-btn primary" id="exportCurrent" disabled><i class="fas fa-image"></i> Export Current PNG</button>
-          <button class="exp-btn zip" id="exportZip" disabled><i class="fas fa-file-zipper"></i> Export JSON + Icons (.zip)</button>
-          <button class="exp-btn ghost" id="exportAllPng" disabled><i class="fas fa-images"></i> Export All as Individual PNGs</button>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-rocket"></i> Export</div>
+        <div class="exps">
+          <button class="ebtn ebtn-zip" id="btnZip" disabled>
+            <i class="fas fa-file-zipper"></i> Export JSON + Icons (.zip)
+          </button>
+          <button class="ebtn ebtn-pri" id="btnPng" disabled>
+            <i class="fas fa-image"></i> Export Current PNG
+          </button>
+          <button class="ebtn ebtn-ghost" id="btnAllPng" disabled>
+            <i class="fas fa-images"></i> Export All Individual PNGs
+          </button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="toast-container" id="toastContainer"></div>
+<!-- Toasts -->
+<div class="toast-box" id="toastBox"></div>
 
 <script>
-(function(){
-// ====== STATE ======
-let srcImg=null;
-let currentShape='squircle';
-let smoothness=0.7;
-let padding=0.1;
-let bgMode='solid';
-let bgColor='#ffffff';
-let gradStart='#ff6b35',gradEnd='#ff3d00',gradAngle=135;
-let currentPlatform='ios';
-let activeTab='preview';
+(function () {
+  "use strict";
 
-// Enhanced platform data with manifest metadata
-const PLATFORMS=[
-  // iOS
-  {id:'ios',name:'iOS App Store',size:1024,shape:'squircle',smooth:0.7,color:'#007aff',badge:'1024px',group:'ios',idiom:'universal',scale:'1x',logicalSize:'1024x1024',filename:'Icon-App-1024x1024.png'},
-  {id:'ios-180',name:'iOS App @3x',size:180,shape:'squircle',smooth:0.7,color:'#007aff',badge:'180px',group:'ios',idiom:'iphone',scale:'3x',logicalSize:'60x60',filename:'Icon-App-60x60@3x.png'},
-  {id:'ios-120',name:'iOS App @2x',size:120,shape:'squircle',smooth:0.7,color:'#007aff',badge:'120px',group:'ios',idiom:'iphone',scale:'2x',logicalSize:'60x60',filename:'Icon-App-60x60@2x.png'},
-  {id:'ios-spotlight-120',name:'iOS Spotlight @3x',size:120,shape:'squircle',smooth:0.7,color:'#007aff',badge:'120px',group:'ios',idiom:'iphone',scale:'3x',logicalSize:'40x40',filename:'Icon-Spotlight-40x40@3x.png'},
-  {id:'ios-spotlight-80',name:'iOS Spotlight @2x',size:80,shape:'squircle',smooth:0.7,color:'#007aff',badge:'80px',group:'ios',idiom:'iphone',scale:'2x',logicalSize:'40x40',filename:'Icon-Spotlight-40x40@2x.png'},
-  {id:'ios-settings-87',name:'iOS Settings @3x',size:87,shape:'squircle',smooth:0.7,color:'#007aff',badge:'87px',group:'ios',idiom:'iphone',scale:'3x',logicalSize:'29x29',filename:'Icon-Settings-29x29@3x.png'},
-  {id:'ios-settings-58',name:'iOS Settings @2x',size:58,shape:'squircle',smooth:0.7,color:'#007aff',badge:'58px',group:'ios',idiom:'iphone',scale:'2x',logicalSize:'29x29',filename:'Icon-Settings-29x29@2x.png'},
-  {id:'ios-notif-60',name:'iOS Notification @3x',size:60,shape:'squircle',smooth:0.7,color:'#007aff',badge:'60px',group:'ios',idiom:'iphone',scale:'3x',logicalSize:'20x20',filename:'Icon-Notification-20x20@3x.png'},
-  {id:'ios-notif-40',name:'iOS Notification @2x',size:40,shape:'squircle',smooth:0.7,color:'#007aff',badge:'40px',group:'ios',idiom:'iphone',scale:'2x',logicalSize:'20x20',filename:'Icon-Notification-20x20@2x.png'},
-  // Android
-  {id:'android-512',name:'Android Play Store',size:512,shape:'squircle',smooth:0.9,color:'#3ddc84',badge:'512px',group:'android',folder:'',filename:'ic_launcher.png'},
-  {id:'android-192',name:'Android xxxhdpi',size:192,shape:'squircle',smooth:0.9,color:'#3ddc84',badge:'192px',group:'android',folder:'mipmap-xxxhdpi',filename:'ic_launcher.png'},
-  {id:'android-144',name:'Android xxhdpi',size:144,shape:'squircle',smooth:0.9,color:'#3ddc84',badge:'144px',group:'android',folder:'mipmap-xxhdpi',filename:'ic_launcher.png'},
-  {id:'android-96',name:'Android xhdpi',size:96,shape:'squircle',smooth:0.9,color:'#3ddc84',badge:'96px',group:'android',folder:'mipmap-xhdpi',filename:'ic_launcher.png'},
-  {id:'android-72',name:'Android hdpi',size:72,shape:'squircle',smooth:0.9,color:'#3ddc84',badge:'72px',group:'android',folder:'mipmap-hdpi',filename:'ic_launcher.png'},
-  {id:'android-48',name:'Android mdpi',size:48,shape:'squircle',smooth:0.9,color:'#3ddc84',badge:'48px',group:'android',folder:'mipmap-mdpi',filename:'ic_launcher.png'},
-  // macOS
-  {id:'macos-16',name:'macOS 16px @1x',size:16,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'16px',group:'macos',idiom:'mac',scale:'1x',logicalSize:'16x16',filename:'icon_16x16.png'},
-  {id:'macos-32-2x',name:'macOS 16px @2x',size:32,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'32px',group:'macos',idiom:'mac',scale:'2x',logicalSize:'16x16',filename:'icon_16x16@2x.png'},
-  {id:'macos-32',name:'macOS 32px @1x',size:32,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'32px',group:'macos',idiom:'mac',scale:'1x',logicalSize:'32x32',filename:'icon_32x32.png'},
-  {id:'macos-64-2x',name:'macOS 32px @2x',size:64,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'64px',group:'macos',idiom:'mac',scale:'2x',logicalSize:'32x32',filename:'icon_32x32@2x.png'},
-  {id:'macos-128',name:'macOS 128px @1x',size:128,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'128px',group:'macos',idiom:'mac',scale:'1x',logicalSize:'128x128',filename:'icon_128x128.png'},
-  {id:'macos-256-2x',name:'macOS 128px @2x',size:256,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'256px',group:'macos',idiom:'mac',scale:'2x',logicalSize:'128x128',filename:'icon_128x128@2x.png'},
-  {id:'macos-256',name:'macOS 256px @1x',size:256,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'256px',group:'macos',idiom:'mac',scale:'1x',logicalSize:'256x256',filename:'icon_256x256.png'},
-  {id:'macos-512-2x',name:'macOS 256px @2x',size:512,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'512px',group:'macos',idiom:'mac',scale:'2x',logicalSize:'256x256',filename:'icon_256x256@2x.png'},
-  {id:'macos-512',name:'macOS 512px @1x',size:512,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'512px',group:'macos',idiom:'mac',scale:'1x',logicalSize:'512x512',filename:'icon_512x512.png'},
-  {id:'macos-1024-2x',name:'macOS 512px @2x',size:1024,shape:'roundrect',smooth:0.55,color:'#bf5af2',badge:'1024px',group:'macos',idiom:'mac',scale:'2x',logicalSize:'512x512',filename:'icon_512x512@2x.png'},
-  // PWA
-  {id:'pwa-512',name:'PWA Icon 512',size:512,shape:'squircle',smooth:0.7,color:'#fbbf24',badge:'512px',group:'pwa',filename:'icon-512x512.png'},
-  {id:'pwa-192',name:'PWA Icon 192',size:192,shape:'squircle',smooth:0.7,color:'#fbbf24',badge:'192px',group:'pwa',filename:'icon-192x192.png'},
-];
+  /* ═══════════════════════════════════════
+     STATE
+     ═══════════════════════════════════════ */
+  var srcImg    = null;
+  var shape     = "squircle";
+  var curvature = 0.7;
+  var padding   = 0.1;
+  var bgMode    = "solid";
+  var bgColor   = "#ffffff";
+  var gStart    = "#ff6b35";
+  var gEnd      = "#d44010";
+  var gAngle    = 135;
+  var selPlat   = "ios";
+  var tab       = "preview";
 
-// ====== SQUIRCLE MATH ======
-function createSquirclePath(ctx, cx, cy, size, smooth) {
-  const r = size / 2;
-  const n = 2 + (1 - smooth) * 8;
-  ctx.beginPath();
-  const steps = 360;
-  for (let i = 0; i <= steps; i++) {
-    const t = (i / steps) * Math.PI * 2;
-    const cosT = Math.cos(t), sinT = Math.sin(t);
-    const x = Math.sign(cosT) * Math.pow(Math.abs(cosT), 2/n) * r;
-    const y = Math.sign(sinT) * Math.pow(Math.abs(sinT), 2/n) * r;
-    if (i === 0) ctx.moveTo(cx + x, cy + y); else ctx.lineTo(cx + x, cy + y);
-  }
-  ctx.closePath();
-}
-
-function createRoundRectPath(ctx, cx, cy, size, radius) {
-  const r = size / 2, cr = r * radius;
-  const x = cx - r, y = cy - r, w = size, h = size;
-  ctx.beginPath();
-  ctx.moveTo(x + cr, y); ctx.lineTo(x + w - cr, y); ctx.arcTo(x + w, y, x + w, y + cr, cr);
-  ctx.lineTo(x + w, y + h - cr); ctx.arcTo(x + w, y + h, x + w - cr, y + h, cr);
-  ctx.lineTo(x + cr, y + h); ctx.arcTo(x, y + h, x, y + h - cr, cr);
-  ctx.lineTo(x, y + cr); ctx.arcTo(x, y, x + cr, y, cr); ctx.closePath();
-}
-
-function createCirclePath(ctx, cx, cy, size) {
-  ctx.beginPath(); ctx.arc(cx, cy, size / 2, 0, Math.PI * 2); ctx.closePath();
-}
-
-function createShapePath(ctx, cx, cy, size, shape, smooth) {
-  switch (shape) {
-    case 'squircle': createSquirclePath(ctx, cx, cy, size, smooth); break;
-    case 'roundrect': createRoundRectPath(ctx, cx, cy, size, smooth * 0.5); break;
-    case 'circle': createCirclePath(ctx, cx, cy, size); break;
-    case 'square': ctx.beginPath(); ctx.rect(cx - size/2, cy - size/2, size, size); ctx.closePath(); break;
-    default: createSquirclePath(ctx, cx, cy, size, smooth);
-  }
-}
-
-// ====== RENDER ======
-function renderIcon(canvas, size, shape, smooth, pad, bg, gStart, gEnd, gAngle, bgM, img) {
-  canvas.width = size; canvas.height = size;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, size, size);
-  const iconSize = size * (1 - pad);
-  const cx = size / 2, cy = size / 2;
-
-  createShapePath(ctx, cx, cy, iconSize, shape, smooth);
-  if (bgM === 'solid') { ctx.fillStyle = bg; ctx.fill(); }
-  else if (bgM === 'gradient') {
-    const rad = (gAngle * Math.PI) / 180;
-    const dx = Math.cos(rad) * iconSize / 2, dy = Math.sin(rad) * iconSize / 2;
-    const grad = ctx.createLinearGradient(cx - dx, cy - dy, cx + dx, cy + dy);
-    grad.addColorStop(0, gStart); grad.addColorStop(1, gEnd);
-    ctx.fillStyle = grad; ctx.fill();
-  } else {
-    ctx.save(); ctx.clip();
-    const cs = Math.max(4, size / 32);
-    for (let y = 0; y < size; y += cs) for (let x = 0; x < size; x += cs) {
-      ctx.fillStyle = (Math.floor(x/cs) + Math.floor(y/cs)) % 2 === 0 ? '#1a1d28' : '#22263a';
-      ctx.fillRect(x, y, cs, cs);
-    }
-    ctx.restore();
-  }
-
-  if (img) {
-    ctx.save();
-    createShapePath(ctx, cx, cy, iconSize, shape, smooth);
-    ctx.clip();
-    const imgAspect = img.width / img.height;
-    let drawW, drawH;
-    if (imgAspect > 1) { drawH = iconSize; drawW = iconSize * imgAspect; }
-    else { drawW = iconSize; drawH = iconSize / imgAspect; }
-    ctx.drawImage(img, cx - drawW / 2, cy - drawH / 2, drawW, drawH);
-    ctx.restore();
-  }
-
-  if (shape === 'squircle' || shape === 'roundrect') {
-    createShapePath(ctx, cx, cy, iconSize, shape, smooth);
-    ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = Math.max(1, size / 512); ctx.stroke();
-  }
-}
-
-function renderPreview() {
-  if (!srcImg) return;
-  const canvas = document.getElementById('mainPreview');
-  renderIcon(canvas, 512, currentShape, smoothness, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
-  document.getElementById('exportCurrent').disabled = false;
-  document.getElementById('exportZip').disabled = false;
-  document.getElementById('exportAllPng').disabled = false;
-}
-
-function renderSizeGrid() {
-  if (!srcImg) return;
-  const grid = document.getElementById('sizeGrid');
-  grid.innerHTML = '';
-  PLATFORMS.forEach(p => {
-    const item = document.createElement('div');
-    item.className = 'size-item';
-    const c = document.createElement('canvas');
-    const displayDim = Math.min(p.size, 64);
-    c.style.width = displayDim + 'px'; c.style.height = displayDim + 'px';
-    renderIcon(c, p.size, currentShape, smoothness, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
-    const label = document.createElement('span');
-    label.textContent = p.size + 'px';
-    item.appendChild(c); item.appendChild(label);
-    item.addEventListener('click', () => exportSingle(p.size, p.filename || `icon-${p.size}x${p.size}.png`));
-    grid.appendChild(item);
-  });
-}
-
-// ====== FILE HANDLING ======
-const uploadZone = document.getElementById('uploadZone');
-const fileInput = document.getElementById('fileInput');
-const mainPreview = document.getElementById('mainPreview');
-
-uploadZone.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', e => { if (e.target.files[0]) loadImage(e.target.files[0]) });
-uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover') });
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('dragover'); if (e.dataTransfer.files[0]) loadImage(e.dataTransfer.files[0]) });
-document.addEventListener('paste', e => {
-  const items = e.clipboardData && e.clipboardData.items; if (!items) return;
-  for (const item of items) { if (item.type.startsWith('image/')) { loadImage(item.getAsFile()); break } }
-});
-
-function loadImage(file) {
-  if (!file.type.startsWith('image/')) { showToast('Not a valid image file', 'error'); return }
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = new Image();
-    img.onload = () => {
-      srcImg = img;
-      uploadZone.style.display = 'none'; mainPreview.style.display = 'block';
-      renderPreview();
-      if (activeTab === 'sizes') renderSizeGrid();
-      showToast('Image loaded — adjust shape and export', 'success');
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-// ====== SHAPE PREVIEW BUTTONS ======
-function buildShapeGrid() {
-  const grid = document.getElementById('shapeGrid');
-  const shapes = [
-    { id: 'squircle', name: 'Squircle' },
-    { id: 'roundrect', name: 'Round Rect' },
-    { id: 'circle', name: 'Circle' },
-    { id: 'square', name: 'Square' },
-    { id: 'ios', name: 'iOS Style' },
-    { id: 'android', name: 'Android' },
+  /* ═══════════════════════════════════════
+     PLATFORM DEFINITIONS
+     ═══════════════════════════════════════ */
+  var PLATFORMS = [
+    // ── iOS ──
+    { id:"ios",       name:"App Store",       sz:1024, sh:"squircle", sm:0.7, c:"#0a84ff", badge:"1024", grp:"ios", idiom:"universal", scale:"1x", lsz:"1024x1024", fn:"Icon-App-1024x1024.png" },
+    { id:"ios-180",   name:"iPhone @3x",      sz:180,  sh:"squircle", sm:0.7, c:"#0a84ff", badge:"180",  grp:"ios", idiom:"iphone",    scale:"3x", lsz:"60x60",     fn:"Icon-App-60x60@3x.png" },
+    { id:"ios-120",   name:"iPhone @2x",      sz:120,  sh:"squircle", sm:0.7, c:"#0a84ff", badge:"120",  grp:"ios", idiom:"iphone",    scale:"2x", lsz:"60x60",     fn:"Icon-App-60x60@2x.png" },
+    { id:"ios-sp120", name:"Spotlight @3x",   sz:120,  sh:"squircle", sm:0.7, c:"#0a84ff", badge:"120",  grp:"ios", idiom:"iphone",    scale:"3x", lsz:"40x40",     fn:"Icon-Spotlight-40x40@3x.png" },
+    { id:"ios-sp80",  name:"Spotlight @2x",   sz:80,   sh:"squircle", sm:0.7, c:"#0a84ff", badge:"80",   grp:"ios", idiom:"iphone",    scale:"2x", lsz:"40x40",     fn:"Icon-Spotlight-40x40@2x.png" },
+    { id:"ios-s87",   name:"Settings @3x",    sz:87,   sh:"squircle", sm:0.7, c:"#0a84ff", badge:"87",   grp:"ios", idiom:"iphone",    scale:"3x", lsz:"29x29",     fn:"Icon-Settings-29x29@3x.png" },
+    { id:"ios-s58",   name:"Settings @2x",    sz:58,   sh:"squircle", sm:0.7, c:"#0a84ff", badge:"58",   grp:"ios", idiom:"iphone",    scale:"2x", lsz:"29x29",     fn:"Icon-Settings-29x29@2x.png" },
+    { id:"ios-n60",   name:"Notification @3x",sz:60,   sh:"squircle", sm:0.7, c:"#0a84ff", badge:"60",   grp:"ios", idiom:"iphone",    scale:"3x", lsz:"20x20",     fn:"Icon-Notification-20x20@3x.png" },
+    { id:"ios-n40",   name:"Notification @2x",sz:40,   sh:"squircle", sm:0.7, c:"#0a84ff", badge:"40",   grp:"ios", idiom:"iphone",    scale:"2x", lsz:"20x20",     fn:"Icon-Notification-20x20@2x.png" },
+    // ── macOS (full Xcode spec) ──
+    { id:"mac-5122",  name:"512pt @2x",       sz:1024, sh:"roundrect", sm:0.55, c:"#bf5af2", badge:"1024", grp:"macos", idiom:"mac", scale:"2x", lsz:"512x512", fn:"icon_512x512@2x.png" },
+    { id:"mac-5121",  name:"512pt @1x",       sz:512,  sh:"roundrect", sm:0.55, c:"#bf5af2", badge:"512",  grp:"macos", idiom:"mac", scale:"1x", lsz:"512x512", fn:"icon_512x512.png" },
+    { id:"mac-2562",  name:"256pt @2x",       sz:512,  sh:"roundrect", sm:0.55, c:"#bf5af2", badge:"512",  grp:"macos", idiom:"mac", scale:"2x", lsz:"256x256", fn:"icon_256x256@2x.png" },
+    { id:"mac-2561",  name:"256pt @1x",       sz:256,  sh:"roundrect", sm:0.55, c:"#bf5af2", badge:"256",  grp:"macos", idiom:"mac", scale:"1x", lsz:"256x256", fn:"icon_256x256.png" },
+    { id:"mac-1282",  name:"128pt @2x",       sz:256,  sh:"roundrect", sm:0.55, c:"#bf5af2", badge:"256",  grp:"macos", idiom:"mac", scale:"2x", lsz:"128x128", fn:"icon_128x128@2x.png" },
+    { id:"mac-1281",  name:"128pt @1x",       sz:128,  sh:"roundrect", sm:0.55, c:"#bf5af2", badge:"128",  grp:"macos", idiom:"mac", scale:"1x", lsz:"128x128", fn:"icon_128x128.png" },
+    { id:"mac-322",   name:"32pt @2x",        sz:64,   sh:"roundrect", sm:0.55, c:"#bf5af2", badge:"64",   grp:"macos", idiom:"mac", scale:"2x", lsz:"32x32",   fn:"icon_32x32@2x.png" },
+    { id:"mac-321",   name:"32pt @1x",        sz:32,   sh:"roundrect", sm:0.55, c:"#bf5af2", badge:"32",   grp:"macos", idiom:"mac", scale:"1x", lsz:"32x32",   fn:"icon_32x32.png" },
+    { id:"mac-162",   name:"16pt @2x",        sz:32,   sh:"roundrect", sm:0.55, c:"#bf5af2", badge:"32",   grp:"macos", idiom:"mac", scale:"2x", lsz:"16x16",   fn:"icon_16x16@2x.png" },
+    { id:"mac-161",   name:"16pt @1x",        sz:16,   sh:"roundrect", sm:0.55, c:"#bf5af2", badge:"16",   grp:"macos", idiom:"mac", scale:"1x", lsz:"16x16",   fn:"icon_16x16.png" },
+    // ── Android ──
+    { id:"and-512",   name:"Play Store",      sz:512, sh:"squircle", sm:0.9, c:"#3ddc84", badge:"512", grp:"android", folder:"",                fn:"ic_launcher.png" },
+    { id:"and-192",   name:"xxxhdpi",         sz:192, sh:"squircle", sm:0.9, c:"#3ddc84", badge:"192", grp:"android", folder:"mipmap-xxxhdpi",  fn:"ic_launcher.png" },
+    { id:"and-144",   name:"xxhdpi",          sz:144, sh:"squircle", sm:0.9, c:"#3ddc84", badge:"144", grp:"android", folder:"mipmap-xxhdpi",   fn:"ic_launcher.png" },
+    { id:"and-96",    name:"xhdpi",           sz:96,  sh:"squircle", sm:0.9, c:"#3ddc84", badge:"96",  grp:"android", folder:"mipmap-xhdpi",    fn:"ic_launcher.png" },
+    { id:"and-72",    name:"hdpi",            sz:72,  sh:"squircle", sm:0.9, c:"#3ddc84", badge:"72",  grp:"android", folder:"mipmap-hdpi",     fn:"ic_launcher.png" },
+    { id:"and-48",    name:"mdpi",            sz:48,  sh:"squircle", sm:0.9, c:"#3ddc84", badge:"48",  grp:"android", folder:"mipmap-mdpi",     fn:"ic_launcher.png" },
+    // ── PWA ──
+    { id:"pwa-512",   name:"PWA 512",         sz:512, sh:"squircle", sm:0.7, c:"#fbbf24", badge:"512", grp:"pwa", fn:"icon-512x512.png" },
+    { id:"pwa-192",   name:"PWA 192",         sz:192, sh:"squircle", sm:0.7, c:"#fbbf24", badge:"192", grp:"pwa", fn:"icon-192x192.png" }
   ];
-  shapes.forEach(s => {
-    const btn = document.createElement('button');
-    btn.className = 'shape-btn' + (s.id === 'squircle' ? ' active' : '');
-    btn.dataset.shape = s.id;
-    const c = document.createElement('canvas');
-    c.width = 28; c.height = 28;
-    const ctx = c.getContext('2d');
-    let shape = s.id, smooth = smoothness;
-    if (s.id === 'ios') { shape = 'squircle'; smooth = 0.7; }
-    else if (s.id === 'android') { shape = 'squircle'; smooth = 0.9; }
-    else if (s.id === 'roundrect') { smooth = 0.45; }
-    createShapePath(ctx, 14, 14, 24, shape, smooth);
-    ctx.fillStyle = '#ff6b35'; ctx.fill();
-    btn.appendChild(c);
-    const span = document.createElement('span'); span.textContent = s.name; span.style.fontSize = '9px';
-    btn.appendChild(span);
-    btn.addEventListener('click', () => {
-      grid.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      if (s.id === 'ios') { currentShape = 'squircle'; smoothness = 0.7; document.getElementById('smoothSlider').value = 70; document.getElementById('smoothVal').textContent = '0.70'; }
-      else if (s.id === 'android') { currentShape = 'squircle'; smoothness = 0.9; document.getElementById('smoothSlider').value = 90; document.getElementById('smoothVal').textContent = '0.90'; }
-      else if (s.id === 'roundrect') { currentShape = 'roundrect'; smoothness = 0.45; document.getElementById('smoothSlider').value = 45; document.getElementById('smoothVal').textContent = '0.45'; }
-      else { currentShape = s.id; }
-      renderPreview(); if (activeTab === 'sizes') renderSizeGrid();
-    });
-    grid.appendChild(btn);
-  });
-}
-buildShapeGrid();
 
-// ====== SLIDERS ======
-document.getElementById('smoothSlider').addEventListener('input', e => {
-  smoothness = e.target.value / 100; document.getElementById('smoothVal').textContent = smoothness.toFixed(2);
-  renderPreview(); if (activeTab === 'sizes') renderSizeGrid();
-});
-document.getElementById('paddingSlider').addEventListener('input', e => {
-  padding = e.target.value / 100; document.getElementById('paddingVal').textContent = Math.round(padding * 100) + '%';
-  renderPreview(); if (activeTab === 'sizes') renderSizeGrid();
-});
-
-// ====== BACKGROUND ======
-document.querySelectorAll('[data-bg]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('[data-bg]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active'); bgMode = btn.dataset.bg;
-    document.getElementById('solidBg').style.display = bgMode === 'solid' ? '' : 'none';
-    document.getElementById('gradientBg').style.display = bgMode === 'gradient' ? '' : 'none';
-    renderPreview(); if (activeTab === 'sizes') renderSizeGrid();
-  });
-});
-
-function syncColor(pickerId, hexId, setter) {
-  const picker = document.getElementById(pickerId), hex = document.getElementById(hexId);
-  picker.addEventListener('input', () => { hex.value = picker.value; setter(picker.value); renderPreview(); if (activeTab === 'sizes') renderSizeGrid() });
-  hex.addEventListener('input', () => { if (/^#[0-9a-fA-F]{6}$/.test(hex.value)) { picker.value = hex.value; setter(hex.value); renderPreview(); if (activeTab === 'sizes') renderSizeGrid() } });
-}
-syncColor('bgColor', 'bgHex', v => bgColor = v);
-syncColor('gradStart', 'gradStartHex', v => gradStart = v);
-syncColor('gradEnd', 'gradEndHex', v => gradEnd = v);
-
-function buildGradDir() {
-  const container = document.getElementById('gradDir');
-  const dirs = [0, 45, 90, 135, 180, 225, 270, 315];
-  const arrows = ['→', '↗', '↑', '↖', '←', '↙', '↓', '↘'];
-  dirs.forEach((d, i) => {
-    const btn = document.createElement('button'); btn.textContent = arrows[i]; btn.title = d + '°';
-    if (d === gradAngle) btn.classList.add('active');
-    btn.addEventListener('click', () => {
-      container.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active'); gradAngle = d; renderPreview(); if (activeTab === 'sizes') renderSizeGrid();
-    });
-    container.appendChild(btn);
-  });
-}
-buildGradDir();
-
-// ====== PLATFORM LIST ======
-function buildPlatformList() {
-  const list = document.getElementById('platformList');
-  // Show group headers + items
-  const groups = {ios:'Apple iOS', android:'Android', macos:'macOS', pwa:'Progressive Web App'};
-  const shown = {};
-  PLATFORMS.forEach(p => {
-    if (!shown[p.group]) {
-      shown[p.group] = true;
-      const hdr = document.createElement('div');
-      hdr.style.cssText = 'font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:8px 12px 2px;';
-      hdr.textContent = groups[p.group] || p.group;
-      list.appendChild(hdr);
+  /* ═══════════════════════════════════════
+     SQUIRCLE / SHAPE MATH
+     ═══════════════════════════════════════ */
+  function pathSquircle(ctx, cx, cy, sz, sm) {
+    var r = sz / 2;
+    var n = 2 + (1 - sm) * 8;
+    ctx.beginPath();
+    for (var i = 0; i <= 360; i++) {
+      var t = i / 360 * Math.PI * 2;
+      var co = Math.cos(t), si = Math.sin(t);
+      var x = Math.sign(co) * Math.pow(Math.abs(co), 2 / n) * r;
+      var y = Math.sign(si) * Math.pow(Math.abs(si), 2 / n) * r;
+      if (i === 0) ctx.moveTo(cx + x, cy + y);
+      else ctx.lineTo(cx + x, cy + y);
     }
-    const item = document.createElement('div');
-    item.className = 'platform-item' + (p.id === 'ios' ? ' active' : '');
-    item.dataset.platform = p.id;
-    item.innerHTML = `
-      <span class="pi-dot" style="background:${p.color}"></span>
-      <span class="pi-name">${p.name}</span>
-      <span class="pi-badge" style="background:${p.color}22;color:${p.color}">${p.badge}</span>
-    `;
-    item.addEventListener('click', () => {
-      list.querySelectorAll('.platform-item').forEach(i => i.classList.remove('active'));
-      item.classList.add('active'); currentPlatform = p.id;
-      currentShape = p.shape; smoothness = p.smooth;
-      document.getElementById('smoothSlider').value = Math.round(smoothness * 100);
-      document.getElementById('smoothVal').textContent = smoothness.toFixed(2);
-      document.querySelectorAll('#shapeGrid .shape-btn').forEach(b => b.classList.remove('active'));
-      renderPreview(); if (activeTab === 'sizes') renderSizeGrid();
-      showToast(`Preset: ${p.name}`, 'info');
-    });
-    list.appendChild(item);
-  });
-}
-buildPlatformList();
-
-// ====== PREVIEW TABS ======
-document.querySelectorAll('.preview-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active'); activeTab = tab.dataset.tab;
-    document.getElementById('sizeGridArea').style.display = activeTab === 'sizes' ? '' : 'none';
-    if (activeTab === 'sizes' && srcImg) renderSizeGrid();
-    if (activeTab === 'compare' && srcImg) renderCompare();
-  });
-});
-
-function renderCompare() {
-  if (!srcImg) return;
-  const area = document.getElementById('previewArea');
-  const existing = area.querySelector('.compare-row');
-  if (existing) existing.remove();
-  const row = document.createElement('div');
-  row.className = 'compare-row'; row.style.cssText = 'position:absolute;bottom:16px;left:50%;transform:translateX(-50%)';
-  [{name:'Square',shape:'square',s:0},{name:'Round Rect',shape:'roundrect',s:0.45},{name:'Squircle',shape:'squircle',s:smoothness},{name:'Circle',shape:'circle',s:1}].forEach(s => {
-    const item = document.createElement('div'); item.className = 'compare-item';
-    const c = document.createElement('canvas'); c.style.width = '48px'; c.style.height = '48px';
-    renderIcon(c, 128, s.shape, s.s, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
-    const label = document.createElement('span'); label.textContent = s.name;
-    item.appendChild(c); item.appendChild(label); row.appendChild(item);
-  });
-  area.appendChild(row);
-}
-
-// ====== EXPORT SINGLE PNG ======
-function exportSingle(size, filename) {
-  if (!srcImg) return;
-  const c = document.createElement('canvas');
-  renderIcon(c, size, currentShape, smoothness, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
-  c.toBlob(blob => {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = filename || `icon-${size}x${size}.png`;
-    a.click(); URL.revokeObjectURL(url);
-    showToast(`Exported ${size}x${size} PNG`, 'success');
-  }, 'image/png');
-}
-
-document.getElementById('exportCurrent').addEventListener('click', () => {
-  const p = PLATFORMS.find(p => p.id === currentPlatform) || PLATFORMS[0];
-  exportSingle(p.size, p.filename);
-});
-
-document.getElementById('exportAllPng').addEventListener('click', () => {
-  if (!srcImg) return;
-  PLATFORMS.forEach((p, i) => {
-    setTimeout(() => {
-      const c = document.createElement('canvas');
-      renderIcon(c, p.size, p.shape, p.smooth, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
-      c.toBlob(blob => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = p.filename || `${p.id}-icon-${p.size}x${p.size}.png`;
-        a.click(); URL.revokeObjectURL(url);
-      }, 'image/png');
-    }, i * 300);
-  });
-  showToast(`Exporting ${PLATFORMS.length} individual PNGs...`, 'success');
-});
-
-// ====== EXPORT JSON + ZIP ======
-function generateIosContentsJson(files) {
-  const images = files.map(f => ({
-    filename: f.filename, idiom: f.idiom || 'universal', scale: f.scale || '1x', size: f.logicalSize || `${f.size}x${f.size}`
-  }));
-  return JSON.stringify({ images: images, info: { author: "squirclelab", version: 1 } }, null, 2);
-}
-
-function generateMacContentsJson(files) {
-  const images = files.map(f => ({
-    idiom: "mac",
-    size: f.logicalSize || `${f.size}x${f.size}`,
-    scale: f.scale || '1x',
-    filename: f.filename
-  }));
-  return JSON.stringify({ images: images, info: { version: 1, author: "xcode" } }, null, 2);
-}
-
-function generatePwaManifest(files) {
-  const icons = files.map(f => ({ src: "icons/" + f.filename, sizes: `${f.size}x${f.size}`, type: "image/png" }));
-  return JSON.stringify({
-    name: "App", short_name: "App", display: "standalone",
-    background_color: bgMode === 'solid' ? bgColor : "#ffffff",
-    theme_color: bgMode === 'solid' ? bgColor : "#ffffff",
-    icons: icons
-  }, null, 2);
-}
-
-document.getElementById('exportZip').addEventListener('click', async () => {
-  if (!srcImg) return;
-  const btn = document.getElementById('exportZip');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating ZIP...';
-
-  try {
-    const zip = new JSZip();
-    const groups = {};
-
-    // Group platforms
-    PLATFORMS.forEach(p => {
-      if (!groups[p.group]) groups[p.group] = [];
-      groups[p.group].push(p);
-    });
-
-    // Generate iOS Assets.xcassets
-    if (groups.ios) {
-      const iosFolder = zip.folder("Assets.xcassets").folder("AppIcon.appiconset");
-      const iosFiles = [];
-      for (const p of groups.ios) {
-        const canvas = document.createElement('canvas');
-        renderIcon(canvas, p.size, currentShape, smoothness, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
-        const blob = await canvasToBlob(canvas);
-        iosFolder.file(p.filename, blob);
-        iosFiles.push(p);
-      }
-      iosFolder.file("Contents.json", generateIosContentsJson(iosFiles));
-    }
-
-    // Generate Android mipmaps
-    if (groups.android) {
-      for (const p of groups.android) {
-        const canvas = document.createElement('canvas');
-        renderIcon(canvas, p.size, currentShape, smoothness, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
-        const blob = await canvasToBlob(canvas);
-        const folderName = p.folder ? `android/${p.folder}` : 'android';
-        zip.folder(folderName).file(p.filename, blob);
-      }
-    }
-
-    // Generate macOS
-    if (groups.macos) {
-      const macFolder = zip.folder("macos").folder("AppIcon.appiconset");
-      const macFiles = [];
-      for (const p of groups.macos) {
-        const canvas = document.createElement('canvas');
-        renderIcon(canvas, p.size, currentShape, smoothness, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
-        const blob = await canvasToBlob(canvas);
-        macFolder.file(p.filename, blob);
-        macFiles.push(p);
-      }
-      macFolder.file("Contents.json", generateMacContentsJson(macFiles));
-    }
-
-    // Generate PWA
-    if (groups.pwa) {
-      const pwaFolder = zip.folder("pwa").folder("icons");
-      const pwaFiles = [];
-      for (const p of groups.pwa) {
-        const canvas = document.createElement('canvas');
-        renderIcon(canvas, p.size, currentShape, smoothness, padding, bgColor, gradStart, gradEnd, gradAngle, bgMode, srcImg);
-        const blob = await canvasToBlob(canvas);
-        pwaFolder.file(p.filename, blob);
-        pwaFiles.push(p);
-      }
-      zip.folder("pwa").file("manifest.json", generatePwaManifest(pwaFiles));
-    }
-
-    // Generate and download
-    const content = await zip.generateAsync({ type: "blob" });
-    const url = URL.createObjectURL(content);
-    const a = document.createElement('a'); a.href = url; a.download = "app-icons.zip";
-    a.click(); URL.revokeObjectURL(url);
-
-    showToast('ZIP with JSON manifests exported successfully!', 'success');
-  } catch (err) {
-    showToast('Error generating ZIP: ' + err.message, 'error');
-    console.error(err);
+    ctx.closePath();
   }
 
-  btn.disabled = false; btn.innerHTML = '<i class="fas fa-file-zipper"></i> Export JSON + Icons (.zip)';
-});
-
-function canvasToBlob(canvas) {
-  return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-}
-
-// ====== TOAST ======
-function showToast(msg, type = 'info') {
-  const c = document.getElementById('toastContainer');
-  const t = document.createElement('div'); t.className = 'toast';
-  const icons = { success: 'fa-check-circle', warning: 'fa-exclamation-triangle', error: 'fa-times-circle', info: 'fa-info-circle' };
-  const colors = { success: '#00e8a2', warning: '#ffb830', error: '#ff4477', info: '#38bdf8' };
-  t.innerHTML = `<i class="fas ${icons[type]||icons.info}" style="color:${colors[type]||colors.info}"></i><span>${msg}</span>`;
-  c.appendChild(t);
-  setTimeout(() => { t.classList.add('exit'); setTimeout(() => t.remove(), 200) }, 3200);
-}
-
-// ====== INTERACTIVE PREVIEW ======
-mainPreview.addEventListener('click', () => {
-  if (!srcImg) return;
-  if (mainPreview.dataset.showing === 'original') {
-    mainPreview.dataset.showing = 'squircle'; renderPreview();
-  } else {
-    mainPreview.dataset.showing = 'original';
-    const ctx = mainPreview.getContext('2d');
-    mainPreview.width = 512; mainPreview.height = 512; ctx.clearRect(0, 0, 512, 512);
-    const imgAspect = srcImg.width / srcImg.height;
-    let dw, dh;
-    if (imgAspect > 1) { dw = 512; dh = 512 / imgAspect; } else { dh = 512; dw = 512 * imgAspect; }
-    ctx.drawImage(srcImg, (512 - dw) / 2, (512 - dh) / 2, dw, dh);
+  function pathRoundRect(ctx, cx, cy, sz, sm) {
+    var r = sz / 2, cr = r * sm * 0.5;
+    var x = cx - r, y = cy - r;
+    ctx.beginPath();
+    ctx.moveTo(x + cr, y);
+    ctx.lineTo(x + sz - cr, y);
+    ctx.arcTo(x + sz, y, x + sz, y + cr, cr);
+    ctx.lineTo(x + sz, y + sz - cr);
+    ctx.arcTo(x + sz, y + sz, x + sz - cr, y + sz, cr);
+    ctx.lineTo(x + cr, y + sz);
+    ctx.arcTo(x, y + sz, x, y + sz - cr, cr);
+    ctx.lineTo(x, y + cr);
+    ctx.arcTo(x, y, x + cr, y, cr);
+    ctx.closePath();
   }
-});
 
-// Particles
-(function createParticles() {
-  const shapes = ['fa-square', 'fa-circle', 'fa-diamond'];
-  for (let i = 0; i < 6; i++) {
-    const el = document.createElement('i');
-    el.className = `fas ${shapes[i % shapes.length]}`;
-    el.style.cssText = `position:fixed;font-size:${12+Math.random()*14}px;opacity:0.03;color:var(--accent);pointer-events:none;z-index:0;left:${Math.random()*100}vw;top:${Math.random()*100}vh;animation:orbF1 ${15+Math.random()*20}s ease-in-out infinite;animation-delay:${Math.random()*-20}s;`;
-    document.body.appendChild(el);
+  function pathCircle(ctx, cx, cy, sz) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, sz / 2, 0, Math.PI * 2);
+    ctx.closePath();
   }
-})();
+
+  function makePath(ctx, cx, cy, sz, sh, sm) {
+    if (sh === "squircle")  pathSquircle(ctx, cx, cy, sz, sm);
+    else if (sh === "roundrect") pathRoundRect(ctx, cx, cy, sz, sm);
+    else if (sh === "circle")    pathCircle(ctx, cx, cy, sz);
+    else { ctx.beginPath(); ctx.rect(cx - sz/2, cy - sz/2, sz, sz); ctx.closePath(); }
+  }
+
+  /* ═══════════════════════════════════════
+     RENDER ICON TO CANVAS
+     ═══════════════════════════════════════ */
+  function renderIcon(cvs, sz, sh, sm, pd, bgM, bgC, gs, ge, ga, img) {
+    cvs.width = sz;
+    cvs.height = sz;
+    var ctx = cvs.getContext("2d");
+    ctx.clearRect(0, 0, sz, sz);
+
+    var isz = sz * (1 - pd);
+    var cx = sz / 2, cy = sz / 2;
+
+    // Draw shape fill (background)
+    makePath(ctx, cx, cy, isz, sh, sm);
+
+    if (bgM === "solid") {
+      ctx.fillStyle = bgC;
+      ctx.fill();
+    } else if (bgM === "gradient") {
+      var rad = ga * Math.PI / 180;
+      var dx = Math.cos(rad) * isz / 2;
+      var dy = Math.sin(rad) * isz / 2;
+      var gr = ctx.createLinearGradient(cx - dx, cy - dy, cx + dx, cy + dy);
+      gr.addColorStop(0, gs);
+      gr.addColorStop(1, ge);
+      ctx.fillStyle = gr;
+      ctx.fill();
+    } else {
+      // Transparent — draw checkerboard
+      ctx.save();
+      ctx.clip();
+      var cs = Math.max(4, sz / 32);
+      for (var yy = 0; yy < sz; yy += cs) {
+        for (var xx = 0; xx < sz; xx += cs) {
+          ctx.fillStyle = (Math.floor(xx/cs) + Math.floor(yy/cs)) % 2 === 0 ? "#1a1d28" : "#22263a";
+          ctx.fillRect(xx, yy, cs, cs);
+        }
+      }
+      ctx.restore();
+    }
+
+    // Draw image clipped to shape
+    if (img) {
+      ctx.save();
+      makePath(ctx, cx, cy, isz, sh, sm);
+      ctx.clip();
+      var ia = img.width / img.height;
+      var dw, dh;
+      if (ia > 1) { dh = isz; dw = isz * ia; }
+      else        { dw = isz; dh = isz / ia; }
+      ctx.drawImage(img, cx - dw/2, cy - dh/2, dw, dh);
+      ctx.restore();
+    }
+
+    // Subtle edge highlight
+    if (sh === "squircle" || sh === "roundrect") {
+      makePath(ctx, cx, cy, isz, sh, sm);
+      ctx.strokeStyle = "rgba(255,255,255,0.06)";
+      ctx.lineWidth = Math.max(1, sz / 512);
+      ctx.stroke();
+    }
+  }
+
+  /* ═══════════════════════════════════════
+     RENDER MAIN PREVIEW
+     ═══════════════════════════════════════ */
+  function renderPreview() {
+    if (!srcImg) return;
+    var c = document.getElementById("previewCanvas");
+    renderIcon(c, 512, shape, curvature, padding, bgMode, bgColor, gStart, gEnd, gAngle, srcImg);
+    enableButtons();
+  }
+
+  function enableButtons() {
+    document.getElementById("btnZip").disabled = false;
+    document.getElementById("btnPng").disabled = false;
+    document.getElementById("btnAllPng").disabled = false;
+  }
+
+  /* ═══════════════════════════════════════
+     RENDER SIZE GRID
+     ═══════════════════════════════════════ */
+  function renderSizeGrid() {
+    if (!srcImg) return;
+    var grid = document.getElementById("sgrid");
+    grid.innerHTML = "";
+    PLATFORMS.forEach(function(p) {
+      var item = document.createElement("div");
+      item.className = "sitem";
+      var c = document.createElement("canvas");
+      var dim = Math.min(p.sz, 56);
+      c.style.width = dim + "px";
+      c.style.height = dim + "px";
+      renderIcon(c, p.sz, shape, curvature, padding, bgMode, bgColor, gStart, gEnd, gAngle, srcImg);
+      var label = document.createElement("span");
+      label.textContent = p.sz + "px";
+      item.appendChild(c);
+      item.appendChild(label);
+      item.addEventListener("click", function() { exportSingle(p.sz, p.fn); });
+      grid.appendChild(item);
+    });
+  }
+
+  /* ═══════════════════════════════════════
+     JSON GENERATORS
+     ═══════════════════════════════════════ */
+  function genMacJson(items) {
+    // Exact format from user spec
+    var images = items.map(function(p) {
+      return { idiom: "mac", size: p.lsz, scale: p.scale, filename: p.fn };
+    });
+    return JSON.stringify({ images: images, info: { version: 1, author: "xcode" } }, null, 2);
+  }
+
+  function genIosJson(items) {
+    var images = items.map(function(p) {
+      return { filename: p.fn, idiom: p.idiom || "universal", scale: p.scale, size: p.lsz || (p.sz + "x" + p.sz) };
+    });
+    return JSON.stringify({ images: images, info: { author: "squirclelab", version: 1 } }, null, 2);
+  }
+
+  function genPwaJson(items) {
+    var icons = items.map(function(p) {
+      return { src: "icons/" + p.fn, sizes: p.sz + "x" + p.sz, type: "image/png" };
+    });
+    return JSON.stringify({
+      name: "App", short_name: "App", display: "standalone",
+      background_color: bgMode === "solid" ? bgColor : "#ffffff",
+      theme_color: bgMode === "solid" ? bgColor : "#ffffff",
+      icons: icons
+    }, null, 2);
+  }
+
+  /* ═══════════════════════════════════════
+     RENDER JSON PREVIEW TAB
+     ═══════════════════════════════════════ */
+  function renderJsonTab() {
+    var macItems  = PLATFORMS.filter(function(p) { return p.grp === "macos"; });
+    var iosItems  = PLATFORMS.filter(function(p) { return p.grp === "ios"; });
+    var pwaItems  = PLATFORMS.filter(function(p) { return p.grp === "pwa"; });
+
+    var html = "";
+    html += '<span style="color:#bf5af2;font-weight:700">// macOS — AppIcon.appiconset/Contents.json</span>\n';
+    html += highlightJson(genMacJson(macItems));
+    html += "\n\n";
+    html += '<span style="color:#0a84ff;font-weight:700">// iOS — AppIcon.appiconset/Contents.json</span>\n';
+    html += highlightJson(genIosJson(iosItems));
+    html += "\n\n";
+    html += '<span style="color:#fbbf24;font-weight:700">// PWA — manifest.json</span>\n';
+    html += highlightJson(genPwaJson(pwaItems));
+
+    document.getElementById("jsonPre").innerHTML = html;
+  }
+
+  function highlightJson(json) {
+    var escaped = json.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return escaped.replace(
+      /("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+      function(match) {
+        var cls = "color:#e06c75"; // number
+        if (/^"/.test(match)) {
+          if (/:$/.test(match)) cls = "color:#61afef"; // key
+          else cls = "color:#98c379"; // string
+        } else if (/true|false/.test(match)) cls = "color:#d19a66";
+        else if (/null/.test(match)) cls = "color:#d19a66";
+        return '<span style="' + cls + '">' + match + '</span>';
+      }
+    );
+  }
+
+  /* ═══════════════════════════════════════
+     RENDER COMPARE TAB
+     ═══════════════════════════════════════ */
+  function renderCompare() {
+    if (!srcImg) return;
+    var body = document.getElementById("pbody");
+    var old = body.querySelector(".cmp-box");
+    if (old) old.remove();
+
+    var box = document.createElement("div");
+    box.className = "cmp-box";
+
+    var shapes = [
+      { n: "Square",    s: "square",    sm: 0 },
+      { n: "Rounded",   s: "roundrect", sm: 0.45 },
+      { n: "Squircle",  s: "squircle",  sm: curvature },
+      { n: "Circle",    s: "circle",    sm: 1 }
+    ];
+
+    shapes.forEach(function(item) {
+      var wrap = document.createElement("div");
+      wrap.className = "cmp-item";
+      var c = document.createElement("canvas");
+      c.style.width = "48px";
+      c.style.height = "48px";
+      renderIcon(c, 128, item.s, item.sm, padding, bgMode, bgColor, gStart, gEnd, gAngle, srcImg);
+      var lbl = document.createElement("span");
+      lbl.textContent = item.n;
+      wrap.appendChild(c);
+      wrap.appendChild(lbl);
+      box.appendChild(wrap);
+    });
+
+    body.appendChild(box);
+  }
+
+  /* ═══════════════════════════════════════
+     FILE LOADING
+     ═══════════════════════════════════════ */
+  var upzone  = document.getElementById("upzone");
+  var fileIn  = document.getElementById("fileIn");
+  var preview = document.getElementById("previewCanvas");
+
+  upzone.addEventListener("click", function() { fileIn.click(); });
+
+  fileIn.addEventListener("change", function(e) {
+    if (e.target.files && e.target.files[0]) loadFile(e.target.files[0]);
+  });
+
+  upzone.addEventListener("dragover", function(e) {
+    e.preventDefault(); upzone.classList.add("drag");
+  });
+  upzone.addEventListener("dragleave", function() {
+    upzone.classList.remove("drag");
+  });
+  upzone.addEventListener("drop", function(e) {
+    e.preventDefault(); upzone.classList.remove("drag");
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+  });
+
+  document.addEventListener("paste", function(e) {
+    var items = e.clipboardData && e.clipboardData.items;
+    if (!items) return;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf("image/") === 0) {
+        loadFile(items[i].getAsFile());
+        break;
+      }
+    }
+  });
+
+  function loadFile(file) {
+    if (!file.type.startsWith("image/")) { toast("Not a valid image file", "error"); return; }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = new Image();
+      img.onload = function() {
+        srcImg = img;
+        upzone.style.display = "none";
+        preview.style.display = "block";
+        renderPreview();
+        toast("Image loaded — adjust and export", "success");
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* ═══════════════════════════════════════
+     SHAPE SELECTOR
+     ═══════════════════════════════════════ */
+  (function buildShapes() {
+    var grid = document.getElementById("shapeGrid");
+    var defs = [
+      { id: "squircle",  n: "Squircle" },
+      { id: "roundrect", n: "Round Rect" },
+      { id: "circle",    n: "Circle" },
+      { id: "square",    n: "Square" },
+      { id: "ios",       n: "iOS" },
+      { id: "android",   n: "Android" }
+    ];
+
+    defs.forEach(function(d) {
+      var btn = document.createElement("button");
+      btn.className = "sbtn" + (d.id === "squircle" ? " on" : "");
+      btn.dataset.shape = d.id;
+
+      // Mini preview canvas
+      var c = document.createElement("canvas");
+      c.width = 28; c.height = 28;
+      var ctx = c.getContext("2d");
+      var sh = d.id, sm = curvature;
+      if (d.id === "ios")     { sh = "squircle"; sm = 0.7; }
+      if (d.id === "android") { sh = "squircle"; sm = 0.9; }
+      if (d.id === "roundrect") { sm = 0.45; }
+      makePath(ctx, 14, 14, 24, sh, sm);
+      ctx.fillStyle = "#ff6b35";
+      ctx.fill();
+      btn.appendChild(c);
+
+      var span = document.createElement("span");
+      span.textContent = d.n;
+      btn.appendChild(span);
+
+      btn.addEventListener("click", function() {
+        grid.querySelectorAll(".sbtn").forEach(function(b) { b.classList.remove("on"); });
+        btn.classList.add("on");
+
+        if (d.id === "ios") {
+          shape = "squircle"; curvature = 0.7;
+          document.getElementById("smoothRange").value = 70;
+          document.getElementById("smoothVal").textContent = "0.70";
+        } else if (d.id === "android") {
+          shape = "squircle"; curvature = 0.9;
+          document.getElementById("smoothRange").value = 90;
+          document.getElementById("smoothVal").textContent = "0.90";
+        } else if (d.id === "roundrect") {
+          shape = "roundrect"; curvature = 0.45;
+          document.getElementById("smoothRange").value = 45;
+          document.getElementById("smoothVal").textContent = "0.45";
+        } else {
+          shape = d.id;
+        }
+        renderPreview();
+        if (tab === "sizes") renderSizeGrid();
+      });
+
+      grid.appendChild(btn);
+    });
+  })();
+
+  /* ═══════════════════════════════════════
+     SLIDERS
+     ═══════════════════════════════════════ */
+  document.getElementById("smoothRange").addEventListener("input", function(e) {
+    curvature = e.target.value / 100;
+    document.getElementById("smoothVal").textContent = curvature.toFixed(2);
+    renderPreview();
+    if (tab === "sizes") renderSizeGrid();
+  });
+
+  document.getElementById("padRange").addEventListener("input", function(e) {
+    padding = e.target.value / 100;
+    document.getElementById("padVal").textContent = Math.round(padding * 100) + "%";
+    renderPreview();
+    if (tab === "sizes") renderSizeGrid();
+  });
+
+  /* ═══════════════════════════════════════
+     BACKGROUND MODE
+     ═══════════════════════════════════════ */
+  document.querySelectorAll("#bgBtns .sbtn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      document.querySelectorAll("#bgBtns .sbtn").forEach(function(b) { b.classList.remove("on"); });
+      btn.classList.add("on");
+      bgMode = btn.dataset.bg;
+
+      document.getElementById("solidUI").style.display = bgMode === "solid" ? "" : "none";
+      document.getElementById("gradUI").style.display  = bgMode === "gradient" ? "" : "none";
+
+      renderPreview();
+      if (tab === "sizes") renderSizeGrid();
+    });
+  });
+
+  /* ═══════════════════════════════════════
+     COLOR SYNC
+     ═══════════════════════════════════════ */
+  function syncColor(pickId, hexId, setter) {
+    var pick = document.getElementById(pickId);
+    var hex  = document.getElementById(hexId);
+    pick.addEventListener("input", function() {
+      hex.value = pick.value;
+      setter(pick.value);
+      renderPreview();
+      if (tab === "sizes") renderSizeGrid();
+    });
+    hex.addEventListener("input", function() {
+      if (/^#[0-9a-fA-F]{6}$/.test(hex.value)) {
+        pick.value = hex.value;
+        setter(hex.value);
+        renderPreview();
+        if (tab === "sizes") renderSizeGrid();
+      }
+    });
+  }
+
+  syncColor("bgColorPick",   "bgColorHex",   function(v) { bgColor = v; });
+  syncColor("gradStartPick", "gradStartHex", function(v) { gStart = v; });
+  syncColor("gradEndPick",   "gradEndHex",   function(v) { gEnd = v; });
+
+  /* ═══════════════════════════════════════
+     GRADIENT DIRECTION
+     ═══════════════════════════════════════ */
+  (function buildGDir() {
+    var cont = document.getElementById("gdir");
+    var dirs   = [0, 45, 90, 135, 180, 225, 270, 315];
+    var arrows = ["→", "↗", "↑", "↖", "←", "↙", "↓", "↘"];
+
+    dirs.forEach(function(d, i) {
+      var btn = document.createElement("button");
+      btn.textContent = arrows[i];
+      btn.title = d + "°";
+      if (d === gAngle) btn.classList.add("on");
+      btn.addEventListener("click", function() {
+        cont.querySelectorAll("button").forEach(function(b) { b.classList.remove("on"); });
+        btn.classList.add("on");
+        gAngle = d;
+        renderPreview();
+        if (tab === "sizes") renderSizeGrid();
+      });
+      cont.appendChild(btn);
+    });
+  })();
+
+  /* ═══════════════════════════════════════
+     PLATFORM LIST
+     ═══════════════════════════════════════ */
+  (function buildPlats() {
+    var list = document.getElementById("platList");
+    var grpNames = { ios: "Apple iOS", macos: "macOS", android: "Android", pwa: "Progressive Web App" };
+    var shown = {};
+
+    PLATFORMS.forEach(function(p) {
+      if (!shown[p.grp]) {
+        shown[p.grp] = true;
+        var hdr = document.createElement("div");
+        hdr.className = "plat-grp";
+        hdr.textContent = grpNames[p.grp] || p.grp;
+        list.appendChild(hdr);
+      }
+
+      var item = document.createElement("div");
+      item.className = "pitem" + (p.id === "ios" ? " on" : "");
+      item.innerHTML =
+        '<span class="dot" style="background:' + p.c + '"></span>' +
+        '<span class="pname">' + p.name + '</span>' +
+        '<span class="pbadge" style="background:' + p.c + '18;color:' + p.c + '">' + p.badge + '</span>';
+
+      item.addEventListener("click", function() {
+        list.querySelectorAll(".pitem").forEach(function(x) { x.classList.remove("on"); });
+        item.classList.add("on");
+        selPlat = p.id;
+        shape = p.sh;
+        curvature = p.sm;
+        document.getElementById("smoothRange").value = Math.round(curvature * 100);
+        document.getElementById("smoothVal").textContent = curvature.toFixed(2);
+        renderPreview();
+        if (tab === "sizes") renderSizeGrid();
+        toast("Preset: " + p.name, "info");
+      });
+
+      list.appendChild(item);
+    });
+  })();
+
+  /* ═══════════════════════════════════════
+     TABS
+     ═══════════════════════════════════════ */
+  document.querySelectorAll("#ptabs .ptab").forEach(function(t) {
+    t.addEventListener("click", function() {
+      document.querySelectorAll("#ptabs .ptab").forEach(function(x) { x.classList.remove("on"); });
+      t.classList.add("on");
+      tab = t.dataset.t;
+
+      document.getElementById("sgridWrap").style.display = tab === "sizes" ? "" : "none";
+      document.getElementById("jsonWrap").style.display  = tab === "json"  ? "" : "none";
+
+      if (tab === "sizes" && srcImg) renderSizeGrid();
+      if (tab === "json") renderJsonTab();
+      if (tab === "compare" && srcImg) renderCompare();
+
+      // Remove compare overlay when switching away
+      if (tab !== "compare") {
+        var old = document.getElementById("pbody").querySelector(".cmp-box");
+        if (old) old.remove();
+      }
+    });
+  });
+
+  /* ═══════════════════════════════════════
+     CLICK PREVIEW TO TOGGLE ORIGINAL
+     ═══════════════════════════════════════ */
+  preview.addEventListener("click", function() {
+    if (!srcImg) return;
+    if (preview.dataset.mode === "original") {
+      preview.dataset.mode = "shaped";
+      renderPreview();
+    } else {
+      preview.dataset.mode = "original";
+      var ctx = preview.getContext("2d");
+      preview.width = 512; preview.height = 512;
+      ctx.clearRect(0, 0, 512, 512);
+      var ia = srcImg.width / srcImg.height;
+      var dw, dh;
+      if (ia > 1) { dw = 512; dh = 512 / ia; }
+      else        { dh = 512; dw = 512 * ia; }
+      ctx.drawImage(srcImg, (512 - dw) / 2, (512 - dh) / 2, dw, dh);
+    }
+  });
+
+  /* ═══════════════════════════════════════
+     EXPORT: SINGLE PNG
+     ═══════════════════════════════════════ */
+  function exportSingle(sz, fn) {
+    if (!srcImg) return;
+    var c = document.createElement("canvas");
+    renderIcon(c, sz, shape, curvature, padding, bgMode, bgColor, gStart, gEnd, gAngle, srcImg);
+    c.toBlob(function(blob) {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = fn || ("icon-" + sz + "x" + sz + ".png");
+      a.click();
+      URL.revokeObjectURL(url);
+      toast("Exported " + sz + "x" + sz + " PNG", "success");
+    }, "image/png");
+  }
+
+  document.getElementById("btnPng").addEventListener("click", function() {
+    var p = PLATFORMS.filter(function(x) { return x.id === selPlat; })[0] || PLATFORMS[0];
+    exportSingle(p.sz, p.fn);
+  });
+
+  /* ═══════════════════════════════════════
+     EXPORT: ALL INDIVIDUAL PNGs
+     ═══════════════════════════════════════ */
+  document.getElementById("btnAllPng").addEventListener("click", function() {
+    if (!srcImg) return;
+    PLATFORMS.forEach(function(p, i) {
+      setTimeout(function() {
+        var c = document.createElement("canvas");
+        renderIcon(c, p.sz, shape, curvature, padding, bgMode, bgColor, gStart, gEnd, gAngle, srcImg);
+        c.toBlob(function(blob) {
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = url;
+          a.download = p.fn || (p.id + "-" + p.sz + ".png");
+          a.click();
+          URL.revokeObjectURL(url);
+        }, "image/png");
+      }, i * 250);
+    });
+    toast("Exporting " + PLATFORMS.length + " PNGs...", "success");
+  });
+
+  /* ═══════════════════════════════════════
+     EXPORT: JSON + ZIP
+     ═══════════════════════════════════════ */
+  function canvasToBlob(c) {
+    return new Promise(function(resolve) { c.toBlob(resolve, "image/png"); });
+  }
+
+  document.getElementById("btnZip").addEventListener("click", async function() {
+    if (!srcImg) return;
+    var btn = document.getElementById("btnZip");
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner spinner"></i> Generating ZIP...';
+
+    try {
+      var zip = new JSZip();
+
+      // Group platforms
+      var groups = {};
+      PLATFORMS.forEach(function(p) {
+        if (!groups[p.grp]) groups[p.grp] = [];
+        groups[p.grp].push(p);
+      });
+
+      // ── iOS ──
+      if (groups.ios) {
+        var iosFolder = zip.folder("Assets.xcassets").folder("AppIcon.appiconset");
+        var iosItems = [];
+        for (var i = 0; i < groups.ios.length; i++) {
+          var p = groups.ios[i];
+          var c = document.createElement("canvas");
+          renderIcon(c, p.sz, shape, curvature, padding, bgMode, bgColor, gStart, gEnd, gAngle, srcImg);
+          var blob = await canvasToBlob(c);
+          iosFolder.file(p.fn, blob);
+          iosItems.push(p);
+        }
+        iosFolder.file("Contents.json", genIosJson(iosItems));
+      }
+
+      // ── macOS (exact Xcode Contents.json) ──
+      if (groups.macos) {
+        var macFolder = zip.folder("macos").folder("AppIcon.appiconset");
+        var macItems = [];
+        for (var j = 0; j < groups.macos.length; j++) {
+          var mp = groups.macos[j];
+          var mc = document.createElement("canvas");
+          renderIcon(mc, mp.sz, shape, curvature, padding, bgMode, bgColor, gStart, gEnd, gAngle, srcImg);
+          var mblob = await canvasToBlob(mc);
+          macFolder.file(mp.fn, mblob);
+          macItems.push(mp);
+        }
+        macFolder.file("Contents.json", genMacJson(macItems));
+      }
+
+      // ── Android ──
+      if (groups.android) {
+        for (var k = 0; k < groups.android.length; k++) {
+          var ap = groups.android[k];
+          var ac = document.createElement("canvas");
+          renderIcon(ac, ap.sz, shape, curvature, padding, bgMode, bgColor, gStart, gEnd, gAngle, srcImg);
+          var ablob = await canvasToBlob(ac);
+          var afolder = ap.folder ? "android/" + ap.folder : "android";
+          zip.folder(afolder).file(ap.fn, ablob);
+        }
+      }
+
+      // ── PWA ──
+      if (groups.pwa) {
+        var pwaIconsFolder = zip.folder("pwa").folder("icons");
+        var pwaItems = [];
+        for (var m = 0; m < groups.pwa.length; m++) {
+          var pp = groups.pwa[m];
+          var pc = document.createElement("canvas");
+          renderIcon(pc, pp.sz, shape, curvature, padding, bgMode, bgColor, gStart, gEnd, gAngle, srcImg);
+          var pblob = await canvasToBlob(pc);
+          pwaIconsFolder.file(pp.fn, pblob);
+          pwaItems.push(pp);
+        }
+        zip.folder("pwa").file("manifest.json", genPwaJson(pwaItems));
+      }
+
+      // Generate and download
+      var content = await zip.generateAsync({ type: "blob" });
+      var url = URL.createObjectURL(content);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "app-icons.zip";
+      a.click();
+      URL.revokeObjectURL(url);
+
+      toast("ZIP with JSON manifests exported!", "success");
+    } catch (err) {
+      toast("ZIP error: " + err.message, "error");
+      console.error(err);
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-file-zipper"></i> Export JSON + Icons (.zip)';
+  });
+
+  /* ═══════════════════════════════════════
+     TOAST NOTIFICATIONS
+     ═══════════════════════════════════════ */
+  function toast(msg, type) {
+    type = type || "info";
+    var box = document.getElementById("toastBox");
+    var el = document.createElement("div");
+    el.className = "toast";
+
+    var icons  = { success: "fa-check-circle", warning: "fa-exclamation-triangle", error: "fa-times-circle", info: "fa-info-circle" };
+    var colors = { success: "#00e8a2", warning: "#ffb830", error: "#ff4477", info: "#38bdf8" };
+
+    el.innerHTML = '<i class="fas ' + (icons[type] || icons.info) + '" style="color:' + (colors[type] || colors.info) + '"></i><span>' + msg + '</span>';
+    box.appendChild(el);
+
+    setTimeout(function() {
+      el.classList.add("out");
+      setTimeout(function() { el.remove(); }, 200);
+    }, 3200);
+  }
 
 })();
 </script>
