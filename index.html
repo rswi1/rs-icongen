@@ -22,7 +22,8 @@
 
 <!-- 6. Safari Pinned Tab (monochrome SVG, single-color paths only) -->
 <link rel="mask-icon" href="https://cdn.jsdelivr.net/gh/RSWI1/RSView@main/safari-pinned-tab.svg?v=2" color="#00fbff">
- <title>SquircleLab — Icon Generator</title>
+
+<title>SquircleLab — Icon Generator</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -463,6 +464,99 @@ input[type="range"]::-webkit-slider-thumb:hover {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── Web Overlay ── */
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes sheetSlideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.web-overlay-backdrop {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
+  display: none; align-items: flex-end; justify-content: center;
+}
+.web-overlay-backdrop.open {
+  display: flex;
+  animation: overlayFadeIn 0.25s ease-out;
+}
+.web-overlay-backdrop.open .web-overlay-sheet {
+  animation: sheetSlideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.web-overlay-sheet {
+  width: 100%; max-width: 480px;
+  background: var(--surface);
+  border: 1px solid var(--border-hi);
+  border-bottom: none;
+  border-radius: 22px 22px 0 0;
+  padding: 10px 18px 32px;
+}
+.web-overlay-handle {
+  width: 36px; height: 4px; border-radius: 2px;
+  background: var(--border-hi); margin: 0 auto 16px;
+}
+.web-overlay-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px; font-weight: 700;
+  color: var(--fg); margin-bottom: 14px; padding-left: 2px;
+}
+.web-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 12px; border-radius: 13px;
+  background: var(--card); border: 1px solid var(--border);
+  text-decoration: none; color: inherit;
+  margin-bottom: 8px;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+}
+.web-card:last-of-type { margin-bottom: 14px; }
+.web-card:hover {
+  border-color: var(--border-hi);
+  background: var(--surface2);
+  transform: translateX(2px);
+}
+.web-card-icon {
+  width: 42px; height: 42px; border-radius: 11px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: #fff;
+  font-family: 'Space Grotesk';
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+.web-card-info { flex: 1; min-width: 0; }
+.web-card-name {
+  font-size: 13px; font-weight: 600;
+  color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.web-card-desc {
+  font-size: 11px; color: var(--muted); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.web-card-chevron {
+  font-size: 20px; color: var(--muted); line-height: 1;
+  flex-shrink: 0;
+}
+.web-overlay-close {
+  width: 100%; padding: 13px; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--fg2); font-size: 13px; font-weight: 700;
+  font-family: 'Space Grotesk'; cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.web-overlay-close:hover { border-color: var(--accent); color: var(--fg); }
+
+/* Web Resources button in header */
+.btn-web-res {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--fg2); font-size: 11px; font-weight: 700;
+  font-family: 'Space Grotesk'; cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.btn-web-res:hover { border-color: var(--accent); color: var(--fg); background: var(--surface2); }
 </style>
 </head>
 <body>
@@ -481,6 +575,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     <div class="hdr-badges">
       <span class="hdr-badge badge-local"><i class="fas fa-lock"></i> Local</span>
       <span class="hdr-badge badge-zip"><i class="fas fa-file-zipper"></i> JSON+ZIP</span>
+      <button class="btn-web-res" id="btnWebRes"><i class="fas fa-link"></i> Image Resources</button>
     </div>
   </header>
 
@@ -607,6 +702,51 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 <!-- Toasts -->
 <div class="toast-box" id="toastBox"></div>
+
+<!-- ===== WEBSITE OVERLAY ===== -->
+<div class="web-overlay-backdrop" id="webOverlay">
+  <div class="web-overlay-sheet">
+    <div class="web-overlay-handle"></div>
+    <div class="web-overlay-title">🔗 Image Resources</div>
+    <!-- RS Icon Search -->
+    <a class="web-card" href="https://rs1.alsh3la.workers.dev/" target="_blank" rel="noopener noreferrer">
+      <div class="web-card-icon" style="background: linear-gradient(135deg, #0a84ff, #00c7be);">RS</div>
+      <div class="web-card-info">
+        <div class="web-card-name">RS Icon Search</div>
+        <div class="web-card-desc">rs1.alsh3la.workers.dev</div>
+      </div>
+      <div class="web-card-chevron">›</div>
+    </a>
+    <!-- Yandex Images -->
+    <a class="web-card" href="https://yandex.com/images" target="_blank" rel="noopener noreferrer">
+      <div class="web-card-icon" style="background: linear-gradient(135deg, #ff453a, #ff9f0a);">YA</div>
+      <div class="web-card-info">
+        <div class="web-card-name">Yandex Images</div>
+        <div class="web-card-desc">yandex.com/images</div>
+      </div>
+      <div class="web-card-chevron">›</div>
+    </a>
+    <!-- Pinterest -->
+    <a class="web-card" href="https://www.pinterest.com/" target="_blank" rel="noopener noreferrer">
+      <div class="web-card-icon" style="background: linear-gradient(135deg, #e60023, #ad081b);">Pi</div>
+      <div class="web-card-info">
+        <div class="web-card-name">Pinterest</div>
+        <div class="web-card-desc">pinterest.com</div>
+      </div>
+      <div class="web-card-chevron">›</div>
+    </a>
+    <!-- PNG Tool -->
+    <a class="web-card" href="https://p.alsh3la.workers.dev/" target="_blank" rel="noopener noreferrer">
+      <div class="web-card-icon" style="background: linear-gradient(135deg, #30d158, #00c7be);">PNG</div>
+      <div class="web-card-info">
+        <div class="web-card-name">PNG Tool</div>
+        <div class="web-card-desc">p.alsh3la.workers.dev</div>
+      </div>
+      <div class="web-card-chevron">›</div>
+    </a>
+    <button class="web-overlay-close" id="webOverlayClose">Close</button>
+  </div>
+</div>
 
 <script>
 (function () {
@@ -1367,6 +1507,33 @@ input[type="range"]::-webkit-slider-thumb:hover {
     }, 3200);
   }
 
+})();
+
+/* ═══════════════════════════════════════
+   WEB OVERLAY
+   ═══════════════════════════════════════ */
+(function() {
+  var overlay = document.getElementById("webOverlay");
+  var btnOpen = document.getElementById("btnWebRes");
+  var btnClose = document.getElementById("webOverlayClose");
+
+  btnOpen.addEventListener("click", function() {
+    overlay.classList.add("open");
+  });
+
+  btnClose.addEventListener("click", function() {
+    overlay.classList.remove("open");
+  });
+
+  // Close on backdrop click (outside the sheet)
+  overlay.addEventListener("click", function(e) {
+    if (e.target === overlay) overlay.classList.remove("open");
+  });
+
+  // Close on Escape key
+  document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") overlay.classList.remove("open");
+  });
 })();
 </script>
 </body>
