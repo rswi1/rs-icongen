@@ -858,6 +858,159 @@
           box-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
         }
     </style>
+
+    <!-- ===== WEBSITE OVERLAY STYLES ===== -->
+    <style>
+      /* Backdrop */
+      .web-overlay-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.72);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        z-index: 2000;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 0 16px max(24px, env(safe-area-inset-bottom));
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.28s ease;
+      }
+      .web-overlay-backdrop.open {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      /* Bottom sheet */
+      .web-overlay-sheet {
+        background: #1c1c1e;
+        border-radius: 28px 28px 22px 22px;
+        padding: 12px 20px 20px;
+        width: 100%;
+        max-width: 500px;
+        transform: translateY(50px);
+        transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+        box-shadow: 0 -4px 40px rgba(0,0,0,0.6);
+      }
+      .web-overlay-backdrop.open .web-overlay-sheet {
+        transform: translateY(0);
+      }
+
+      /* Drag handle */
+      .web-overlay-handle {
+        width: 38px;
+        height: 4px;
+        background: #48484a;
+        border-radius: 4px;
+        margin: 0 auto 14px;
+      }
+
+      /* Sheet title */
+      .web-overlay-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #ebebf5;
+        text-align: center;
+        margin-bottom: 16px;
+        letter-spacing: -0.2px;
+      }
+
+      /* Individual website card */
+      .web-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: #2c2c2e;
+        border-radius: 18px;
+        padding: 13px 14px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.14s, transform 0.14s;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .web-card:last-of-type { margin-bottom: 0; }
+      .web-card:hover  { background: #3a3a3c; }
+      .web-card:active { background: #3a3a3c; transform: scale(0.97); }
+
+      /* Card icon badge */
+      .web-card-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+      }
+
+      /* Card text */
+      .web-card-info { flex: 1; min-width: 0; }
+      .web-card-name {
+        font-size: 15px;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .web-card-desc {
+        font-size: 12px;
+        color: #8e8e93;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* Chevron */
+      .web-card-chevron {
+        color: #3a3a3c;
+        font-size: 20px;
+        font-weight: 300;
+        flex-shrink: 0;
+        line-height: 1;
+      }
+
+      /* Close pill */
+      .web-overlay-close {
+        display: block;
+        width: 100%;
+        margin-top: 14px;
+        padding: 14px;
+        background: #2c2c2e;
+        border: none;
+        border-radius: 16px;
+        color: #0a84ff;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        -webkit-tap-highlight-color: transparent;
+        transition: background 0.14s;
+      }
+      .web-overlay-close:hover  { background: #3a3a3c; }
+      .web-overlay-close:active { background: #3a3a3c; }
+
+      /* Trigger button in header */
+      .web-overlay-trigger {
+        background: #2c2c2e;
+        border: none;
+        cursor: pointer;
+        padding: 7px 10px;
+        border-radius: 12px;
+        font-size: 18px;
+        transition: background 0.14s, transform 0.14s;
+        -webkit-tap-highlight-color: transparent;
+        flex-shrink: 0;
+        line-height: 1;
+      }
+      .web-overlay-trigger:hover  { background: #3a3a3c; }
+      .web-overlay-trigger:active { transform: scale(0.93); }
+    </style>
     </head>
 <body>
 
@@ -873,6 +1026,8 @@
       <button class="badge-option" data-badge="new">NEW</button>
       <button class="badge-option" data-badge="numeric">123</button>
     </div>
+    <!-- Image Resources trigger -->
+    <button class="web-overlay-trigger" id="webOverlayTrigger" title="Image Resources">🌐</button>
   </div>
 
   <div class="two-columns">
@@ -1068,6 +1223,46 @@
       <div class="filename-hint">iOS ZIP · Mac ZIP — all sizes + Contents.json, Xcode ready</div>
     </div>
     </div><!-- end controls-wrapper -->
+  </div>
+</div>
+
+<!-- ===== WEBSITE OVERLAY ===== -->
+<div class="web-overlay-backdrop" id="webOverlay">
+  <div class="web-overlay-sheet">
+    <div class="web-overlay-handle"></div>
+    <div class="web-overlay-title">🔗 Image Resources</div>
+
+    <!-- RS Icon Search -->
+    <a class="web-card" href="https://rs1.alsh3la.workers.dev/" target="_blank" rel="noopener noreferrer">
+      <div class="web-card-icon" style="background: linear-gradient(135deg, #0a84ff, #00c7be);">🔍</div>
+      <div class="web-card-info">
+        <div class="web-card-name">RS Icon Search</div>
+        <div class="web-card-desc">rs1.alsh3la.workers.dev</div>
+      </div>
+      <div class="web-card-chevron">›</div>
+    </a>
+
+    <!-- Yandex Images -->
+    <a class="web-card" href="https://yandex.com/images" target="_blank" rel="noopener noreferrer">
+      <div class="web-card-icon" style="background: linear-gradient(135deg, #ff453a, #ff9f0a);">🖼️</div>
+      <div class="web-card-info">
+        <div class="web-card-name">Yandex Images</div>
+        <div class="web-card-desc">yandex.com/images</div>
+      </div>
+      <div class="web-card-chevron">›</div>
+    </a>
+
+    <!-- Pinterest -->
+    <a class="web-card" href="https://www.pinterest.com/" target="_blank" rel="noopener noreferrer">
+      <div class="web-card-icon" style="background: linear-gradient(135deg, #e60023, #ad081b);">📌</div>
+      <div class="web-card-info">
+        <div class="web-card-name">Pinterest</div>
+        <div class="web-card-desc">pinterest.com</div>
+      </div>
+      <div class="web-card-chevron">›</div>
+    </a>
+
+    <button class="web-overlay-close" id="webOverlayClose">Close</button>
   </div>
 </div>
 
@@ -2025,6 +2220,29 @@
       }, 320);
 
       window.addEventListener('scroll', onScroll, { passive: true });
+    })();
+
+    // ── Website Overlay ──
+    (function() {
+      const overlay  = document.getElementById('webOverlay');
+      const trigger  = document.getElementById('webOverlayTrigger');
+      const closeBtn = document.getElementById('webOverlayClose');
+
+      function openOverlay()  { overlay.classList.add('open');    document.body.style.overflow = 'hidden'; }
+      function closeOverlay() { overlay.classList.remove('open'); document.body.style.overflow = ''; }
+
+      trigger.addEventListener('click', openOverlay);
+      closeBtn.addEventListener('click', closeOverlay);
+
+      // Close on backdrop tap (outside the sheet)
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) closeOverlay();
+      });
+
+      // Close on Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeOverlay();
+      });
     })();
 
   })();
