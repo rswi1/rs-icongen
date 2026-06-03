@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <!-- ===== ZERO-FAIL FAVICON STACK ===== -->
+   <!-- ===== FAVICON ===== -->
   <link rel="icon" type="image/png" href="https://gitlab.com/alsh3la991/PNGresizer/-/raw/main/resized-icon_1_-256x256.png">
 
 <title>SquircleLab — Icon Generator</title>
@@ -530,6 +530,77 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 .web-overlay-close:hover { border-color: var(--accent); color: var(--fg); }
 
+/* ── Background Remover ── */
+@keyframes pulseGlow {
+  0%,100% { box-shadow: 0 0 0 0 rgba(0,232,162,0.0); }
+  50%      { box-shadow: 0 0 18px 4px rgba(0,232,162,0.18); }
+}
+.bgr-card { border-color: rgba(0,232,162,0.15) !important; }
+.bgr-card .card-title i { background: rgba(0,232,162,0.12); color: #00e8a2; }
+.bgr-status {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; color: var(--muted); margin-bottom: 10px;
+  font-family: 'Space Grotesk'; font-weight: 600;
+}
+.bgr-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--muted); flex-shrink: 0; transition: background 0.3s;
+}
+.bgr-dot.active { background: #00e8a2; animation: pulseGlow 2s infinite; }
+.bgr-dot.processing { background: #ffb830; }
+.bgr-thumbs {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px;
+}
+.bgr-thumb {
+  border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--border);
+  aspect-ratio: 1; position: relative;
+  background: repeating-conic-gradient(#1a1d28 0% 25%, #22263a 0% 50%) 0 0 / 10px 10px;
+}
+.bgr-thumb canvas { width: 100%; height: 100%; display: block; object-fit: cover; }
+.bgr-thumb-label {
+  position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+  font-size: 8px; font-weight: 800; font-family: 'Space Grotesk';
+  background: rgba(7,10,16,0.75); color: var(--fg2);
+  padding: 2px 7px; border-radius: 4px; white-space: nowrap;
+}
+.bgr-controls { display: flex; flex-direction: column; gap: 8px; }
+.bgr-row { display: flex; gap: 6px; }
+.bgr-btn {
+  flex: 1; padding: 9px 6px; border-radius: 9px; border: 1px solid var(--border);
+  background: var(--card); color: var(--fg2);
+  font-size: 11px; font-weight: 700; font-family: 'Space Grotesk';
+  cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.bgr-btn:hover { border-color: var(--border-hi); color: var(--fg); background: var(--surface2); }
+.bgr-btn.primary {
+  background: linear-gradient(135deg, #00e8a2, #00b87a);
+  border-color: transparent; color: #000;
+}
+.bgr-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,232,162,0.2); }
+.bgr-btn.danger { border-color: rgba(255,68,119,0.2); color: #ff4477; }
+.bgr-btn.danger:hover { border-color: #ff4477; background: rgba(255,68,119,0.08); }
+.bgr-btn:disabled { opacity: 0.3; pointer-events: none; }
+.bgr-tol-row { display: flex; flex-direction: column; gap: 4px; }
+.bgr-tol-head { display: flex; justify-content: space-between; }
+.bgr-tol-head span { font-size: 11px; color: var(--fg2); font-weight: 500; }
+.bgr-tol-head .bgr-tol-val { color: var(--accent); font-family: 'Space Grotesk'; font-weight: 700; }
+.bgr-tip {
+  font-size: 10px; color: var(--muted); line-height: 1.5;
+  padding: 7px 9px; border-radius: 7px;
+  background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+}
+.bgr-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 2px; }
+.bgr-mode-btn {
+  padding: 7px 4px; border-radius: 8px; border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  font-size: 10px; font-weight: 700; font-family: 'Space Grotesk';
+  cursor: pointer; transition: all 0.18s; text-align: center;
+}
+.bgr-mode-btn:hover { border-color: var(--border-hi); color: var(--fg2); }
+.bgr-mode-btn.on { border-color: #00e8a2; color: #00e8a2; background: rgba(0,232,162,0.07); }
+
 /* Web Resources button in header */
 .btn-web-res {
   display: inline-flex; align-items: center; gap: 6px;
@@ -655,6 +726,58 @@ input[type="range"]::-webkit-slider-thumb:hover {
           </div>
           <div style="font-size:10px;color:var(--muted);margin-bottom:3px;font-weight:600">Direction</div>
           <div class="gdir" id="gdir"></div>
+        </div>
+      </div>
+
+      <!-- Background Remover -->
+      <div class="card bgr-card" id="bgrCard">
+        <div class="card-title"><i class="fas fa-wand-magic-sparkles"></i> Background Remover</div>
+        <div class="bgr-status">
+          <div class="bgr-dot" id="bgrDot"></div>
+          <span id="bgrStatusTxt">Upload an image to begin</span>
+        </div>
+
+        <!-- Mode selector -->
+        <div class="bgr-modes" id="bgrModes">
+          <button class="bgr-mode-btn on" data-mode="flood">🪣 Flood Fill</button>
+          <button class="bgr-mode-btn" data-mode="color">🎨 Color Match</button>
+        </div>
+
+        <!-- Tolerance slider -->
+        <div class="bgr-tol-row" style="margin-bottom:8px">
+          <div class="bgr-tol-head">
+            <span>Tolerance</span>
+            <span class="bgr-tol-val" id="bgrTolVal">32</span>
+          </div>
+          <input type="range" id="bgrTolRange" min="1" max="128" value="32">
+        </div>
+
+        <!-- Before / After thumbnails -->
+        <div class="bgr-thumbs" id="bgrThumbs" style="display:none">
+          <div class="bgr-thumb">
+            <canvas id="bgrBefore"></canvas>
+            <div class="bgr-thumb-label">Original</div>
+          </div>
+          <div class="bgr-thumb">
+            <canvas id="bgrAfter"></canvas>
+            <div class="bgr-thumb-label">Removed</div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="bgr-controls">
+          <div class="bgr-row">
+            <button class="bgr-btn primary" id="bgrRemoveBtn" disabled>
+              <i class="fas fa-wand-magic-sparkles"></i> Remove BG
+            </button>
+            <button class="bgr-btn danger" id="bgrResetBtn" disabled>
+              <i class="fas fa-rotate-left"></i> Reset
+            </button>
+          </div>
+          <div class="bgr-tip" id="bgrTip">
+            <b>Flood Fill:</b> removes connected pixels from corners/edges.<br>
+            <b>Color Match:</b> removes all pixels matching the most common edge color.
+          </div>
         </div>
       </div>
 
@@ -784,7 +907,14 @@ input[type="range"]::-webkit-slider-thumb:hover {
     { id:"and-48",    name:"mdpi",            sz:48,  sh:"squircle", sm:0.9, c:"#3ddc84", badge:"48",  grp:"android", folder:"mipmap-mdpi",     fn:"ic_launcher.png" },
     // ── PWA ──
     { id:"pwa-512",   name:"PWA 512",         sz:512, sh:"squircle", sm:0.7, c:"#fbbf24", badge:"512", grp:"pwa", fn:"icon-512x512.png" },
-    { id:"pwa-192",   name:"PWA 192",         sz:192, sh:"squircle", sm:0.7, c:"#fbbf24", badge:"192", grp:"pwa", fn:"icon-192x192.png" }
+    { id:"pwa-192",   name:"PWA 192",         sz:192, sh:"squircle", sm:0.7, c:"#fbbf24", badge:"192", grp:"pwa", fn:"icon-192x192.png" },
+    // ── Fill PNG (Large Platforms) ──
+    { id:"fill-4096", name:"High-Res 4096",   sz:4096, sh:"fill", sm:1, c:"#e879f9", badge:"4096", grp:"fill", fn:"icon-4096x4096.png" },
+    { id:"fill-2048", name:"High-Res 2048",   sz:2048, sh:"fill", sm:1, c:"#e879f9", badge:"2048", grp:"fill", fn:"icon-2048x2048.png" },
+    { id:"fill-steam",name:"Steam",            sz:1024, sh:"fill", sm:1, c:"#e879f9", badge:"1024", grp:"fill", fn:"steam-icon-1024x1024.png" },
+    { id:"fill-og",   name:"Open Graph",       sz:1200, sh:"fill", sm:1, c:"#e879f9", badge:"1200", grp:"fill", fn:"og-image-1200x1200.png" },
+    { id:"fill-tw",   name:"Twitter / X",      sz:800,  sh:"fill", sm:1, c:"#e879f9", badge:"800",  grp:"fill", fn:"twitter-icon-800x800.png" },
+    { id:"fill-512",  name:"Generic 512",      sz:512,  sh:"fill", sm:1, c:"#e879f9", badge:"512",  grp:"fill", fn:"icon-fill-512x512.png" }
   ];
 
   /* ═══════════════════════════════════════
@@ -831,6 +961,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     if (sh === "squircle")  pathSquircle(ctx, cx, cy, sz, sm);
     else if (sh === "roundrect") pathRoundRect(ctx, cx, cy, sz, sm);
     else if (sh === "circle")    pathCircle(ctx, cx, cy, sz);
+    else if (sh === "fill")      { ctx.beginPath(); ctx.rect(cx - sz/2, cy - sz/2, sz, sz); ctx.closePath(); }
     else { ctx.beginPath(); ctx.rect(cx - sz/2, cy - sz/2, sz, sz); ctx.closePath(); }
   }
 
@@ -842,6 +973,29 @@ input[type="range"]::-webkit-slider-thumb:hover {
     cvs.height = sz;
     var ctx = cvs.getContext("2d");
     ctx.clearRect(0, 0, sz, sz);
+
+    // ── Fill PNG mode: image covers the entire canvas edge-to-edge ──
+    if (sh === "fill") {
+      if (bgM === "solid") {
+        ctx.fillStyle = bgC;
+        ctx.fillRect(0, 0, sz, sz);
+      } else if (bgM === "gradient") {
+        var rad0 = ga * Math.PI / 180;
+        var dx0 = Math.cos(rad0) * sz / 2, dy0 = Math.sin(rad0) * sz / 2;
+        var gr0 = ctx.createLinearGradient(sz/2 - dx0, sz/2 - dy0, sz/2 + dx0, sz/2 + dy0);
+        gr0.addColorStop(0, gs); gr0.addColorStop(1, ge);
+        ctx.fillStyle = gr0;
+        ctx.fillRect(0, 0, sz, sz);
+      }
+      if (img) {
+        var ia0 = img.width / img.height;
+        var dw0, dh0;
+        if (ia0 > 1) { dh0 = sz; dw0 = sz * ia0; }
+        else         { dw0 = sz; dh0 = sz / ia0; }
+        ctx.drawImage(img, (sz - dw0) / 2, (sz - dh0) / 2, dw0, dh0);
+      }
+      return;
+    }
 
     var isz = sz * (1 - pd);
     var cx = sz / 2, cy = sz / 2;
@@ -1103,7 +1257,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
       { id: "circle",    n: "Circle" },
       { id: "square",    n: "Square" },
       { id: "ios",       n: "iOS" },
-      { id: "android",   n: "Android" }
+      { id: "android",   n: "Android" },
+      { id: "fill",      n: "Fill PNG" }
     ];
 
     defs.forEach(function(d) {
@@ -1119,10 +1274,22 @@ input[type="range"]::-webkit-slider-thumb:hover {
       if (d.id === "ios")     { sh = "squircle"; sm = 0.7; }
       if (d.id === "android") { sh = "squircle"; sm = 0.9; }
       if (d.id === "roundrect") { sm = 0.45; }
-      makePath(ctx, 14, 14, 24, sh, sm);
-      ctx.fillStyle = "#ff6b35";
-      ctx.fill();
-      btn.appendChild(c);
+      if (d.id === "fill") {
+        // Draw a solid filled square preview with a dashed inner border hint
+        ctx.fillStyle = "#ff6b35";
+        ctx.fillRect(2, 2, 24, 24);
+        ctx.strokeStyle = "rgba(255,255,255,0.35)";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([3, 2]);
+        ctx.strokeRect(5, 5, 18, 18);
+        ctx.setLineDash([]);
+        btn.appendChild(c);
+      } else {
+        makePath(ctx, 14, 14, 24, sh, sm);
+        ctx.fillStyle = "#ff6b35";
+        ctx.fill();
+        btn.appendChild(c);
+      }
 
       var span = document.createElement("span");
       span.textContent = d.n;
@@ -1144,6 +1311,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
           shape = "roundrect"; curvature = 0.45;
           document.getElementById("smoothRange").value = 45;
           document.getElementById("smoothVal").textContent = "0.45";
+        } else if (d.id === "fill") {
+          shape = "fill"; padding = 0;
+          document.getElementById("padRange").value = 0;
+          document.getElementById("padVal").textContent = "0%";
         } else {
           shape = d.id;
         }
@@ -1244,7 +1415,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
      ═══════════════════════════════════════ */
   (function buildPlats() {
     var list = document.getElementById("platList");
-    var grpNames = { ios: "Apple iOS", macos: "macOS", android: "Android", pwa: "Progressive Web App" };
+    var grpNames = { ios: "Apple iOS", macos: "macOS", android: "Android", pwa: "Progressive Web App", fill: "Fill PNG — Large Platforms" };
     var shown = {};
 
     PLATFORMS.forEach(function(p) {
@@ -1450,6 +1621,18 @@ input[type="range"]::-webkit-slider-thumb:hover {
         zip.folder("pwa").file("manifest.json", genPwaJson(pwaItems));
       }
 
+      // ── Fill PNG ──
+      if (groups.fill) {
+        var fillFolder = zip.folder("fill");
+        for (var fi = 0; fi < groups.fill.length; fi++) {
+          var fp = groups.fill[fi];
+          var fc = document.createElement("canvas");
+          renderIcon(fc, fp.sz, fp.sh, fp.sm, padding, bgMode, bgColor, gStart, gEnd, gAngle, srcImg);
+          var fblob = await canvasToBlob(fc);
+          fillFolder.file(fp.fn, fblob);
+        }
+      }
+
       // Generate and download
       var content = await zip.generateAsync({ type: "blob" });
       var url = URL.createObjectURL(content);
@@ -1490,11 +1673,344 @@ input[type="range"]::-webkit-slider-thumb:hover {
     }, 3200);
   }
 
+  /* ── Expose hooks for Background Remover module ── */
+  window.__bgrToast = toast;
+  window.__bgrSetSrcImg = function(img) {
+    srcImg = img;
+    renderPreview();
+    if (tab === "sizes") renderSizeGrid();
+  };
+
 })();
 
 /* ═══════════════════════════════════════
-   WEB OVERLAY
+   BACKGROUND REMOVER
    ═══════════════════════════════════════ */
+(function() {
+  "use strict";
+
+  var bgrMode      = "flood";   // "flood" | "color"
+  var tolerance    = 32;
+  var origImgData  = null;      // ImageData of the raw source (before removal)
+  var bgrActive    = false;     // has BG been removed?
+
+  /* ── Grab shared srcImg reference via MutationObserver trick ──
+     We piggyback on the existing loadFile flow by watching for
+     previewCanvas becoming visible, then snapshotting srcImg.       */
+  var bgrRemoveBtn = document.getElementById("bgrRemoveBtn");
+  var bgrResetBtn  = document.getElementById("bgrResetBtn");
+  var bgrDot       = document.getElementById("bgrDot");
+  var bgrStatusTxt = document.getElementById("bgrStatusTxt");
+  var bgrThumbs    = document.getElementById("bgrThumbs");
+  var bgrTolRange  = document.getElementById("bgrTolRange");
+  var bgrTolVal    = document.getElementById("bgrTolVal");
+
+  // Tolerance slider
+  bgrTolRange.addEventListener("input", function() {
+    tolerance = parseInt(bgrTolRange.value);
+    bgrTolVal.textContent = tolerance;
+  });
+
+  // Mode buttons
+  document.querySelectorAll(".bgr-mode-btn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      document.querySelectorAll(".bgr-mode-btn").forEach(function(b) { b.classList.remove("on"); });
+      btn.classList.add("on");
+      bgrMode = btn.dataset.mode;
+    });
+  });
+
+  /* ── Hook into the main app's loadFile ──
+     We override window._bgrOnImageLoad which the main script calls
+     after loading. We use a polling approach on previewCanvas.      */
+  function waitForImage() {
+    var prev = document.getElementById("previewCanvas");
+    var observer = new MutationObserver(function() {
+      if (prev.style.display !== "none") {
+        onImageReady();
+      }
+    });
+    observer.observe(prev, { attributes: true, attributeFilter: ["style"] });
+  }
+
+  function onImageReady() {
+    // Snapshot the current canvas as original ImageData
+    var prev = document.getElementById("previewCanvas");
+    var ctx  = prev.getContext("2d");
+    origImgData = ctx.getImageData(0, 0, prev.width, prev.height);
+    bgrActive = false;
+
+    // Update UI
+    bgrRemoveBtn.disabled = false;
+    bgrResetBtn.disabled  = true;
+    bgrDot.className      = "bgr-dot active";
+    bgrStatusTxt.textContent = "Ready — click Remove BG";
+
+    // Draw before thumb
+    drawThumb("bgrBefore", origImgData);
+    bgrThumbs.style.display = "none";
+  }
+
+  // Poll for image load by intercepting the fileIn change
+  var fileInEl = document.getElementById("fileIn");
+  fileInEl.addEventListener("change", function() {
+    // Give the main loadFile ~200ms to fire, then snapshot
+    setTimeout(function() {
+      var prev = document.getElementById("previewCanvas");
+      if (prev.style.display !== "none") onImageReady();
+    }, 350);
+  });
+  // Also handle drag/drop and paste
+  document.getElementById("upzone").addEventListener("drop", function() {
+    setTimeout(function() {
+      var prev = document.getElementById("previewCanvas");
+      if (prev.style.display !== "none") onImageReady();
+    }, 350);
+  });
+  document.addEventListener("paste", function() {
+    setTimeout(function() {
+      var prev = document.getElementById("previewCanvas");
+      if (prev.style.display !== "none") onImageReady();
+    }, 350);
+  });
+
+  /* ── Draw thumbnail ── */
+  function drawThumb(id, imageData) {
+    var cvs = document.getElementById(id);
+    cvs.width  = imageData.width;
+    cvs.height = imageData.height;
+    cvs.getContext("2d").putImageData(imageData, 0, 0);
+  }
+
+  /* ── Color distance (Euclidean RGB) ── */
+  function colorDist(d, i, r, g, b) {
+    var dr = d[i]   - r;
+    var dg = d[i+1] - g;
+    var db = d[i+2] - b;
+    return Math.sqrt(dr*dr + dg*dg + db*db);
+  }
+
+  /* ── Flood Fill BG removal (BFS from corners + edges) ── */
+  function floodRemove(imageData, tol) {
+    var d = new Uint8ClampedArray(imageData.data);
+    var w = imageData.width, h = imageData.height;
+    var visited = new Uint8Array(w * h);
+    var queue   = [];
+
+    function enqueue(x, y) {
+      var idx = y * w + x;
+      if (visited[idx]) return;
+      visited[idx] = 1;
+      var pi = idx * 4;
+      // Seed from the corner color at that exact pixel
+      queue.push({ x: x, y: y, sr: d[pi], sg: d[pi+1], sb: d[pi+2] });
+    }
+
+    // Seed from all four corners
+    enqueue(0, 0); enqueue(w-1, 0); enqueue(0, h-1); enqueue(w-1, h-1);
+    // Seed from entire border for robustness
+    for (var ex = 0; ex < w; ex++) { enqueue(ex, 0); enqueue(ex, h-1); }
+    for (var ey = 0; ey < h; ey++) { enqueue(0, ey); enqueue(w-1, ey); }
+
+    var dx4 = [1,-1,0,0];
+    var dy4 = [0,0,1,-1];
+
+    while (queue.length > 0) {
+      var cur = queue.shift();
+      var pi  = (cur.y * w + cur.x) * 4;
+
+      if (colorDist(d, pi, cur.sr, cur.sg, cur.sb) > tol) continue;
+
+      // Make transparent
+      d[pi+3] = 0;
+
+      for (var n = 0; n < 4; n++) {
+        var nx = cur.x + dx4[n];
+        var ny = cur.y + dy4[n];
+        if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+        var ni = ny * w + nx;
+        if (visited[ni]) continue;
+        visited[ni] = 1;
+        queue.push({ x: nx, y: ny, sr: cur.sr, sg: cur.sg, sb: cur.sb });
+      }
+    }
+
+    // Feather edges (soft alpha on semi-transparent border pixels)
+    featherEdges(d, w, h);
+
+    return new ImageData(d, w, h);
+  }
+
+  /* ── Color Match removal (global color similarity) ── */
+  function colorMatchRemove(imageData, tol) {
+    var d  = new Uint8ClampedArray(imageData.data);
+    var w  = imageData.width, h = imageData.height;
+
+    // Find dominant edge color via histogram on border pixels
+    var counts = {};
+    function sampleEdge(x, y) {
+      var i = (y * w + x) * 4;
+      if (d[i+3] < 128) return;
+      var key = (d[i] >> 3) + "," + (d[i+1] >> 3) + "," + (d[i+2] >> 3);
+      counts[key] = (counts[key] || 0) + 1;
+    }
+    for (var ex = 0; ex < w; ex++) { sampleEdge(ex, 0); sampleEdge(ex, h-1); }
+    for (var ey = 0; ey < h; ey++) { sampleEdge(0, ey); sampleEdge(w-1, ey); }
+
+    var best = null, bestN = 0;
+    Object.keys(counts).forEach(function(k) {
+      if (counts[k] > bestN) { bestN = counts[k]; best = k; }
+    });
+    if (!best) best = "31,31,31";
+    var parts = best.split(",");
+    var tr = parseInt(parts[0]) * 8, tg = parseInt(parts[1]) * 8, tb = parseInt(parts[2]) * 8;
+
+    for (var i = 0; i < d.length; i += 4) {
+      if (d[i+3] < 10) continue;
+      var dist = colorDist(d, i, tr, tg, tb);
+      if (dist <= tol) {
+        d[i+3] = 0;
+      } else if (dist <= tol * 1.5) {
+        // Soft transition zone
+        d[i+3] = Math.round(d[i+3] * ((dist - tol) / (tol * 0.5)));
+      }
+    }
+
+    featherEdges(d, w, h);
+    return new ImageData(d, w, h);
+  }
+
+  /* ── Edge feathering (soften hard alpha boundaries) ── */
+  function featherEdges(d, w, h) {
+    var alpha = new Float32Array(w * h);
+    for (var i = 0; i < w * h; i++) alpha[i] = d[i*4+3] / 255;
+
+    // One-pass box blur on alpha only (radius 1)
+    var blurred = new Float32Array(w * h);
+    for (var y = 1; y < h-1; y++) {
+      for (var x = 1; x < w-1; x++) {
+        var sum = 0;
+        for (var dy = -1; dy <= 1; dy++)
+          for (var dx = -1; dx <= 1; dx++)
+            sum += alpha[(y+dy)*w+(x+dx)];
+        blurred[y*w+x] = sum / 9;
+      }
+    }
+    // Apply blurred alpha only to semi-transparent pixels
+    for (var j = 0; j < w * h; j++) {
+      if (alpha[j] > 0 && alpha[j] < 1) {
+        d[j*4+3] = Math.round(blurred[j] * 255);
+      }
+    }
+  }
+
+  /* ── Main Remove BG button ── */
+  bgrRemoveBtn.addEventListener("click", function() {
+    var prev = document.getElementById("previewCanvas");
+    if (prev.style.display === "none" || !origImgData) return;
+
+    bgrDot.className      = "bgr-dot processing";
+    bgrStatusTxt.textContent = "Processing…";
+    bgrRemoveBtn.disabled = true;
+
+    // Defer to next frame so UI updates
+    setTimeout(function() {
+      try {
+        // Work on a fresh copy of the original
+        var srcData = new ImageData(
+          new Uint8ClampedArray(origImgData.data),
+          origImgData.width, origImgData.height
+        );
+
+        var result = bgrMode === "flood"
+          ? floodRemove(srcData, tolerance)
+          : colorMatchRemove(srcData, tolerance);
+
+        // Paint result back onto previewCanvas
+        var ctx = prev.getContext("2d");
+        prev.width  = result.width;
+        prev.height = result.height;
+        ctx.putImageData(result, 0, 0);
+
+        // Now update the srcImg used by the rest of the app
+        // We replace it by drawing the result to an offscreen canvas
+        // and re-loading it as an Image object
+        var offscreen = document.createElement("canvas");
+        offscreen.width  = result.width;
+        offscreen.height = result.height;
+        offscreen.getContext("2d").putImageData(result, 0, 0);
+
+        offscreen.toBlob(function(blob) {
+          var url = URL.createObjectURL(blob);
+          var img = new Image();
+          img.onload = function() {
+            // Inject into the main app's srcImg
+            // The main IIFE exposes nothing, so we trigger a synthetic
+            // file load by replacing the previewCanvas source and
+            // dispatching a custom event the main app won't see —
+            // instead we just update srcImg via the exposed global hook.
+            if (window.__bgrSetSrcImg) window.__bgrSetSrcImg(img);
+            URL.revokeObjectURL(url);
+          };
+          img.src = url;
+        }, "image/png");
+
+        // Draw after thumb
+        drawThumb("bgrAfter", result);
+        bgrThumbs.style.display = "";
+
+        bgrActive = true;
+        bgrDot.className = "bgr-dot active";
+        bgrStatusTxt.textContent = "✓ Background removed!";
+        bgrResetBtn.disabled  = false;
+        bgrRemoveBtn.disabled = false;
+
+        // Show toast via the main app's toast if accessible
+        if (window.__bgrToast) window.__bgrToast("Background removed — adjust & export", "success");
+
+      } catch(e) {
+        bgrDot.className = "bgr-dot";
+        bgrStatusTxt.textContent = "Error: " + e.message;
+        bgrRemoveBtn.disabled = false;
+        console.error(e);
+      }
+    }, 20);
+  });
+
+  /* ── Reset button ── */
+  bgrResetBtn.addEventListener("click", function() {
+    if (!origImgData) return;
+    var prev = document.getElementById("previewCanvas");
+    var ctx  = prev.getContext("2d");
+    prev.width  = origImgData.width;
+    prev.height = origImgData.height;
+    ctx.putImageData(origImgData, 0, 0);
+
+    // Restore original srcImg
+    var offscreen = document.createElement("canvas");
+    offscreen.width  = origImgData.width;
+    offscreen.height = origImgData.height;
+    offscreen.getContext("2d").putImageData(origImgData, 0, 0);
+    offscreen.toBlob(function(blob) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function() {
+        if (window.__bgrSetSrcImg) window.__bgrSetSrcImg(img);
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    }, "image/png");
+
+    bgrActive = false;
+    bgrThumbs.style.display = "none";
+    bgrResetBtn.disabled = true;
+    bgrDot.className = "bgr-dot active";
+    bgrStatusTxt.textContent = "Reset to original";
+    if (window.__bgrToast) window.__bgrToast("Restored original image", "info");
+  });
+
+})();
+
 (function() {
   var overlay = document.getElementById("webOverlay");
   var btnOpen = document.getElementById("btnWebRes");
